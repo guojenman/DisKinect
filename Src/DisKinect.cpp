@@ -66,7 +66,7 @@ void DisKinect::update()
 void DisKinect::draw()
 {
 	gl::clear(ColorA(0, 0, 0, 0), true);
-	ni->renderColor(getWindowBounds());
+	ni->renderDepthMap(getWindowBounds());
 
 	gl::pushMatrices();
 	gl::setMatrices(mCam);

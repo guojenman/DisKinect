@@ -18,7 +18,7 @@ UserTracker* UserTracker::getInstance()
 
 UserTracker::UserTracker()
 {
-	mUsersTracking = 0;
+	activeUserId = 0;
 	ni = WuCinderNITE::getInstance();
 	mSignalConnectionNewUser = ni->signalNewUser.connect(boost::bind(&UserTracker::onNewUser, this, boost::lambda::_1));
 	mSignalConnectionLostUser = ni->signalLostUser.connect(boost::bind(&UserTracker::onLostUser, this, boost::lambda::_1));
@@ -44,7 +44,6 @@ void UserTracker::onNewUser(XnUserID nId)
 {
 	onLostUser(nId);
 	mUsers.push_back(UserInfo(nId));
-	mUsersTracking++;
 }
 
 void UserTracker::onLostUser(XnUserID nId)
@@ -52,7 +51,6 @@ void UserTracker::onLostUser(XnUserID nId)
 	for(list<UserInfo>::iterator it = mUsers.begin(); it != mUsers.end();) {
 		if (it->id == nId) {
 			mUsers.erase(it);
-			mUsersTracking++;
 			break;
 		}
 		it++;
@@ -95,10 +93,9 @@ void UserTracker::onUpdate()
 			totalDist += kneeR.distanceSquared(it->kneeR);
 
 			if (totalDist == 0) {
-				if (++it->motionAtZeroDuration > 100) {
+				if (++it->motionAtZeroDuration == 100) {
 					it->isActive = false;
 				}
-
 			} else {
 				it->motionAtZeroDuration = 0;
 				if (!it->isActive) {
@@ -120,7 +117,12 @@ void UserTracker::onUpdate()
 	mUsers.sort();
 
 	if (!mUsers.empty()) {
-		ci::app::console() << mUsers.begin()->id << endl;
+		if (mUsers.begin()->id != activeUserId) {
+			activeUserId = mUsers.begin()->id;
+			ci::app::console() << mUsers.begin()->id << endl;
+		}
+	} else {
+		activeUserId = 0;
 	}
 }
 

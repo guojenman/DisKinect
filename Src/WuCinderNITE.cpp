@@ -40,6 +40,7 @@ WuCinderNITE* WuCinderNITE::getInstance()
 
 WuCinderNITE::WuCinderNITE() {
 	useSingleCalibrationMode = true;
+	waitForTrackingToSingalNewUser = true;
 	mNeedPoseForCalibration = false;
 	mIsCalibrated = false;
 	mRunUpdates = false;
@@ -59,6 +60,7 @@ WuCinderNITE::~WuCinderNITE() {
 	mSceneAnalyzer.Release();
 	signalNewUser.disconnect_all_slots();
 	signalLostUser.disconnect_all_slots();
+	signalUpdate.disconnect_all_slots();
 }
 
 void WuCinderNITE::shutdown()
@@ -450,6 +452,15 @@ void WuCinderNITE::findUsers() {
 	mUserGen.GetUsers(mUsers, mNumUsers);
 }
 
+void WuCinderNITE::startTracking(XnUserID nId)
+{
+	mUserGen.GetSkeletonCap().StartTracking(nId);
+	mUserGen.GetSkeletonCap().SetSmoothing(0.5f);
+	if (waitForTrackingToSingalNewUser) {
+		signalNewUser(nId);
+	}
+}
+
 void WuCinderNITE::registerCallbacks()
 {
 	XnStatus status = XN_STATUS_OK;
@@ -489,19 +500,25 @@ void WuCinderNITE::unregisterCallbacks()
 void XN_CALLBACK_TYPE WuCinderNITE::CB_NewUser(xn::UserGenerator& generator, XnUserID nId, void* pCookie)
 {
 	ci::app::console() << "new user " << nId << endl;
+	mInstance->findUsers();
 	if (mInstance->mNeedPoseForCalibration) {
-		if (mInstance->mIsCalibrated) {
-			mInstance->mUserGen.GetSkeletonCap().LoadCalibrationData(nId, 0);
-			mInstance->mUserGen.GetSkeletonCap().StartTracking(nId);
-			mInstance->mUserGen.GetSkeletonCap().SetSmoothing(0.5f);
+		if ((mInstance->useSingleCalibrationMode && mInstance->mIsCalibrated) || mInstance->mUserGen.GetSkeletonCap().IsCalibrated(nId)) {
+			mInstance->mUserGen.GetSkeletonCap().LoadCalibrationData(nId, mInstance->useSingleCalibrationMode ? 0 : nId);
+			mInstance->startTracking(nId);
 		} else {
 			mInstance->mUserGen.GetPoseDetectionCap().StartPoseDetection(mInstance->mCalibrationPose, nId);
 		}
 	} else {
-		mInstance->mUserGen.GetSkeletonCap().RequestCalibration(nId, TRUE);
+		if ((mInstance->useSingleCalibrationMode && mInstance->mIsCalibrated) || mInstance->mUserGen.GetSkeletonCap().IsCalibrated(nId)) {
+			mInstance->mUserGen.GetSkeletonCap().LoadCalibrationData(nId, mInstance->useSingleCalibrationMode ? 0 : nId);
+			mInstance->startTracking(nId);
+		} else {
+			mInstance->mUserGen.GetSkeletonCap().RequestCalibration(nId, TRUE);
+		}
 	}
-	mInstance->findUsers();
-	mInstance->signalNewUser(nId);
+	if (!mInstance->waitForTrackingToSingalNewUser) {
+		mInstance->signalNewUser(nId);
+	}
 }
 void XN_CALLBACK_TYPE WuCinderNITE::CB_LostUser(xn::UserGenerator& generator, XnUserID nId, void* pCookie)
 {
@@ -532,9 +549,10 @@ void XN_CALLBACK_TYPE WuCinderNITE::CB_CalibrationComplete(xn::SkeletonCapabilit
 			if (mInstance->useSingleCalibrationMode) {
 				mInstance->mIsCalibrated = TRUE;
 				mInstance->mUserGen.GetSkeletonCap().SaveCalibrationData(nId, 0);
+			} else {
+				mInstance->mUserGen.GetSkeletonCap().SaveCalibrationData(nId, nId);
 			}
-			mInstance->mUserGen.GetSkeletonCap().StartTracking(nId);
-			mInstance->mUserGen.GetSkeletonCap().SetSmoothing(0.5f);
+			mInstance->startTracking(nId);
 		}
 		mInstance->mUserGen.GetPoseDetectionCap().StopPoseDetection(nId);
 		mInstance->findUsers();

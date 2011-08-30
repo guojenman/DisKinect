@@ -59,12 +59,18 @@ public:
 	void renderLimb(XnUserID player, XnSkeletonJoint eJoint1, XnSkeletonJoint eJoint2, float confidence = 0.75f);
 	void renderColor(ci::Area area);
 	void debugNodeTypes();
+	void startTracking(XnUserID nId);
 
 	WuCinderNITESingalUser		signalNewUser;
 	WuCinderNITESingalUser		signalLostUser;
 	WuCinderNITESingalUpdate	signalUpdate;
 
-	bool				useSingleCalibrationMode;
+	/**
+	 * Options
+	 */
+	bool				useSingleCalibrationMode;	// default true
+	bool				waitForTrackingToSingalNewUser;	// default true
+
 	unsigned short		maxDepth;
 	XnMapOutputMode		mMapMode;
 	xn::Context			mContext;
