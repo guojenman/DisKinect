@@ -44,7 +44,6 @@ WuCinderNITE::WuCinderNITE() {
 	mNeedPoseForCalibration = false;
 	mIsCalibrated = false;
 	mRunUpdates = false;
-	mNumUsers = 0;
 }
 
 WuCinderNITE::~WuCinderNITE() {
@@ -60,7 +59,6 @@ WuCinderNITE::~WuCinderNITE() {
 	mSceneAnalyzer.Release();
 	signalNewUser.disconnect_all_slots();
 	signalLostUser.disconnect_all_slots();
-	signalUpdate.disconnect_all_slots();
 }
 
 void WuCinderNITE::shutdown()
@@ -200,7 +198,6 @@ void WuCinderNITE::startUpdating()
 	}
 	mRunUpdates = true;
 	mContext.StartGeneratingAll();
-
 	mThread = boost::shared_ptr<boost::thread>(new boost::thread(boost::bind(&WuCinderNITE::update, this)));
 }
 
@@ -219,7 +216,6 @@ void WuCinderNITE::update()
 {
 	while (mRunUpdates) {
 		XnStatus status = XN_STATUS_OK;
-
 		status = mContext.WaitAndUpdateAll();
 		if( status != XN_STATUS_OK ) {
 			ci::app::console() << "no update" << endl;
@@ -247,7 +243,6 @@ void WuCinderNITE::update()
 			mImageGen.GetMetaData(mImageMeta);
 			updateImageSurface();
 		}
-		signalUpdate();
 	}
 }
 
@@ -370,45 +365,48 @@ void WuCinderNITE::renderColor(ci::Area area)
 	}
 }
 
-void WuCinderNITE::renderSkeleton()
+void WuCinderNITE::renderSkeleton(XnUserID nId)
 {
-	for (int nUser = 0; nUser < mNumUsers; nUser++) {
-		if (mUserGen.GetSkeletonCap().IsTracking(mUsers[nUser])) {
-
+	if (nId == 0) {
+		for (int nUser = 1; nUser < 4; nUser++) {
+			renderSkeleton(nUser);
+		}
+	} else {
+		if (mUserGen.GetSkeletonCap().IsTracking(nId)) {
 			glLineWidth(3);
-			ci::gl::color(1-mNITEUserColors[mUsers[nUser]%mNITENumNITEUserColors][0],
-								  1-mNITEUserColors[mUsers[nUser]%mNITENumNITEUserColors][1],
-								  1-mNITEUserColors[mUsers[nUser]%mNITENumNITEUserColors][2], 1);
+			ci::gl::color(1-mNITEUserColors[nId % mNITENumNITEUserColors][0],
+								  1-mNITEUserColors[nId % mNITENumNITEUserColors][1],
+								  1-mNITEUserColors[nId % mNITENumNITEUserColors][2], 1);
 
 			// HEAD TO NECK
-			renderLimb(mUsers[nUser], XN_SKEL_HEAD, XN_SKEL_NECK);
+			renderLimb(nId, XN_SKEL_HEAD, XN_SKEL_NECK);
 
 			// Left Arm
-			renderLimb(mUsers[nUser], XN_SKEL_NECK, XN_SKEL_LEFT_SHOULDER);
-			renderLimb(mUsers[nUser], XN_SKEL_LEFT_SHOULDER, XN_SKEL_LEFT_ELBOW);
-			renderLimb(mUsers[nUser], XN_SKEL_LEFT_ELBOW, XN_SKEL_LEFT_HAND);
-			renderLimb(mUsers[nUser], XN_SKEL_LEFT_HAND, XN_SKEL_LEFT_FINGERTIP);
+			renderLimb(nId, XN_SKEL_NECK, XN_SKEL_LEFT_SHOULDER);
+			renderLimb(nId, XN_SKEL_LEFT_SHOULDER, XN_SKEL_LEFT_ELBOW);
+			renderLimb(nId, XN_SKEL_LEFT_ELBOW, XN_SKEL_LEFT_HAND);
+			renderLimb(nId, XN_SKEL_LEFT_HAND, XN_SKEL_LEFT_FINGERTIP);
 
 			// RIGHT ARM
-			renderLimb(mUsers[nUser], XN_SKEL_NECK, XN_SKEL_RIGHT_SHOULDER);
-			renderLimb(mUsers[nUser], XN_SKEL_RIGHT_SHOULDER, XN_SKEL_RIGHT_ELBOW);
-			renderLimb(mUsers[nUser], XN_SKEL_RIGHT_ELBOW, XN_SKEL_RIGHT_HAND);
-			renderLimb(mUsers[nUser], XN_SKEL_RIGHT_HAND, XN_SKEL_RIGHT_FINGERTIP);
+			renderLimb(nId, XN_SKEL_NECK, XN_SKEL_RIGHT_SHOULDER);
+			renderLimb(nId, XN_SKEL_RIGHT_SHOULDER, XN_SKEL_RIGHT_ELBOW);
+			renderLimb(nId, XN_SKEL_RIGHT_ELBOW, XN_SKEL_RIGHT_HAND);
+			renderLimb(nId, XN_SKEL_RIGHT_HAND, XN_SKEL_RIGHT_FINGERTIP);
 			// TORSO
-			renderLimb(mUsers[nUser], XN_SKEL_LEFT_SHOULDER, XN_SKEL_TORSO);
-			renderLimb(mUsers[nUser], XN_SKEL_RIGHT_SHOULDER, XN_SKEL_TORSO);
+			renderLimb(nId, XN_SKEL_LEFT_SHOULDER, XN_SKEL_TORSO);
+			renderLimb(nId, XN_SKEL_RIGHT_SHOULDER, XN_SKEL_TORSO);
 
 			// LEFT LEG
-			renderLimb(mUsers[nUser], XN_SKEL_TORSO, XN_SKEL_LEFT_HIP);
-			renderLimb(mUsers[nUser], XN_SKEL_LEFT_HIP, XN_SKEL_LEFT_KNEE);
-			renderLimb(mUsers[nUser], XN_SKEL_LEFT_KNEE, XN_SKEL_LEFT_FOOT);
+			renderLimb(nId, XN_SKEL_TORSO, XN_SKEL_LEFT_HIP);
+			renderLimb(nId, XN_SKEL_LEFT_HIP, XN_SKEL_LEFT_KNEE);
+			renderLimb(nId, XN_SKEL_LEFT_KNEE, XN_SKEL_LEFT_FOOT);
 
 			// RIGHT LEG
-			renderLimb(mUsers[nUser], XN_SKEL_TORSO, XN_SKEL_RIGHT_HIP);
-			renderLimb(mUsers[nUser], XN_SKEL_RIGHT_HIP, XN_SKEL_RIGHT_KNEE);
-			renderLimb(mUsers[nUser], XN_SKEL_RIGHT_KNEE, XN_SKEL_RIGHT_FOOT);
+			renderLimb(nId, XN_SKEL_TORSO, XN_SKEL_RIGHT_HIP);
+			renderLimb(nId, XN_SKEL_RIGHT_HIP, XN_SKEL_RIGHT_KNEE);
+			renderLimb(nId, XN_SKEL_RIGHT_KNEE, XN_SKEL_RIGHT_FOOT);
 			// PELVIS
-			renderLimb(mUsers[nUser], XN_SKEL_LEFT_HIP, XN_SKEL_RIGHT_HIP);
+			renderLimb(nId, XN_SKEL_LEFT_HIP, XN_SKEL_RIGHT_HIP);
 			glLineWidth(1);
 		}
 		ci::gl::color(1, 1, 1, 1);
@@ -445,11 +443,6 @@ void WuCinderNITE::renderLimb(XnUserID player, XnSkeletonJoint eJoint1, XnSkelet
 		mDepthGen.ConvertRealWorldToProjective(2, pt, pt);
 		ci::gl::drawLine(ci::Vec2f(pt[0].X, pt[0].Y), ci::Vec2f(pt[1].X, pt[1].Y));
 	}
-}
-
-void WuCinderNITE::findUsers() {
-	mNumUsers = 15;
-	mUserGen.GetUsers(mUsers, mNumUsers);
 }
 
 void WuCinderNITE::startTracking(XnUserID nId)
@@ -500,7 +493,6 @@ void WuCinderNITE::unregisterCallbacks()
 void XN_CALLBACK_TYPE WuCinderNITE::CB_NewUser(xn::UserGenerator& generator, XnUserID nId, void* pCookie)
 {
 	ci::app::console() << "new user " << nId << endl;
-	mInstance->findUsers();
 	if (mInstance->mNeedPoseForCalibration) {
 		if ((mInstance->useSingleCalibrationMode && mInstance->mIsCalibrated) || mInstance->mUserGen.GetSkeletonCap().IsCalibrated(nId)) {
 			mInstance->mUserGen.GetSkeletonCap().LoadCalibrationData(nId, mInstance->useSingleCalibrationMode ? 0 : nId);
@@ -523,7 +515,6 @@ void XN_CALLBACK_TYPE WuCinderNITE::CB_NewUser(xn::UserGenerator& generator, XnU
 void XN_CALLBACK_TYPE WuCinderNITE::CB_LostUser(xn::UserGenerator& generator, XnUserID nId, void* pCookie)
 {
 	ci::app::console() << "lost user " << nId << endl;
-	mInstance->findUsers();
 	mInstance->signalLostUser(nId);
 }
 void XN_CALLBACK_TYPE WuCinderNITE::CB_CalibrationStart(xn::SkeletonCapability& capability, XnUserID nId, void* pCookie)
@@ -555,7 +546,6 @@ void XN_CALLBACK_TYPE WuCinderNITE::CB_CalibrationComplete(xn::SkeletonCapabilit
 			mInstance->startTracking(nId);
 		}
 		mInstance->mUserGen.GetPoseDetectionCap().StopPoseDetection(nId);
-		mInstance->findUsers();
 	}
 }
 void XN_CALLBACK_TYPE WuCinderNITE::CB_PoseDetected(xn::PoseDetectionCapability& capability, const XnChar* strPose, XnUserID nId, void* pCookie)

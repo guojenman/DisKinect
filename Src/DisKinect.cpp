@@ -46,9 +46,10 @@ void DisKinect::setup()
 	mapMode.nYRes = 480;
 
 	ni = WuCinderNITE::getInstance();
-	ni->setup("Resources/Captured.oni");
-	//ni->setup("Resources/Sample-User.xml", mapMode, true, true);
-	ni->startUpdating();
+	ni->setup("Resources/1.oni");
+//	ni->setup("Resources/Sample-User.xml", mapMode, true, true);
+//	ni->startUpdating();
+	ni->mContext.StartGeneratingAll();
 
 	tracker = UserTracker::getInstance();
 
@@ -61,6 +62,8 @@ void DisKinect::update()
 {
 	mCam.setPerspective(60.0f, getWindowAspectRatio(), 1.0f, ni->maxDepth);
 	mCam.lookAt(mCamEye, mCamLookAt);
+	ni->mContext.WaitAndUpdateAll();
+	tracker->update();
 }
 
 void DisKinect::draw()
@@ -70,7 +73,9 @@ void DisKinect::draw()
 
 	gl::pushMatrices();
 	gl::setMatrices(mCam);
-	ni->renderSkeleton();
+	if (tracker->activeUserId != 0) {
+		ni->renderSkeleton(tracker->activeUserId);
+	}
 	gl::popMatrices();
 }
 

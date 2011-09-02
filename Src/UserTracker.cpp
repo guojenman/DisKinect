@@ -19,17 +19,17 @@ UserTracker* UserTracker::getInstance()
 UserTracker::UserTracker()
 {
 	activeUserId = 0;
+	activeMotionTolerance = 2.0f;
+	activeTickTotlerance = 5;
 	ni = WuCinderNITE::getInstance();
 	mSignalConnectionNewUser = ni->signalNewUser.connect(boost::bind(&UserTracker::onNewUser, this, boost::lambda::_1));
 	mSignalConnectionLostUser = ni->signalLostUser.connect(boost::bind(&UserTracker::onLostUser, this, boost::lambda::_1));
-	mSignalConnectionUpdate = ni->signalUpdate.connect(boost::bind(&UserTracker::onUpdate, this));
 }
 
 UserTracker::~UserTracker()
 {
 	mSignalConnectionNewUser.disconnect();
 	mSignalConnectionLostUser.disconnect();
-	mSignalConnectionUpdate.disconnect();
 }
 
 void UserTracker::release()
@@ -57,13 +57,14 @@ void UserTracker::onLostUser(XnUserID nId)
 	}
 }
 
-void UserTracker::onUpdate()
+void UserTracker::update()
 {
 	XnSkeletonJointPosition	jointShoulderL, jointHandL, jointKneeL;
 	XnSkeletonJointPosition	jointShoulderR, jointHandR, jointKneeR;
 	ci::Vec3f	shoulderL, handL, kneeL;
 	ci::Vec3f	shoulderR, handR, kneeR;
 	float totalDist;
+	float confidence = 0.5f;
 	// measure distance of important joints have moved from the last position
 	// and decide if the user is active or not - used for sorting, and gives us
 	// the next active user, if user A stays still for too long (possible lost of user)
@@ -77,12 +78,36 @@ void UserTracker::onUpdate()
 			ni->mUserGen.GetSkeletonCap().GetSkeletonJointPosition(it->id, XN_SKEL_RIGHT_HAND, jointHandR);
 			ni->mUserGen.GetSkeletonCap().GetSkeletonJointPosition(it->id, XN_SKEL_RIGHT_KNEE, jointKneeR);
 
-			shoulderL = WuCinderNITE::XnVector3DToVec3f(jointHandL.position);
-			shoulderR = WuCinderNITE::XnVector3DToVec3f(jointHandR.position);
-			handL = WuCinderNITE::XnVector3DToVec3f(jointHandL.position);
-			handR = WuCinderNITE::XnVector3DToVec3f(jointHandR.position);
-			kneeL = WuCinderNITE::XnVector3DToVec3f(jointKneeL.position);
-			kneeR = WuCinderNITE::XnVector3DToVec3f(jointKneeR.position);
+			if (jointHandL.fConfidence > confidence) {
+				shoulderL = WuCinderNITE::XnVector3DToVec3f(jointHandL.position);
+			} else {
+				shoulderL = it->shoulderL;
+			}
+			if (jointHandR.fConfidence > confidence) {
+				shoulderR = WuCinderNITE::XnVector3DToVec3f(jointHandR.position);
+			} else {
+				shoulderR = it->shoulderR;
+			}
+			if (jointHandL.fConfidence > confidence) {
+				handL = WuCinderNITE::XnVector3DToVec3f(jointHandL.position);
+			} else {
+				handL = it->handL;
+			}
+			if (jointHandR.fConfidence > confidence) {
+				handR = WuCinderNITE::XnVector3DToVec3f(jointHandR.position);
+			} else {
+				handR = it->handR;
+			}
+			if (jointKneeL.fConfidence > confidence) {
+				kneeL = WuCinderNITE::XnVector3DToVec3f(jointKneeL.position);
+			} else {
+				kneeL = it->kneeL;
+			}
+			if (jointKneeR.fConfidence > confidence) {
+				kneeR = WuCinderNITE::XnVector3DToVec3f(jointKneeR.position);
+			} else {
+				kneeR = it->kneeR;
+			}
 
 			totalDist = 0;
 			totalDist += shoulderL.distanceSquared(it->shoulderL);
@@ -92,8 +117,8 @@ void UserTracker::onUpdate()
 			totalDist += kneeL.distanceSquared(it->kneeL);
 			totalDist += kneeR.distanceSquared(it->kneeR);
 
-			if (totalDist == 0) {
-				if (++it->motionAtZeroDuration == 100) {
+			if (totalDist <= activeMotionTolerance) {
+				if (++it->motionAtZeroDuration == activeTickTotlerance) {
 					it->isActive = false;
 				}
 			} else {
@@ -116,12 +141,13 @@ void UserTracker::onUpdate()
 	}
 	mUsers.sort();
 
-	if (!mUsers.empty()) {
+	if (!mUsers.empty() && mUsers.begin()->isActive) {
 		if (mUsers.begin()->id != activeUserId) {
 			activeUserId = mUsers.begin()->id;
 			ci::app::console() << mUsers.begin()->id << endl;
 		}
-	} else {
+	} else if (activeUserId != 0) {
+		ci::app::console() << "no active user" << endl;
 		activeUserId = 0;
 	}
 }

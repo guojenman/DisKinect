@@ -35,7 +35,6 @@ if (status != XN_STATUS_OK) \
 class WuCinderNITE {
 public:
 	typedef boost::signals2::signal<void (XnUserID)> WuCinderNITESingalUser;
-	typedef boost::signals2::signal<void ()> WuCinderNITESingalUpdate;
 
 	static WuCinderNITE* getInstance();
 	static ci::Vec3f XnVector3DToVec3f(XnVector3D &pos) {
@@ -55,7 +54,7 @@ public:
 	XnMapOutputMode getMapMode();
 
 	void renderDepthMap(ci::Area area);
-	void renderSkeleton();
+	void renderSkeleton(XnUserID nId = 0);
 	void renderLimb(XnUserID player, XnSkeletonJoint eJoint1, XnSkeletonJoint eJoint2, float confidence = 0.75f);
 	void renderColor(ci::Area area);
 	void debugNodeTypes();
@@ -63,7 +62,6 @@ public:
 
 	WuCinderNITESingalUser		signalNewUser;
 	WuCinderNITESingalUser		signalLostUser;
-	WuCinderNITESingalUpdate	signalUpdate;
 
 	/**
 	 * Options
@@ -82,8 +80,6 @@ public:
 	xn::DepthMetaData	mDepthMeta;
 	xn::ImageMetaData	mImageMeta;
 	XnPlane3D			mFloor;
-	XnUserID			mUsers[15];
-	XnUInt16			mNumUsers;
 
 
 protected:
@@ -94,7 +90,6 @@ protected:
 	void updateImageSurface();
 	void registerCallbacks();
 	void unregisterCallbacks();
-	void findUsers();
 
 	static WuCinderNITE* mInstance;
 

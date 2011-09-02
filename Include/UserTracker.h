@@ -16,6 +16,7 @@
 #include <boost/signals2.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <list>
+#include <algorithm>
 #include "XnCppWrapper.h"
 #include "WuCinderNITE.h"
 
@@ -23,9 +24,12 @@ class UserTracker {
 public:
 	static UserTracker* getInstance();
 	virtual ~UserTracker();
+	void update();
 	void release();
 
 	XnUserID	activeUserId;
+	float		activeMotionTolerance;
+	unsigned int	activeTickTotlerance;
 
 private:
 	struct UserInfo {
@@ -37,27 +41,21 @@ private:
 		ci::Vec3f	shoulderL, handL, kneeL;
 		ci::Vec3f	shoulderR, handR, kneeR;
 
-		bool operator<(UserInfo &other) {
-			return isActive ? false : other.isActive;
-		};
-		bool operator>(UserInfo &other) {
-			return isActive ? true : false;
-		};
+		bool operator<(const UserInfo& other) {
+			return isActive > other.isActive;
+		}
 	};
 
 	UserTracker();
-
 	static UserTracker* mInstance;
 
 	void onNewUser(XnUserID nId);
 	void onLostUser(XnUserID nId);
-	void onUpdate();
 
 	WuCinderNITE*		ni;
 	list<UserInfo>		mUsers;
 	boost::signals2::connection	mSignalConnectionNewUser;
 	boost::signals2::connection	mSignalConnectionLostUser;
-	boost::signals2::connection mSignalConnectionUpdate;
 
 
 };

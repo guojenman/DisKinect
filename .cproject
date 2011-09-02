@@ -54,7 +54,7 @@
 									<listOptionValue builtIn="false" value="&quot;${CINDER_PATH}/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${CINDER_PATH}/boost&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;/System/Library/Frameworks/OpenGL.framework/Versions/A/Headers&quot;"/>
-									<listOptionValue builtIn="false" value="/Users/guojianwu/Documents/Libraries/OpenNI-v1.3.2.1/Include"/>
+									<listOptionValue builtIn="false" value="/Users/guojianwu/Documents/Libraries/OpenNI-v1.3.2.3/Include"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1223034809" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
