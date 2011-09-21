@@ -6,12 +6,7 @@
  */
 
 #include "WuCinderNITE.h"
-#include "cinder/gl/gl.h"
-#include "cinder/gl/Texture.h"
 #include "gl.h"
-
-#include <XnStatusCodes.h>
-#include <XnTypes.h>
 
 XnUInt32 mNITENumNITEUserColors = 10;
 XnFloat mNITEUserColors[][3] = {
@@ -212,37 +207,63 @@ void WuCinderNITE::stopUpdating()
 	mContext.StopGeneratingAll();
 }
 
-void WuCinderNITE::update()
+void WuCinderNITE::updateLoop()
 {
 	while (mRunUpdates) {
-		XnStatus status = XN_STATUS_OK;
-		status = mContext.WaitAndUpdateAll();
-		if( status != XN_STATUS_OK ) {
-			ci::app::console() << "no update" << endl;
-			continue;
-		}
+		update();
+	}
+}
 
+void WuCinderNITE::update()
+{
+
+	XnStatus status = XN_STATUS_OK;
+	status = mContext.WaitAndUpdateAll();
+	if( status == XN_STATUS_OK ) {
 		if( !mUserGen ) {
 			ci::app::console() << "No user generator" << endl;
 			return;
 		}
 
 		status = mContext.FindExistingNode(XN_NODE_TYPE_DEPTH, mDepthGen);
-		if( status != XN_STATUS_OK ) {
-			ci::app::console() << xnGetStatusString(status) << endl;
-			continue;
-		}
-		mSceneAnalyzer.GetFloor(mFloor);
+		if( status == XN_STATUS_OK ) {
 
-		mUserGen.GetUserPixels(0, mSceneMeta);
-		if (mUseDepthMap) {
-			mDepthGen.GetMetaData(mDepthMeta);
-			updateDepthSurface();
+			mSceneAnalyzer.GetFloor(mFloor);
+
+			mUserGen.GetUserPixels(0, mSceneMeta);
+			if (mUseDepthMap) {
+				mDepthGen.GetMetaData(mDepthMeta);
+				updateDepthSurface();
+			}
+			if (mUseColorImage) {
+				mImageGen.GetMetaData(mImageMeta);
+				updateImageSurface();
+			}
+
+			XnSkeletonJointTransformation joint;
+			for(int i = 1; i < MAX_USERS; i++) {
+				skeletons[i].isTracking = mUserGen.GetSkeletonCap().IsTracking(i);
+				if (skeletons[i].isTracking) {
+					for(int j = 1; j < MAX_JOINTS; j++) {
+						mUserGen.GetSkeletonCap().GetSkeletonJoint(i, (XnSkeletonJoint)j, joint);
+						skeletons[i].joints[j].confidence = joint.position.fConfidence;
+						skeletons[i].joints[j].position.x = joint.position.position.X;
+						skeletons[i].joints[j].position.y = joint.position.position.Y;
+						skeletons[i].joints[j].position.z = joint.position.position.Z;
+					}
+				} else {
+					for(int j = 1; j < MAX_JOINTS; j++) {
+						skeletons[i].joints[j].confidence = 0;
+					}
+				}
+			}
+
+
+		} else {
+			ci::app::console() << xnGetStatusString(status) << endl;
 		}
-		if (mUseColorImage) {
-			mImageGen.GetMetaData(mImageMeta);
-			updateImageSurface();
-		}
+	} else {
+		ci::app::console() << "no update" << endl;
 	}
 }
 
@@ -368,78 +389,80 @@ void WuCinderNITE::renderColor(ci::Area area)
 void WuCinderNITE::renderSkeleton(XnUserID nId)
 {
 	if (nId == 0) {
-		for (int nUser = 1; nUser < 4; nUser++) {
-			renderSkeleton(nUser);
+		for (int nUser = 1; nUser < MAX_USERS; nUser++) {
+			renderSkeleton(skeletons[nUser], nUser);
 		}
 	} else {
-		if (mUserGen.GetSkeletonCap().IsTracking(nId)) {
-			glLineWidth(3);
-			ci::gl::color(1-mNITEUserColors[nId % mNITENumNITEUserColors][0],
-								  1-mNITEUserColors[nId % mNITENumNITEUserColors][1],
-								  1-mNITEUserColors[nId % mNITENumNITEUserColors][2], 1);
-
-			// HEAD TO NECK
-			renderLimb(nId, XN_SKEL_HEAD, XN_SKEL_NECK);
-
-			// Left Arm
-			renderLimb(nId, XN_SKEL_NECK, XN_SKEL_LEFT_SHOULDER);
-			renderLimb(nId, XN_SKEL_LEFT_SHOULDER, XN_SKEL_LEFT_ELBOW);
-			renderLimb(nId, XN_SKEL_LEFT_ELBOW, XN_SKEL_LEFT_HAND);
-			renderLimb(nId, XN_SKEL_LEFT_HAND, XN_SKEL_LEFT_FINGERTIP);
-
-			// RIGHT ARM
-			renderLimb(nId, XN_SKEL_NECK, XN_SKEL_RIGHT_SHOULDER);
-			renderLimb(nId, XN_SKEL_RIGHT_SHOULDER, XN_SKEL_RIGHT_ELBOW);
-			renderLimb(nId, XN_SKEL_RIGHT_ELBOW, XN_SKEL_RIGHT_HAND);
-			renderLimb(nId, XN_SKEL_RIGHT_HAND, XN_SKEL_RIGHT_FINGERTIP);
-			// TORSO
-			renderLimb(nId, XN_SKEL_LEFT_SHOULDER, XN_SKEL_TORSO);
-			renderLimb(nId, XN_SKEL_RIGHT_SHOULDER, XN_SKEL_TORSO);
-
-			// LEFT LEG
-			renderLimb(nId, XN_SKEL_TORSO, XN_SKEL_LEFT_HIP);
-			renderLimb(nId, XN_SKEL_LEFT_HIP, XN_SKEL_LEFT_KNEE);
-			renderLimb(nId, XN_SKEL_LEFT_KNEE, XN_SKEL_LEFT_FOOT);
-
-			// RIGHT LEG
-			renderLimb(nId, XN_SKEL_TORSO, XN_SKEL_RIGHT_HIP);
-			renderLimb(nId, XN_SKEL_RIGHT_HIP, XN_SKEL_RIGHT_KNEE);
-			renderLimb(nId, XN_SKEL_RIGHT_KNEE, XN_SKEL_RIGHT_FOOT);
-			// PELVIS
-			renderLimb(nId, XN_SKEL_LEFT_HIP, XN_SKEL_RIGHT_HIP);
-			glLineWidth(1);
-		}
-		ci::gl::color(1, 1, 1, 1);
+		renderSkeleton(skeletons[nId], nId);
 	}
 }
 
-void WuCinderNITE::renderLimb(XnUserID player, XnSkeletonJoint eJoint1, XnSkeletonJoint eJoint2, float confidence)
+void WuCinderNITE::renderSkeleton(SKELETON &skeleton, XnUserID nId)
 {
-	if (!mUserGen.GetSkeletonCap().IsCalibrated(player)) {
-		ci::app::console() << player << ":not calibrated!" << endl;
-		return;
+	if (skeleton.isTracking) {
+		glLineWidth(3);
+		ci::gl::color(1-mNITEUserColors[nId % mNITENumNITEUserColors][0],
+							  1-mNITEUserColors[nId % mNITENumNITEUserColors][1],
+							  1-mNITEUserColors[nId % mNITENumNITEUserColors][2], 1);
+
+		// HEAD TO NECK
+		renderLimb(skeleton, XN_SKEL_HEAD, XN_SKEL_NECK);
+
+		// Left Arm
+		renderLimb(skeleton, XN_SKEL_NECK, XN_SKEL_LEFT_SHOULDER);
+		renderLimb(skeleton, XN_SKEL_LEFT_SHOULDER, XN_SKEL_LEFT_ELBOW);
+		renderLimb(skeleton, XN_SKEL_LEFT_ELBOW, XN_SKEL_LEFT_HAND);
+		renderLimb(skeleton, XN_SKEL_LEFT_HAND, XN_SKEL_LEFT_FINGERTIP);
+
+		// RIGHT ARM
+		renderLimb(skeleton, XN_SKEL_NECK, XN_SKEL_RIGHT_SHOULDER);
+		renderLimb(skeleton, XN_SKEL_RIGHT_SHOULDER, XN_SKEL_RIGHT_ELBOW);
+		renderLimb(skeleton, XN_SKEL_RIGHT_ELBOW, XN_SKEL_RIGHT_HAND);
+		renderLimb(skeleton, XN_SKEL_RIGHT_HAND, XN_SKEL_RIGHT_FINGERTIP);
+		// TORSO
+		renderLimb(skeleton, XN_SKEL_LEFT_SHOULDER, XN_SKEL_TORSO);
+		renderLimb(skeleton, XN_SKEL_RIGHT_SHOULDER, XN_SKEL_TORSO);
+
+		// LEFT LEG
+		renderLimb(skeleton, XN_SKEL_TORSO, XN_SKEL_LEFT_HIP);
+		renderLimb(skeleton, XN_SKEL_LEFT_HIP, XN_SKEL_LEFT_KNEE);
+		renderLimb(skeleton, XN_SKEL_LEFT_KNEE, XN_SKEL_LEFT_FOOT);
+
+		// RIGHT LEG
+		renderLimb(skeleton, XN_SKEL_TORSO, XN_SKEL_RIGHT_HIP);
+		renderLimb(skeleton, XN_SKEL_RIGHT_HIP, XN_SKEL_RIGHT_KNEE);
+		renderLimb(skeleton, XN_SKEL_RIGHT_KNEE, XN_SKEL_RIGHT_FOOT);
+		// PELVIS
+		renderLimb(skeleton, XN_SKEL_LEFT_HIP, XN_SKEL_RIGHT_HIP);
+		glLineWidth(1);
 	}
-	if (!mUserGen.GetSkeletonCap().IsTracking(player)) {
-		ci::app::console() << player << ":not tracked!" << endl;
+	ci::gl::color(1, 1, 1, 1);
+}
+
+void WuCinderNITE::renderLimb(SKELETON &skeleton, XnSkeletonJoint eJoint1, XnSkeletonJoint eJoint2, float confidence)
+{
+	if (!skeleton.isTracking) {
+		ci::app::console() << "user not tracked!" << endl;
 		return;
 	}
 
-	XnSkeletonJointPosition joint1, joint2;
-	mUserGen.GetSkeletonCap().GetSkeletonJointPosition(player, eJoint1, joint1);
-	mUserGen.GetSkeletonCap().GetSkeletonJointPosition(player, eJoint2, joint2);
-	if (joint1.fConfidence < confidence || joint2.fConfidence < confidence) {
+
+	if (skeleton.joints[eJoint1].confidence < confidence || skeleton.joints[eJoint2].confidence < confidence) {
 		return;
 	}
 	if (true) {
 		// 3D - arbitrary scale
-		ci::gl::drawLine(ci::Vec3f(joint1.position.X, joint1.position.Y, joint1.position.Z),
-				ci::Vec3f(joint2.position.X, joint2.position.Y, joint2.position.Z));
+		ci::gl::drawLine(skeleton.joints[eJoint1].position,skeleton.joints[eJoint2].position);
 
 	} else {
 		// 2D
 		XnPoint3D pt[2];
-		pt[0] = joint1.position;
-		pt[1] = joint2.position;
+		pt[0].X = skeleton.joints[eJoint1].position.x;
+		pt[0].Y = skeleton.joints[eJoint1].position.y;
+		pt[0].Z = skeleton.joints[eJoint1].position.z;
+		pt[1].X = skeleton.joints[eJoint2].position.x;
+		pt[2].Y = skeleton.joints[eJoint2].position.y;
+		pt[3].Z = skeleton.joints[eJoint2].position.z;
 		mDepthGen.ConvertRealWorldToProjective(2, pt, pt);
 		ci::gl::drawLine(ci::Vec2f(pt[0].X, pt[0].Y), ci::Vec2f(pt[1].X, pt[1].Y));
 	}

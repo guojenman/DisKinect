@@ -13,6 +13,7 @@
 #include "cinder/Vector.h"
 #include "cinder/app/AppBasic.h"
 #include "cinder/gl/gl.h"
+#include "cinder/gl/Texture.h"
 
 #include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
@@ -21,6 +22,8 @@
 #include <XnOpenNI.h>
 #include <XnCppWrapper.h>
 #include <XnCodecIDs.h>
+#include <XnStatusCodes.h>
+#include <XnTypes.h>
 
 using namespace std;
 
@@ -35,6 +38,18 @@ if (status != XN_STATUS_OK) \
 class WuCinderNITE {
 public:
 	typedef boost::signals2::signal<void (XnUserID)> WuCinderNITESingalUser;
+	static const int	MAX_JOINTS = 25;
+	static const int	MAX_USERS = 11;
+
+	struct SKELETON_JOINT {
+		SKELETON_JOINT():confidence(0.0){};
+		float confidence;
+		ci::Vec3f position;
+	};
+	struct SKELETON {
+		bool isTracking;
+		SKELETON_JOINT joints[MAX_JOINTS];
+	};
 
 	static WuCinderNITE* getInstance();
 	static ci::Vec3f XnVector3DToVec3f(XnVector3D &pos) {
@@ -45,6 +60,7 @@ public:
 
 	void setup(string xmlpath, XnMapOutputMode mapMode, bool useDepthMap = true, bool useColorImage = true);
 	void setup(string onipath);
+	void update();
 	void startUpdating();
 	void stopUpdating();
 	void shutdown();
@@ -54,8 +70,9 @@ public:
 	XnMapOutputMode getMapMode();
 
 	void renderDepthMap(ci::Area area);
+	void renderSkeleton(SKELETON &skeleton, XnUserID nId = 0);
 	void renderSkeleton(XnUserID nId = 0);
-	void renderLimb(XnUserID player, XnSkeletonJoint eJoint1, XnSkeletonJoint eJoint2, float confidence = 0.75f);
+	void renderLimb(SKELETON &skeleton, XnSkeletonJoint eJoint1, XnSkeletonJoint eJoint2, float confidence = 0.75f);
 	void renderColor(ci::Area area);
 	void debugNodeTypes();
 	void startTracking(XnUserID nId);
@@ -68,6 +85,8 @@ public:
 	 */
 	bool				useSingleCalibrationMode;	// default true
 	bool				waitForTrackingToSingalNewUser;	// default true
+
+	SKELETON			skeletons[MAX_USERS];
 
 	unsigned short		maxDepth;
 	XnMapOutputMode		mMapMode;
@@ -85,7 +104,7 @@ public:
 protected:
 	WuCinderNITE();
 
-	void update();
+	void updateLoop();
 	void updateDepthSurface();
 	void updateImageSurface();
 	void registerCallbacks();
@@ -95,6 +114,7 @@ protected:
 
 	volatile bool		mRunUpdates; // exits update thread if false
 	boost::shared_ptr<boost::thread>	mThread;
+	boost::mutex mMutex;
 
 	bool				mNeedPoseForCalibration;
 	bool				mIsCalibrated;

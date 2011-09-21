@@ -62,7 +62,7 @@ void DisKinect::update()
 {
 	mCam.setPerspective(60.0f, getWindowAspectRatio(), 1.0f, ni->maxDepth);
 	mCam.lookAt(mCamEye, mCamLookAt);
-	ni->mContext.WaitAndUpdateAll();
+	ni->update();
 	tracker->update();
 }
 
