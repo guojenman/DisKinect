@@ -7,13 +7,19 @@
 
 #include "UserRelay.h"
 #include "cinder/app/App.h"
+#include "UserStreamLive.h"
+
 namespace relay {
 	UserRelay::UserRelay( WuCinderNITE* t_ni, UserTracker* t_tracker ) {
 		// TODO Auto-generated constructor stub
 		this->ni = t_ni;
 		this->tracker = t_tracker;
 
+		// Create the FSM and set the initial state
 		this->fsm = new relay::UserStreamStateManager();
+		relay::UserStreamLive* live = new relay::UserStreamLive();
+		this->fsm->setInitialState( live );
+
 
 		mCamEye = ci::Vec3f(0, 0, -500.0f);
 		mCamLookAt = ci::Vec3f::zero();
@@ -35,9 +41,11 @@ namespace relay {
 	}
 
 	void UserRelay::renderSkeleton() {
+		WuCinderNITE::SKELETON aSkeleton = 	getSkeleton();
+
 		ci::gl::pushMatrices();
 		ci::gl::setMatrices(mCam);
-
+			ni->renderSkeleton( aSkeleton , 0 );
 		ci::gl::popMatrices();
 	}
 

@@ -29,13 +29,13 @@ namespace relay {
 
 	WuCinderNITE::SKELETON UserStreamLive::getSkeleton() {
 
-		/*
-		 * if (tracker->activeUserId != 0) {
-			ni->renderSkeleton(tracker->activeUserId);
-		}
-		 */
 		WuCinderNITE::SKELETON aSkeleton;
-		aSkeleton.isTracking = false;
+		if( tracker->activeUserId != 0 ) {
+			aSkeleton = ni->skeletons[ tracker->activeUserId ];
+		} else { // is false by default?
+			aSkeleton.isTracking = false;
+		}
+
 		return aSkeleton;
 	}
 

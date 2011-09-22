@@ -6,6 +6,8 @@
  */
 
 #include "UserStreamStateManager.h"
+
+
 namespace relay {
 
 	UserStreamStateManager::UserStreamStateManager() {

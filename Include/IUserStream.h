@@ -15,7 +15,7 @@ namespace relay {
 	class IUserStream {
 	public:
 		virtual ~IUserStream(){};
-		virtual void release() = 0;
+//		virtual void release() = 0;
 
 		virtual void enter() = 0;
 		virtual void update() = 0;

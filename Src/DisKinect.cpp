@@ -38,13 +38,13 @@ void DisKinect::setup()
 	mapMode.nYRes = 480;
 
 	WuCinderNITE* aNi = WuCinderNITE::getInstance();
-	aNi->setup("Resources/1.oni");
+	aNi->setup("Resources/SkeletonRec.oni");
 //	aNi->setup("Resources/Sample-User.xml", mapMode, true, true);
 //	aNi->startUpdating();
 	aNi->mContext.StartGeneratingAll();
 
-
 	UserTracker* aTracker = UserTracker::getInstance();
+
 	userRelay = new relay::UserRelay( aNi, aTracker );
 }
 
