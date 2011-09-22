@@ -59,55 +59,32 @@ void UserTracker::onLostUser(XnUserID nId)
 
 void UserTracker::update()
 {
-	XnSkeletonJointPosition	jointShoulderL, jointHandL, jointKneeL;
-	XnSkeletonJointPosition	jointShoulderR, jointHandR, jointKneeR;
-	ci::Vec3f	shoulderL, handL, kneeL;
-	ci::Vec3f	shoulderR, handR, kneeR;
 	float totalDist;
 	float confidence = 0.5f;
 	// measure distance of important joints have moved from the last position
 	// and decide if the user is active or not - used for sorting, and gives us
 	// the next active user, if user A stays still for too long (possible lost of user)
 	for(list<UserInfo>::iterator it = mUsers.begin(); it != mUsers.end();) {
-		if (ni->mUserGen.GetSkeletonCap().IsTracking(it->id)) {
-			ni->mUserGen.GetSkeletonCap().GetSkeletonJointPosition(it->id, XN_SKEL_LEFT_SHOULDER, jointShoulderL);
-			ni->mUserGen.GetSkeletonCap().GetSkeletonJointPosition(it->id, XN_SKEL_LEFT_HAND, jointHandL);
-			ni->mUserGen.GetSkeletonCap().GetSkeletonJointPosition(it->id, XN_SKEL_LEFT_KNEE, jointKneeL);
+		WuCinderNITE::SKELETON &skeleton = ni->skeletons[it->id];
+		if (skeleton.isTracking) {
 
-			ni->mUserGen.GetSkeletonCap().GetSkeletonJointPosition(it->id, XN_SKEL_RIGHT_SHOULDER, jointShoulderR);
-			ni->mUserGen.GetSkeletonCap().GetSkeletonJointPosition(it->id, XN_SKEL_RIGHT_HAND, jointHandR);
-			ni->mUserGen.GetSkeletonCap().GetSkeletonJointPosition(it->id, XN_SKEL_RIGHT_KNEE, jointKneeR);
+			ci::Vec3f &shoulderL = skeleton.joints[XN_SKEL_LEFT_SHOULDER].confidence > confidence
+					? skeleton.joints[XN_SKEL_LEFT_SHOULDER].position : it->shoulderL;
 
-			if (jointHandL.fConfidence > confidence) {
-				shoulderL = WuCinderNITE::XnVector3DToVec3f(jointHandL.position);
-			} else {
-				shoulderL = it->shoulderL;
-			}
-			if (jointHandR.fConfidence > confidence) {
-				shoulderR = WuCinderNITE::XnVector3DToVec3f(jointHandR.position);
-			} else {
-				shoulderR = it->shoulderR;
-			}
-			if (jointHandL.fConfidence > confidence) {
-				handL = WuCinderNITE::XnVector3DToVec3f(jointHandL.position);
-			} else {
-				handL = it->handL;
-			}
-			if (jointHandR.fConfidence > confidence) {
-				handR = WuCinderNITE::XnVector3DToVec3f(jointHandR.position);
-			} else {
-				handR = it->handR;
-			}
-			if (jointKneeL.fConfidence > confidence) {
-				kneeL = WuCinderNITE::XnVector3DToVec3f(jointKneeL.position);
-			} else {
-				kneeL = it->kneeL;
-			}
-			if (jointKneeR.fConfidence > confidence) {
-				kneeR = WuCinderNITE::XnVector3DToVec3f(jointKneeR.position);
-			} else {
-				kneeR = it->kneeR;
-			}
+			ci::Vec3f &handL = skeleton.joints[XN_SKEL_RIGHT_SHOULDER].confidence > confidence
+					? skeleton.joints[XN_SKEL_RIGHT_SHOULDER].position : it->shoulderR;
+
+			ci::Vec3f &kneeL = skeleton.joints[XN_SKEL_LEFT_HAND].confidence > confidence
+					? skeleton.joints[XN_SKEL_LEFT_HAND].position : it->handL;
+
+			ci::Vec3f &shoulderR = skeleton.joints[XN_SKEL_RIGHT_HAND].confidence > confidence
+					? skeleton.joints[XN_SKEL_RIGHT_HAND].position : it->handR;
+
+			ci::Vec3f &handR = skeleton.joints[XN_SKEL_LEFT_KNEE].confidence > confidence
+					? skeleton.joints[XN_SKEL_LEFT_KNEE].position : it->kneeL;
+
+			ci::Vec3f &kneeR = skeleton.joints[XN_SKEL_RIGHT_KNEE].confidence > confidence
+					? skeleton.joints[XN_SKEL_RIGHT_KNEE].position : it->kneeR;
 
 			totalDist = 0;
 			totalDist += shoulderL.distanceSquared(it->shoulderL);

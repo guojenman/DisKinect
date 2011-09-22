@@ -193,7 +193,7 @@ void WuCinderNITE::startUpdating()
 	}
 	mRunUpdates = true;
 	mContext.StartGeneratingAll();
-	mThread = boost::shared_ptr<boost::thread>(new boost::thread(boost::bind(&WuCinderNITE::update, this)));
+	mThread = boost::shared_ptr<boost::thread>(new boost::thread(boost::bind(&WuCinderNITE::updateLoop, this)));
 }
 
 void WuCinderNITE::stopUpdating()
@@ -219,51 +219,48 @@ void WuCinderNITE::update()
 
 	XnStatus status = XN_STATUS_OK;
 	status = mContext.WaitAndUpdateAll();
-	if( status == XN_STATUS_OK ) {
-		if( !mUserGen ) {
-			ci::app::console() << "No user generator" << endl;
-			return;
-		}
-
-		status = mContext.FindExistingNode(XN_NODE_TYPE_DEPTH, mDepthGen);
-		if( status == XN_STATUS_OK ) {
-
-			mSceneAnalyzer.GetFloor(mFloor);
-
-			mUserGen.GetUserPixels(0, mSceneMeta);
-			if (mUseDepthMap) {
-				mDepthGen.GetMetaData(mDepthMeta);
-				updateDepthSurface();
-			}
-			if (mUseColorImage) {
-				mImageGen.GetMetaData(mImageMeta);
-				updateImageSurface();
-			}
-
-			XnSkeletonJointTransformation joint;
-			for(int i = 1; i < MAX_USERS; i++) {
-				skeletons[i].isTracking = mUserGen.GetSkeletonCap().IsTracking(i);
-				if (skeletons[i].isTracking) {
-					for(int j = 1; j < MAX_JOINTS; j++) {
-						mUserGen.GetSkeletonCap().GetSkeletonJoint(i, (XnSkeletonJoint)j, joint);
-						skeletons[i].joints[j].confidence = joint.position.fConfidence;
-						skeletons[i].joints[j].position.x = joint.position.position.X;
-						skeletons[i].joints[j].position.y = joint.position.position.Y;
-						skeletons[i].joints[j].position.z = joint.position.position.Z;
-					}
-				} else {
-					for(int j = 1; j < MAX_JOINTS; j++) {
-						skeletons[i].joints[j].confidence = 0;
-					}
-				}
-			}
-
-
-		} else {
-			ci::app::console() << xnGetStatusString(status) << endl;
-		}
-	} else {
+	if( status != XN_STATUS_OK ) {
 		ci::app::console() << "no update" << endl;
+		return;
+	}
+	if( !mUserGen ) {
+		ci::app::console() << "No user generator" << endl;
+		return;
+	}
+	status = mContext.FindExistingNode(XN_NODE_TYPE_DEPTH, mDepthGen);
+	if( status != XN_STATUS_OK ) {
+		ci::app::console() << xnGetStatusString(status) << endl;
+		return;
+	}
+
+	mSceneAnalyzer.GetFloor(mFloor);
+
+	mUserGen.GetUserPixels(0, mSceneMeta);
+	if (mUseDepthMap) {
+		mDepthGen.GetMetaData(mDepthMeta);
+		updateDepthSurface();
+	}
+	if (mUseColorImage) {
+		mImageGen.GetMetaData(mImageMeta);
+		updateImageSurface();
+	}
+
+	XnSkeletonJointTransformation joint;
+	for(int i = 1; i < MAX_USERS; i++) {
+		skeletons[i].isTracking = mUserGen.GetSkeletonCap().IsTracking(i);
+		if (skeletons[i].isTracking) {
+			for(int j = 1; j < MAX_JOINTS; j++) {
+				mUserGen.GetSkeletonCap().GetSkeletonJoint(i, (XnSkeletonJoint)j, joint);
+				skeletons[i].joints[j].confidence = joint.position.fConfidence;
+				skeletons[i].joints[j].position.x = joint.position.position.X;
+				skeletons[i].joints[j].position.y = joint.position.position.Y;
+				skeletons[i].joints[j].position.z = joint.position.position.Z;
+			}
+		} else {
+			for(int j = 1; j < MAX_JOINTS; j++) {
+				skeletons[i].joints[j].confidence = 0;
+			}
+		}
 	}
 }
 
@@ -445,8 +442,6 @@ void WuCinderNITE::renderLimb(SKELETON &skeleton, XnSkeletonJoint eJoint1, XnSke
 		ci::app::console() << "user not tracked!" << endl;
 		return;
 	}
-
-
 	if (skeleton.joints[eJoint1].confidence < confidence || skeleton.joints[eJoint2].confidence < confidence) {
 		return;
 	}
