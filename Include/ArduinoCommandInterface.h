@@ -15,9 +15,7 @@ public:
 	void setup(string device, bool debug);
     void printDevices();
     void bindDevice(string device);
-	bool isValidCommand(string c);
 	void sendMessage(string message);
-	string fixMessage(string message);
 	bool isDebug;
     Serial serial;
 };
