@@ -7,8 +7,7 @@
 #include "cinder/Rand.h"
 #include "cinder/Camera.h"
 
-#include "WuCinderNITE.h"
-#include "UserTracker.h"
+#include "UserRelay.h"
 
 using namespace ci;
 using namespace app;
@@ -23,14 +22,7 @@ public:
 	void shutdown();
 
 	void keyUp(KeyEvent event);
-
-	WuCinderNITE* ni;
-	UserTracker* tracker;
-
-	CameraPersp mCam;
-	Vec3f mCamEye;
-	Vec3f mCamLookAt;
-	Vec4f lightPosition;
+	relay::UserRelay* userRelay;
 };
 
 void DisKinect::prepareSettings( AppBasic::Settings *settings )
@@ -45,45 +37,33 @@ void DisKinect::setup()
 	mapMode.nXRes = 640;
 	mapMode.nYRes = 480;
 
-	ni = WuCinderNITE::getInstance();
-	ni->setup("Resources/1.oni");
-//	ni->setup("Resources/Sample-User.xml", mapMode, true, true);
-//	ni->startUpdating();
-	ni->mContext.StartGeneratingAll();
+	WuCinderNITE* aNi = WuCinderNITE::getInstance();
+	aNi->setup("Resources/1.oni");
+//	aNi->setup("Resources/Sample-User.xml", mapMode, true, true);
+//	aNi->startUpdating();
+	aNi->mContext.StartGeneratingAll();
 
-	tracker = UserTracker::getInstance();
 
-	mCamEye = Vec3f(0, 0, -500.0f);
-	mCamLookAt = Vec3f::zero();
+	UserTracker* aTracker = UserTracker::getInstance();
+	userRelay = new relay::UserRelay( aNi, aTracker );
 }
 
 
 void DisKinect::update()
 {
-	mCam.setPerspective(60.0f, getWindowAspectRatio(), 1.0f, ni->maxDepth);
-	mCam.lookAt(mCamEye, mCamLookAt);
-	ni->update();
-	tracker->update();
+	userRelay->update();
 }
 
 void DisKinect::draw()
 {
 	gl::clear(ColorA(0, 0, 0, 0), true);
-	ni->renderDepthMap(getWindowBounds());
-
-	gl::pushMatrices();
-	gl::setMatrices(mCam);
-	if (tracker->activeUserId != 0) {
-		ni->renderSkeleton(tracker->activeUserId);
-	}
-	gl::popMatrices();
+	userRelay->renderDepthMap();
+	userRelay->renderSkeleton();
 }
 
 void DisKinect::shutdown()
 {
 	console() << "quitting..." << std::endl;
-	tracker->release();
-	ni->shutdown();
 }
 
 void DisKinect::keyUp(KeyEvent event)

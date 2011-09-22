@@ -1,3 +1,4 @@
 Debug
 Release
 Resources/*.oni
+.DS_Store
