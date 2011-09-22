@@ -3,6 +3,13 @@
  *
  *  Created on: Sep 21, 2011
  *      Author: mariogonzalez
+ *      Abstract:
+ *      	This class contains a UserStreamStateMachine which can has the following or more states (classes):
+ *      		* UserStreamLive
+ *      		* UserStreamPlayback
+ *      		* UserStreamRecorder
+ *      	It determines which state the UserStreamStateMachine should be in,
+ *      	and ask the UserStreamStateMachine for skeleton information each frame
  */
 
 #include "UserRelay.h"

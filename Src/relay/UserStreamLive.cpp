@@ -3,6 +3,9 @@
  *
  *  Created on: Sep 21, 2011
  *      Author: mariogonzalez
+ *      Abstract:
+ *      	 This represents one of the states in the UserStreamStateManager
+ *      	 It is responsible for retrieving live skeleton data from the kinect
  */
 
 #include "UserStreamLive.h"
