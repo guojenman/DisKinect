@@ -32,6 +32,15 @@ namespace relay {
 		mCamLookAt = ci::Vec3f::zero();
 	}
 
+	UserRelay::~UserRelay() {
+		tracker->release();
+		ni->shutdown();
+
+		delete fsm;
+
+		std::cout << "UserRelay destructor!" << std::endl;
+	}
+
 	void UserRelay::update() {
 		WuCinderNITE::SKELETON aSkeleton;
 		mCam.setPerspective(60.0f, cinder::app::App::get()->getWindowAspectRatio(), 1.0f, ni->maxDepth);
@@ -58,11 +67,5 @@ namespace relay {
 		ci::gl::setMatrices(mCam);
 			ni->renderSkeleton( aSkeleton , 0 );
 		ci::gl::popMatrices();
-	}
-
-	UserRelay::~UserRelay() {
-		tracker->release();
-		ni->shutdown();
-		// TODO Auto-generated destructor stub
 	}
 }

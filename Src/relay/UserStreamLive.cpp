@@ -19,6 +19,7 @@ namespace relay {
 
 	UserStreamLive::~UserStreamLive() {
 		// TODO Auto-generated destructor stub
+		std::cout << "UserStreamLive destructor!" << std::endl;
 	}
 
 	void UserStreamLive::enter() {

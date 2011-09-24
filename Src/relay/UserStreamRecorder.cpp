@@ -12,9 +12,12 @@
 
 namespace relay {
 
-	UserStreamRecorder::UserStreamRecorder() {}
+	UserStreamRecorder::UserStreamRecorder() {
+		_livestream = NULL;
+	}
 	UserStreamRecorder::~UserStreamRecorder() {
 		delete _livestream;
+		std::cout << "UserStreamRecorder destructor!" << std::endl;
 	}
 
 	void UserStreamRecorder::enter() {

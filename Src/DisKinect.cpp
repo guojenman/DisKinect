@@ -67,6 +67,7 @@ void DisKinect::draw()
 void DisKinect::shutdown()
 {
 	console() << "quitting..." << std::endl;
+	delete userRelay;
 }
 
 void DisKinect::keyUp(KeyEvent event)

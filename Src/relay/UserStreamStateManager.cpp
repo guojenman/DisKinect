@@ -12,6 +12,9 @@ namespace relay {
 
 	UserStreamStateManager::UserStreamStateManager() {
 		// TODO Auto-generated constructor stub
+		currentState = NULL;
+		previousState = NULL;
+		nextState = NULL;
 	}
 
 	UserStreamStateManager::~UserStreamStateManager() {
@@ -19,6 +22,8 @@ namespace relay {
 		delete currentState;
 		delete previousState;
 		delete nextState;
+
+		std::cout << "UserStreamStateManager destructor!" << std::endl;
 	}
 
 	void UserStreamStateManager::setInitialState( IUserStream* aState ) {
