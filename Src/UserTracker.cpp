@@ -22,8 +22,8 @@ UserTracker::UserTracker()
 	activeMotionTolerance = 2.0f;
 	activeTickTotlerance = 5;
 	ni = WuCinderNITE::getInstance();
-	mSignalConnectionNewUser = ni->signalNewUser.connect(boost::bind(&UserTracker::onNewUser, this, boost::lambda::_1));
-	mSignalConnectionLostUser = ni->signalLostUser.connect(boost::bind(&UserTracker::onLostUser, this, boost::lambda::_1));
+	mSignalConnectionNewUser = ni->signalNewUser.connect( boost::bind(&UserTracker::onNewUser, this, boost::lambda::_1) );
+	mSignalConnectionLostUser = ni->signalLostUser.connect( boost::bind(&UserTracker::onLostUser, this, boost::lambda::_1) );
 }
 
 UserTracker::~UserTracker()

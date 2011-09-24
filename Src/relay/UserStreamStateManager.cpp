@@ -55,6 +55,12 @@ namespace relay {
 		}
 	}
 
+	void UserStreamStateManager::draw() {
+		if( currentState ) {
+			currentState->draw();
+		}
+	}
+
 	WuCinderNITE::SKELETON UserStreamStateManager::getSkeleton() {
 		return currentState->getSkeleton();
 	}

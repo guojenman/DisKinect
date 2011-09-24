@@ -1,5 +1,5 @@
 /*
- * UserStreamLive.cpp
+ * UserStreamRecorder.cpp
  *
  *  Created on: Sep 21, 2011
  *      Author: mariogonzalez
@@ -8,24 +8,28 @@
  *      	 It is responsible for retrieving live skeleton data from the kinect
  */
 
-#ifndef USERSTREAMLIVE_H_
-#define USERSTREAMLIVE_H_
+#ifndef UserStreamRecorder_H_
+#define UserStreamRecorder_H_
 
 #include "IUserStream.h"
+#include "UserStreamLive.h"
 
 namespace relay {
 
-class UserStreamLive : public IUserStream  {
+class UserStreamRecorder : public IUserStream  {
 	public:
-		UserStreamLive();
-		virtual ~UserStreamLive();
+		UserStreamRecorder();
+		virtual ~UserStreamRecorder();
 
 		void enter();
 		void update();
 		void draw();
 		void exit();
 		WuCinderNITE::SKELETON getSkeleton();
+
+	private:
+		UserStreamLive *_livestream;	// When queried for skeleton data we just send whatever our livestream has
 	};
 }
 
-#endif /* USERSTREAMLIVE_H_ */
+#endif /* UserStreamRecorder_H_ */

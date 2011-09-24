@@ -20,6 +20,7 @@ namespace relay {
 		virtual void enter() = 0;
 		virtual void update() = 0;
 		virtual void exit() = 0;
+		virtual void draw() = 0;
 		virtual WuCinderNITE::SKELETON getSkeleton() = 0;
 
 	protected:

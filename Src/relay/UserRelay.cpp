@@ -15,6 +15,7 @@
 #include "UserRelay.h"
 #include "cinder/app/App.h"
 #include "UserStreamLive.h"
+#include "UserStreamRecorder.h"
 
 namespace relay {
 	UserRelay::UserRelay( WuCinderNITE* t_ni, UserTracker* t_tracker ) {
@@ -24,9 +25,8 @@ namespace relay {
 
 		// Create the FSM and set the initial state
 		this->fsm = new relay::UserStreamStateManager();
-		relay::UserStreamLive* live = new relay::UserStreamLive();
+		relay::UserStreamRecorder* live = new relay::UserStreamRecorder();
 		this->fsm->setInitialState( live );
-
 
 		mCamEye = ci::Vec3f(0, 0, -500.0f);
 		mCamLookAt = ci::Vec3f::zero();
@@ -37,6 +37,10 @@ namespace relay {
 		mCam.setPerspective(60.0f, cinder::app::App::get()->getWindowAspectRatio(), 1.0f, ni->maxDepth);
 		mCam.lookAt(mCamEye, mCamLookAt);
 		fsm->update();
+	}
+
+	void UserRelay::draw(){
+		fsm->draw();
 	}
 
 	WuCinderNITE::SKELETON UserRelay::getSkeleton() {

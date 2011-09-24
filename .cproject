@@ -6,7 +6,7 @@
 		<cconfiguration id="cdt.managedbuild.config.gnu.macosx.exe.debug.403169942">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.macosx.exe.debug.403169942" moduleId="org.eclipse.cdt.core.settings" name="Debug">
 				<macros>
-					<stringMacro name="CINDER_PATH" type="VALUE_PATH_DIR" value="/Users/mariogonzalez/GIT/LIBRARY/Cinder"/>
+					<stringMacro name="CINDER_PATH" type="VALUE_PATH_DIR" value="/Users/onedayitwillmake/GIT/LIBRARY/Cinder"/>
 				</macros>
 				<externalSettings/>
 				<extensions>
@@ -31,6 +31,7 @@
 									<listOptionValue builtIn="false" value="&quot;${CINDER_PATH}/lib&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${CINDER_PATH}/lib/macosx&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/lib"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/DisKinect/thirdparty}&quot;"/>
 								</option>
 								<option id="macosx.cpp.link.option.libs.1593998636" name="Libraries (-l)" superClass="macosx.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="cinder_d"/>
@@ -50,11 +51,11 @@
 								<option id="gnu.cpp.compilermacosx.exe.debug.option.optimization.level.1167803440" name="Optimization Level" superClass="gnu.cpp.compilermacosx.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.macosx.exe.debug.option.debugging.level.1628416572" name="Debug Level" superClass="gnu.cpp.compiler.macosx.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1486716906" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${CINDER_PATH}/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${CINDER_PATH}/boost&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;/System/Library/Frameworks/OpenGL.framework/Versions/A/Headers&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/DisKinect/Include/OpenNI}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/DisKinect/Include}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1223034809" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -67,6 +68,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Src"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="Lib/lib_json"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

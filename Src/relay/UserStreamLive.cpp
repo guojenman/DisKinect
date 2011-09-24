@@ -26,9 +26,8 @@ namespace relay {
 		tracker = UserTracker::getInstance();
 	}
 
-	void UserStreamLive::update() {
-
-	}
+	void UserStreamLive::update() {}
+	void UserStreamLive::draw(){}
 
 	WuCinderNITE::SKELETON UserStreamLive::getSkeleton() {
 

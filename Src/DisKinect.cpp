@@ -57,6 +57,9 @@ void DisKinect::update()
 void DisKinect::draw()
 {
 	gl::clear(ColorA(0, 0, 0, 0), true);
+
+	userRelay->draw();
+	// These will be moved to userRelay->draw later
 	userRelay->renderDepthMap();
 	userRelay->renderSkeleton();
 }

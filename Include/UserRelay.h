@@ -20,6 +20,7 @@
 #include "UserStreamStateManager.h"
 #include "cinder/Camera.h"
 #include "cinder/Vector.h"
+#include "json/json.h"
 
 namespace relay {
 	class UserRelay {
@@ -37,6 +38,8 @@ namespace relay {
 	private:
 		WuCinderNITE* ni;
 		UserTracker* tracker;
+
+		Json::Value 			_jsonRoot;   // will contains the root value after parsing.
 
 		relay::UserStreamStateManager* fsm;
 

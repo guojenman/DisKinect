@@ -23,6 +23,7 @@ class UserStreamStateManager {
 		void gotoNextState();
 
 		void update();
+		void draw();
 		WuCinderNITE::SKELETON getSkeleton();
 
 	private:
