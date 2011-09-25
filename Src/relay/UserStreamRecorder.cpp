@@ -89,10 +89,9 @@ namespace relay {
 	void UserStreamRecorder::recordState() {
 
 		WuCinderNITE::SKELETON aSkeleton = _livestream->getSkeleton();
-		UserStreamFrame aFrame = UserStreamFrame( _framenumber, aSkeleton );
+		UserStreamFrame* aFrame = new UserStreamFrame( _framenumber, aSkeleton );
+		_recording.push_back( aFrame );
 		_framenumber++;
-
-		_recording.push_back( &aFrame );
 	}
 
 	/**

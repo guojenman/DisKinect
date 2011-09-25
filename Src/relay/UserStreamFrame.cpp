@@ -6,7 +6,10 @@
  */
 
 #include "UserStreamFrame.h"
+#include <iterator>
 
+
+#define ZERO_IF_NAN(__X__) (__X__ != __X__) ? 0.0f : __X__
 namespace relay
 {
 
@@ -23,7 +26,37 @@ namespace relay
 
 	Json::Value UserStreamFrame::toJSON() {
 		Json::Value value;
-		value["framenumber"] = 4;
+		value["framenumber"] = framenumber;
+
+		Json::Value skeletonData;
+		skeletonData["isTracking"] = skeleton.isTracking;
+
+		// Store position data for each joint
+		Json::Value joints;
+
+		// iterate and get position/confidence data from each joint
+		size_t length = sizeof(skeleton.joints) / sizeof(WuCinderNITE::SKELETON_JOINT);
+		WuCinderNITE::SKELETON_JOINT *begin = &skeleton.joints[0];
+		WuCinderNITE::SKELETON_JOINT *end = &skeleton.joints[length];
+		for(WuCinderNITE::SKELETON_JOINT* i = begin; i != end; ++i){
+			//std::cout << skeleton.joints[i].position << std::endl;
+			WuCinderNITE::SKELETON_JOINT *singleJoint = &*i;
+
+			Json::Value aJointJson;
+			aJointJson["confidence"] = singleJoint->confidence;
+
+			Json::Value positionJson;
+			positionJson["x"] = ZERO_IF_NAN(singleJoint->position.x);
+			positionJson["y"] = ZERO_IF_NAN(singleJoint->position.y);
+			positionJson["z"] = ZERO_IF_NAN(singleJoint->position.z);
+			aJointJson["position"] = positionJson;
+
+			// Add to joints list
+			joints.append( aJointJson );
+		}
+
+		skeletonData["joints"] = joints;
+		value["skeletonData"] = skeletonData;
 		return value;
 	}
 }
