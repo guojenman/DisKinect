@@ -5,7 +5,8 @@
  *      Author: mariogonzalez
  *      Abstract:
  *      	 This represents one of the states in the UserStreamStateManager
- *      	 It is responsible for retrieving live skeleton data from the kinect
+ *      	 It is able to record a user stream from the Kinect and outputing it as a JSON string
+ *      	 It relies on a UserStreamLive instance for kinect data
  */
 
 #ifndef UserStreamRecorder_H_
@@ -38,25 +39,24 @@ class UserStreamRecorder : public IUserStream  {
 		bool onSaveClicked( ci::app::MouseEvent event );
 
 	private:
-		void setState( RecorderState aState );
+		void setState( RecorderState aState );	// Sets the current state, modifies _label in place
 
-		UserStreamLive *_livestream;	// When queried for skeleton data we just send whatever our livestream has
+		UserStreamLive *_livestream;		// When queried for skeleton data we just send whatever our livestream has
 
-		// Gui
-		mowa::sgui::LabelControl* _label;
-		mowa::sgui::ButtonControl* _toggle;
-		mowa::sgui::SimpleGUI* _gui;
+		// GUI
+		mowa::sgui::LabelControl* _label;	// Label that displays crrent state
+		mowa::sgui::ButtonControl* _toggle;	// Toggle button
+		mowa::sgui::SimpleGUI* _gui;		// SimpleGUI instance
 
-		RecorderState _state;
-		uint32_t _framenumber; // Current frame number of recording, set to zero on start
+		RecorderState _state;	// Current state - either recording or idle
+		uint32_t _framenumber;	// Current frame number of recording, set to zero on start
 
-		std::vector<UserStreamFrame*> _recording;
-
+		std::vector<UserStreamFrame*> _recording;	// Stores frames during recording
 
 		// recording
-		void startRecording();
-		void recordState();
-		void stopRecording();
+		void startRecording();	// Starts recording Kinect data
+		void recordState();		// Records a single frame of user Kinect data via UserStreamFrame
+		void stopRecording();	// Stops recording Kinect data
 	};
 }
 

@@ -3,6 +3,9 @@
  *
  *  Created on: Sep 24, 2011
  *      Author: onedayitwillmake
+ *      Abstract: This class represents a single frame of UserStream data.
+ *      It contains a framenumber, and a WuCinderNITE::SKELETON struct.
+ *      It is able to output itself as a jsonstring, or create itself from a json string
  */
 
 #include "UserStreamFrame.h"

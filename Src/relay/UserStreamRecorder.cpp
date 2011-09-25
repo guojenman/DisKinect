@@ -5,7 +5,8 @@
  *      Author: mariogonzalez
  *      Abstract:
  *      	 This represents one of the states in the UserStreamStateManager
- *      	 It is responsible for retrieving live skeleton data from the kinect
+ *      	 It is able to record a user stream from the Kinect and outputing it as a JSON string
+ *      	 It relies on a UserStreamLive instance for kinect data
  */
 
 #include "UserStreamRecorder.h"
@@ -109,8 +110,6 @@ namespace relay {
 
 		return true;
 	}
-
-	// SimpleGUI Callbacks
 	bool UserStreamRecorder::onSaveClicked( ci::app::MouseEvent event ) {
 		stopRecording();
 

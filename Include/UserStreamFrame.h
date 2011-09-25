@@ -1,9 +1,11 @@
 /*
- * UserStreamFrame.h
+ * UserStreamFrame.cpp
  *
  *  Created on: Sep 24, 2011
  *      Author: onedayitwillmake
- *      Abstract: Represents a single frame of a recording
+ *      Abstract: This class represents a single frame of UserStream data.
+ *      It contains a framenumber, and a WuCinderNITE::SKELETON struct.
+ *      It is able to output itself as a jsonstring, or create itself from a json string
  */
 
 #ifndef USERSTREAMFRAME_H_
@@ -23,9 +25,13 @@ namespace relay
 
 			// Static creation of an instance
 			static UserStreamFrame* fromJSON( Json::Value json  );
+			// Outputs to JSON string
 			Json::Value toJSON();
 
+			// Sequenced framenumber of this recording
 			uint32_t framenumber;
+
+			// Skeleton data
 			WuCinderNITE::SKELETON skeleton;
 	};
 

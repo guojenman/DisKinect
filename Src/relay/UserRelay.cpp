@@ -9,7 +9,7 @@
  *      		* UserStreamPlayback
  *      		* UserStreamRecorder
  *      	It determines which state the UserStreamStateMachine should be in,
- *      	and ask the UserStreamStateMachine for skeleton information each frame
+ *      	and asks the UserStreamStateMachine for skeleton information each frame
  */
 
 #include "UserRelay.h"
