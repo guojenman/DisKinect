@@ -13,6 +13,7 @@
 #define UserStreamRecorder_H_
 
 #include <vector>
+#include <iostream>
 #include "IUserStream.h"
 #include "UserStreamLive.h"
 #include "UserStreamFrame.h"
@@ -57,6 +58,7 @@ class UserStreamRecorder : public IUserStream  {
 		void startRecording();	// Starts recording Kinect data
 		void recordState();		// Records a single frame of user Kinect data via UserStreamFrame
 		void stopRecording();	// Stops recording Kinect data
+		void saveToDisk( std::string jsonString );	// Save to disk
 	};
 }
 

@@ -30,6 +30,7 @@ namespace relay {
 		currentState = aState;
 		currentState->enter();
 	}
+
 	void UserStreamStateManager::changeState( IUserStream* aState ) {
 
 		if(aState != previousState)

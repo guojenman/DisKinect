@@ -11,6 +11,10 @@
 
 #include "UserStreamRecorder.h"
 #include "cinder/app/App.h"
+#include "cinder/Utilities.h"
+#include "cinder/Color.h"
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 namespace relay {
 
 	UserStreamRecorder::UserStreamRecorder() {
@@ -33,6 +37,10 @@ namespace relay {
 		_livestream->enter();
 
 		_gui = new mowa::sgui::SimpleGUI( ci::app::App::get() );
+		_gui->textColor = ColorA(1,1,1,1);
+		_gui->lightColor = ColorA(1, 0, 1, 1);
+		_gui->darkColor = ColorA(0.05,0.05,0.05, 1);
+		_gui->bgColor = ColorA(0.15, 0.15, 0.15, 1.0);
 		_gui->addLabel("RECORDER");
 		_gui->addSeparator();
 		_label = _gui->addLabel("Idle");
@@ -121,7 +129,27 @@ namespace relay {
 			json.append( aFrame->toJSON() );
 		}
 
+		saveToDisk( json.toStyledString() );
 
-		std::cout << json.toStyledString() << std::endl;
+		return true;
+	}
+
+	void UserStreamRecorder::saveToDisk( std::string jsonString ) {
+		// Create a timestamp
+		using namespace boost::posix_time;
+	    using namespace boost::gregorian;
+
+
+		// Use boost to figure out the current time on local machine
+		ptime now = second_clock::local_time();
+
+		std::stringstream ss;
+		ss << now.date().month() <<  now.date().day() << "_" << ci::app::App::get()->getElapsedFrames();
+		std::string timeStamp = ss.str();
+
+		// Write the file to the documents directory
+		std::string fileName = ci::getDocumentsDirectory() + "/Diskinect/Recording_" + timeStamp;
+		ci::OStreamFileRef oStream = ci::writeFileStream( fileName + ".json", true );
+		oStream->writeData( jsonString.data(), jsonString.length() );
 	}
 }

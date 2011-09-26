@@ -25,6 +25,7 @@ namespace relay {
 
 		// Create the FSM and set the initial state
 		this->fsm = new relay::UserStreamStateManager();
+
 		relay::UserStreamRecorder* live = new relay::UserStreamRecorder();
 		this->fsm->setInitialState( live );
 
