@@ -13,6 +13,7 @@
 #include "cinder/app/App.h"
 #include "cinder/Utilities.h"
 #include "cinder/Color.h"
+#include "json/writer.h"
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace relay {
@@ -121,14 +122,23 @@ namespace relay {
 	bool UserStreamRecorder::onSaveClicked( ci::app::MouseEvent event ) {
 		stopRecording();
 
+
 		Json::Value json;
+		Json::Value root;
 		for( std::vector<UserStreamFrame*>::iterator i = _recording.begin();
 				i != _recording.end();
 				++i) {
 			UserStreamFrame* aFrame = *i;
-			json.append( aFrame->toJSON() );
+			root.append( aFrame->toJSON() );
 		}
 
+		json["root"] = root;
+		// Write fast version to console
+//		Json::FastWriter writer;
+		std::cout << json.toStyledString() << std::endl;
+
+
+		// Save nice version to disk
 		saveToDisk( json.toStyledString() );
 
 		return true;

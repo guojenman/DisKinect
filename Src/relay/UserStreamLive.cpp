@@ -28,7 +28,9 @@ namespace relay {
 	}
 
 	void UserStreamLive::update() {}
-	void UserStreamLive::draw(){}
+	void UserStreamLive::draw(){
+
+	}
 
 	WuCinderNITE::SKELETON UserStreamLive::getSkeleton() {
 

@@ -16,7 +16,6 @@
 
 namespace relay
 {
-
 	class UserStreamFrame
 	{
 		public:

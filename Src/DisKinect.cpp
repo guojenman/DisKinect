@@ -8,7 +8,6 @@
 #include "cinder/Camera.h"
 
 #include "UserRelay.h"
-
 using namespace ci;
 using namespace app;
 using namespace std;

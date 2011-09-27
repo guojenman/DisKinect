@@ -24,7 +24,20 @@ namespace relay
 
 	UserStreamFrame* UserStreamFrame::fromJSON( Json::Value json  ) {
 		WuCinderNITE::SKELETON aSkeleton;
-		return new UserStreamFrame(1, aSkeleton);;
+
+		aSkeleton.isTracking = json["skeletonData"]["isTracking"].asBool();
+		Json::Value jointInfo = json["skeletonData"]["joints"];
+
+		// iterate and get position/confidence data from each joint
+		size_t length = sizeof(aSkeleton.joints) / sizeof(WuCinderNITE::SKELETON_JOINT);
+		for( uint i = 0; i < length; ++i ) {
+			aSkeleton.joints[i].confidence = (float)jointInfo[i]["confidence"].asDouble();
+			aSkeleton.joints[i].position.x = (float)jointInfo[i]["position"]["x"].asDouble();
+			aSkeleton.joints[i].position.y = (float)jointInfo[i]["position"]["y"].asDouble();
+			aSkeleton.joints[i].position.z = (float)jointInfo[i]["position"]["z"].asDouble();
+		}
+
+		return new UserStreamFrame( json["framenumber"].asInt(), aSkeleton );
 	}
 
 	Json::Value UserStreamFrame::toJSON() {

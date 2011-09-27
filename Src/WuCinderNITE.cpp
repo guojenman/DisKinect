@@ -439,7 +439,7 @@ void WuCinderNITE::renderSkeleton(SKELETON &skeleton, XnUserID nId)
 void WuCinderNITE::renderLimb(SKELETON &skeleton, XnSkeletonJoint eJoint1, XnSkeletonJoint eJoint2, float confidence)
 {
 	if (!skeleton.isTracking) {
-		ci::app::console() << "user not tracked!" << endl;
+	//	ci::app::console() << "user not tracked!" << endl;
 		return;
 	}
 	if (skeleton.joints[eJoint1].confidence < confidence || skeleton.joints[eJoint2].confidence < confidence) {

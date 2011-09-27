@@ -16,6 +16,7 @@
 #include "cinder/app/App.h"
 #include "UserStreamLive.h"
 #include "UserStreamRecorder.h"
+#include "UserStreamPlayer.h"""
 
 namespace relay {
 	UserRelay::UserRelay( WuCinderNITE* t_ni, UserTracker* t_tracker ) {
@@ -26,8 +27,18 @@ namespace relay {
 		// Create the FSM and set the initial state
 		this->fsm = new relay::UserStreamStateManager();
 
-		relay::UserStreamRecorder* live = new relay::UserStreamRecorder();
-		this->fsm->setInitialState( live );
+		// Test the live stream
+//		relay::UserStreamLive* live = new relay::UserStreamRecorder();
+//		this->fsm->setInitialState( live );
+
+		// Test the recorder
+//		relay::UserStreamRecorder* recorder = new relay::UserStreamRecorder();
+//		this->fsm->setInitialState( recorder );
+
+		// Test using the player
+		relay::UserStreamPlayer* player = new relay::UserStreamPlayer();
+		player->setJson("jsontest.json");			// Note the UserStreamPlayer requires the JSON to be set before 'enter' - set via string path or Json::Value
+		this->fsm->setInitialState( player );
 
 		mCamEye = ci::Vec3f(0, 0, -500.0f);
 		mCamLookAt = ci::Vec3f::zero();
@@ -62,7 +73,7 @@ namespace relay {
 	}
 
 	void UserRelay::renderSkeleton() {
-		WuCinderNITE::SKELETON aSkeleton = 	getSkeleton();
+		WuCinderNITE::SKELETON aSkeleton = getSkeleton();
 
 		ci::gl::pushMatrices();
 		ci::gl::setMatrices(mCam);
