@@ -11,15 +11,23 @@
 #ifndef USERSTREAMFRAME_H_
 #define USERSTREAMFRAME_H_
 
-#include "WuCinderNITE.h"
 #include "json/value.h"
+#include "SkeletonStruct.h"
+
+// Forward declerations
+namespace SKELETON {
+	struct SKELETON;
+	struct SKELETON_JOINT;
+}
+class WuCinderNITE;
+class UserTracker;
 
 namespace relay
 {
 	class UserStreamFrame
 	{
 		public:
-			UserStreamFrame( uint32_t aFramenumber, WuCinderNITE::SKELETON &aSkeleton );
+			UserStreamFrame( uint32_t aFramenumber, SKELETON::SKELETON &aSkeleton );
 			virtual ~UserStreamFrame();
 
 			// Static creation of an instance
@@ -31,7 +39,7 @@ namespace relay
 			uint32_t framenumber;
 
 			// Skeleton data
-			WuCinderNITE::SKELETON skeleton;
+			SKELETON::SKELETON skeleton;
 	};
 
 }

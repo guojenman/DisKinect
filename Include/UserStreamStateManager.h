@@ -10,6 +10,10 @@
 
 #include "IUserStream.h"
 
+// Forward Declerations
+namespace SKELETON {
+	struct SKELETON;
+}
 namespace relay {
 
 class UserStreamStateManager {
@@ -24,7 +28,7 @@ class UserStreamStateManager {
 
 		void update();
 		void draw();
-		WuCinderNITE::SKELETON getSkeleton();
+		SKELETON::SKELETON getSkeleton();
 
 	private:
 		IUserStream* currentState;

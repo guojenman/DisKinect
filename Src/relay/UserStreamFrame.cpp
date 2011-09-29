@@ -4,11 +4,12 @@
  *  Created on: Sep 24, 2011
  *      Author: onedayitwillmake
  *      Abstract: This class represents a single frame of UserStream data.
- *      It contains a framenumber, and a WuCinderNITE::SKELETON struct.
+ *      It contains a framenumber, and a SKELETON::SKELETON struct.
  *      It is able to output itself as a jsonstring, or create itself from a json string
  */
 
 #include "UserStreamFrame.h"
+
 #include <iterator>
 
 
@@ -16,21 +17,21 @@
 namespace relay
 {
 
-	UserStreamFrame::UserStreamFrame( uint32_t aFramenumber, WuCinderNITE::SKELETON &aSkeleton ) {
+	UserStreamFrame::UserStreamFrame( uint32_t aFramenumber, SKELETON::SKELETON &aSkeleton ) {
 		framenumber = aFramenumber;
 		skeleton = aSkeleton;
 	}
 	UserStreamFrame::~UserStreamFrame() {}
 
 	UserStreamFrame* UserStreamFrame::fromJSON( Json::Value json  ) {
-		WuCinderNITE::SKELETON aSkeleton;
+		SKELETON::SKELETON aSkeleton;
 
 		aSkeleton.isTracking = json["skeletonData"]["isTracking"].asBool();
 		Json::Value jointInfo = json["skeletonData"]["joints"];
 
 		// iterate and get position/confidence data from each joint
-		size_t length = sizeof(aSkeleton.joints) / sizeof(WuCinderNITE::SKELETON_JOINT);
-		for( uint i = 0; i < length; ++i ) {
+		size_t length = sizeof(aSkeleton.joints) / sizeof(SKELETON::SKELETON_JOINT);
+		for( int i = 0; i < length; ++i ) {
 			aSkeleton.joints[i].confidence = (float)jointInfo[i]["confidence"].asDouble();
 			aSkeleton.joints[i].position.x = (float)jointInfo[i]["position"]["x"].asDouble();
 			aSkeleton.joints[i].position.y = (float)jointInfo[i]["position"]["y"].asDouble();
@@ -51,12 +52,12 @@ namespace relay
 		Json::Value joints;
 
 		// iterate and get position/confidence data from each joint
-		size_t length = sizeof(skeleton.joints) / sizeof(WuCinderNITE::SKELETON_JOINT);
-		WuCinderNITE::SKELETON_JOINT *begin = &skeleton.joints[0];
-		WuCinderNITE::SKELETON_JOINT *end = &skeleton.joints[length];
-		for(WuCinderNITE::SKELETON_JOINT* i = begin; i != end; ++i){
+		size_t length = sizeof(skeleton.joints) / sizeof(SKELETON::SKELETON_JOINT);
+		SKELETON::SKELETON_JOINT *begin = &skeleton.joints[0];
+		SKELETON::SKELETON_JOINT *end = &skeleton.joints[length];
+		for(SKELETON::SKELETON_JOINT* i = begin; i != end; ++i){
 			//std::cout << skeleton.joints[i].position << std::endl;
-			WuCinderNITE::SKELETON_JOINT *singleJoint = &*i;
+			SKELETON::SKELETON_JOINT *singleJoint = &*i;
 
 			Json::Value aJointJson;
 			aJointJson["confidence"] = singleJoint->confidence;

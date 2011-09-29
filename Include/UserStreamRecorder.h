@@ -20,6 +20,13 @@
 #include "simplegui/SimpleGUI.h"
 #include "cinder/app/Event.h"
 
+
+// Forward declerations
+namespace SKELETON {
+	struct SKELETON;
+	struct SKELETON_JOINT;
+}
+
 namespace relay {
 class UserStreamRecorder : public IUserStream  {
 
@@ -33,7 +40,7 @@ class UserStreamRecorder : public IUserStream  {
 		void update();
 		void draw();
 		void exit();
-		WuCinderNITE::SKELETON getSkeleton();
+		SKELETON::SKELETON getSkeleton();
 
 		// Callbacks
 		bool onToggleRecordingClicked( ci::app::MouseEvent event );

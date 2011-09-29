@@ -13,6 +13,14 @@
 
 #include "IUserStream.h"
 
+// Forward declerations
+namespace SKELETON {
+	struct SKELETON;
+	struct SKELETON_JOINT;
+}
+class WuCinderNITE;
+class UserTracker;
+
 namespace relay {
 
 class UserStreamLive : public IUserStream  {
@@ -24,7 +32,7 @@ class UserStreamLive : public IUserStream  {
 		void update();
 		void draw();
 		void exit();
-		WuCinderNITE::SKELETON getSkeleton();
+		SKELETON::SKELETON getSkeleton();
 	};
 }
 

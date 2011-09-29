@@ -6,6 +6,7 @@
  */
 
 #include "WuCinderNITE.h"
+#include "SkeletonStruct.h"
 #include "gl.h"
 
 XnUInt32 mNITENumNITEUserColors = 10;
@@ -394,7 +395,7 @@ void WuCinderNITE::renderSkeleton(XnUserID nId)
 	}
 }
 
-void WuCinderNITE::renderSkeleton(SKELETON &skeleton, XnUserID nId)
+void WuCinderNITE::renderSkeleton(SKELETON::SKELETON &skeleton, XnUserID nId)
 {
 	if (skeleton.isTracking) {
 		glLineWidth(3);
@@ -436,7 +437,7 @@ void WuCinderNITE::renderSkeleton(SKELETON &skeleton, XnUserID nId)
 	ci::gl::color(1, 1, 1, 1);
 }
 
-void WuCinderNITE::renderLimb(SKELETON &skeleton, XnSkeletonJoint eJoint1, XnSkeletonJoint eJoint2, float confidence)
+void WuCinderNITE::renderLimb(SKELETON::SKELETON &skeleton, XnSkeletonJoint eJoint1, XnSkeletonJoint eJoint2, float confidence)
 {
 	if (!skeleton.isTracking) {
 	//	ci::app::console() << "user not tracked!" << endl;

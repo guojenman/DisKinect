@@ -14,9 +14,14 @@
 
 #include "UserRelay.h"
 #include "cinder/app/App.h"
+
+#include "WuCinderNITE.h"
+#include "UserTracker.h"
+#include "SkeletonStruct.h"
+
 #include "UserStreamLive.h"
 #include "UserStreamRecorder.h"
-#include "UserStreamPlayer.h"""
+#include "UserStreamPlayer.h"
 
 namespace relay {
 	UserRelay::UserRelay( WuCinderNITE* t_ni, UserTracker* t_tracker ) {
@@ -54,7 +59,7 @@ namespace relay {
 	}
 
 	void UserRelay::update() {
-		WuCinderNITE::SKELETON aSkeleton;
+		SKELETON::SKELETON aSkeleton;
 		mCam.setPerspective(60.0f, cinder::app::App::get()->getWindowAspectRatio(), 1.0f, ni->maxDepth);
 		mCam.lookAt(mCamEye, mCamLookAt);
 		fsm->update();
@@ -64,7 +69,7 @@ namespace relay {
 		fsm->draw();
 	}
 
-	WuCinderNITE::SKELETON UserRelay::getSkeleton() {
+	SKELETON::SKELETON UserRelay::getSkeleton() {
 		return fsm->getSkeleton();
 	}
 
@@ -73,7 +78,7 @@ namespace relay {
 	}
 
 	void UserRelay::renderSkeleton() {
-		WuCinderNITE::SKELETON aSkeleton = getSkeleton();
+		SKELETON::SKELETON aSkeleton = getSkeleton();
 
 		ci::gl::pushMatrices();
 		ci::gl::setMatrices(mCam);

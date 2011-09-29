@@ -10,11 +10,17 @@
  */
 
 #include "UserStreamRecorder.h"
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 #include "cinder/app/App.h"
 #include "cinder/Utilities.h"
 #include "cinder/Color.h"
+
 #include "json/writer.h"
-#include <boost/date_time/posix_time/posix_time.hpp>
+
+#include "WuCinderNITE.h"
+#include "UserTracker.h"
+#include "SkeletonStruct.h"
 
 namespace relay {
 
@@ -67,7 +73,7 @@ namespace relay {
 		_gui->draw();
 	}
 
-	WuCinderNITE::SKELETON UserStreamRecorder::getSkeleton() {
+	SKELETON::SKELETON UserStreamRecorder::getSkeleton() {
 		return _livestream->getSkeleton();
 	}
 
@@ -98,7 +104,7 @@ namespace relay {
 
 	void UserStreamRecorder::recordState() {
 
-		WuCinderNITE::SKELETON aSkeleton = _livestream->getSkeleton();
+		SKELETON::SKELETON aSkeleton = _livestream->getSkeleton();
 		UserStreamFrame* aFrame = new UserStreamFrame( _framenumber, aSkeleton );
 		_recording.push_back( aFrame );
 		_framenumber++;

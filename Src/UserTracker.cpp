@@ -6,6 +6,7 @@
  */
 
 #include "UserTracker.h"
+#include "SkeletonStruct.h"
 
 UserTracker* UserTracker::mInstance = NULL;
 UserTracker* UserTracker::getInstance()
@@ -65,7 +66,7 @@ void UserTracker::update()
 	// and decide if the user is active or not - used for sorting, and gives us
 	// the next active user, if user A stays still for too long (possible lost of user)
 	for(list<UserInfo>::iterator it = mUsers.begin(); it != mUsers.end();) {
-		WuCinderNITE::SKELETON &skeleton = ni->skeletons[it->id];
+		SKELETON::SKELETON &skeleton = ni->skeletons[it->id];
 		if (skeleton.isTracking) {
 
 			ci::Vec3f &shoulderL = skeleton.joints[XN_SKEL_LEFT_SHOULDER].confidence > confidence

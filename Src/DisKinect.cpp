@@ -8,6 +8,11 @@
 #include "cinder/Camera.h"
 
 #include "UserRelay.h"
+
+#include "WuCinderNITE.h"
+#include "UserTracker.h"
+#include "SkeletonStruct.h"
+
 using namespace ci;
 using namespace app;
 using namespace std;

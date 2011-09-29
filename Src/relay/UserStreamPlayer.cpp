@@ -11,6 +11,16 @@
 #include "UserStreamPlayer.h"
 #include <iostream>
 #include <fstream>
+
+#include "UserStreamLive.h"
+#include "UserStreamRecorder.h"
+#include "UserStreamPlayer.h"
+
+
+#include "WuCinderNITE.h"
+#include "UserTracker.h"
+#include "SkeletonStruct.h"
+
 #include "json/reader.h"
 
 namespace relay {
@@ -58,7 +68,7 @@ namespace relay {
 		_state = PLAYING;
 	}
 
-	WuCinderNITE::SKELETON UserStreamPlayer::getSkeleton() {
+	SKELETON::SKELETON UserStreamPlayer::getSkeleton() {
 		uint frameToPlay = (uint)ci::math<float>::min( _currentFrame, _totalframes-1 );
 
 		// To avoid throwing an exception - just return an empty skeleton struct if the current frame is greater than our size
@@ -66,7 +76,7 @@ namespace relay {
 		if( frameToPlay < _recording.size() ) {
 			return _recording.at( frameToPlay )->skeleton;
 		} else {
-			WuCinderNITE::SKELETON skeleton;
+			SKELETON::SKELETON skeleton;
 			return skeleton;
 		}
 

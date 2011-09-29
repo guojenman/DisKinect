@@ -10,6 +10,11 @@
 
 #include "UserStreamLive.h"
 
+#include "WuCinderNITE.h"
+#include "UserTracker.h"
+#include "SkeletonStruct.h"
+
+
 namespace relay {
 
 	UserStreamLive::UserStreamLive() {
@@ -32,9 +37,9 @@ namespace relay {
 
 	}
 
-	WuCinderNITE::SKELETON UserStreamLive::getSkeleton() {
+	SKELETON::SKELETON UserStreamLive::getSkeleton() {
 
-		WuCinderNITE::SKELETON aSkeleton;
+		SKELETON::SKELETON aSkeleton;
 		if( tracker->activeUserId != 0 ) {
 			aSkeleton = ni->skeletons[ tracker->activeUserId ];
 		} else { // is false by default?

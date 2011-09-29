@@ -8,8 +8,13 @@
 #ifndef IUSERSTREAM_H_
 #define IUSERSTREAM_H_
 
-#include "WuCinderNITE.h"
-#include "UserTracker.h"
+// Forward declerations
+namespace SKELETON {
+	struct SKELETON;
+	struct SKELETON_JOINT;
+}
+class WuCinderNITE;
+class UserTracker;
 
 namespace relay {
 	class IUserStream {
@@ -20,7 +25,7 @@ namespace relay {
 		virtual void update() = 0;
 		virtual void exit() = 0;
 		virtual void draw() = 0;
-		virtual WuCinderNITE::SKELETON getSkeleton() = 0;
+		virtual SKELETON::SKELETON getSkeleton() = 0;
 
 	protected:
 		WuCinderNITE* ni;

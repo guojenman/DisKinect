@@ -8,6 +8,10 @@
 #include "UserStreamStateManager.h"
 
 
+#include "WuCinderNITE.h"
+#include "UserTracker.h"
+#include "SkeletonStruct.h"
+
 namespace relay {
 
 	UserStreamStateManager::UserStreamStateManager() {
@@ -67,7 +71,7 @@ namespace relay {
 		}
 	}
 
-	WuCinderNITE::SKELETON UserStreamStateManager::getSkeleton() {
+	SKELETON::SKELETON UserStreamStateManager::getSkeleton() {
 		return currentState->getSkeleton();
 	}
 }

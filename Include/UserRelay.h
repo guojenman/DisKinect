@@ -15,12 +15,20 @@
 #ifndef USERRELAY_H_
 #define USERRELAY_H_
 
-#include "WuCinderNITE.h"
-#include "UserTracker.h"
+
+
 #include "UserStreamStateManager.h"
 #include "cinder/Camera.h"
 #include "cinder/Vector.h"
 #include "json/json.h"
+
+// Forward declerations
+namespace SKELETON {
+	struct SKELETON;
+	struct SKELETON_JOINT;
+}
+class WuCinderNITE;
+class UserTracker;
 
 namespace relay {
 	class UserRelay {
@@ -29,7 +37,7 @@ namespace relay {
 		virtual ~UserRelay();
 
 		void update();
-		WuCinderNITE::SKELETON getSkeleton();
+		SKELETON::SKELETON getSkeleton();
 
 		void renderDepthMap();
 		void renderSkeleton();

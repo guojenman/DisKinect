@@ -16,6 +16,15 @@
 #include "json/value.h"
 
 
+// Forward declerations
+namespace SKELETON {
+	struct SKELETON;
+	struct SKELETON_JOINT;
+}
+class WuCinderNITE;
+class UserTracker;
+
+
 namespace relay {
 	class UserStreamPlayer : public IUserStream {
 		enum PlayerState { PLAYING, PAUSED };
@@ -28,7 +37,7 @@ namespace relay {
 		void update();
 		void draw();
 		void exit();
-		WuCinderNITE::SKELETON getSkeleton();
+		SKELETON::SKELETON getSkeleton();
 
 		void play();
 		void pause();
