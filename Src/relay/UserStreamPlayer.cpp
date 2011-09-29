@@ -11,6 +11,7 @@
 #include "UserStreamPlayer.h"
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 #include "UserStreamLive.h"
 #include "UserStreamRecorder.h"
@@ -22,12 +23,20 @@
 #include "SkeletonStruct.h"
 
 #include "json/reader.h"
+#include "simplegui/SimpleGUI.h"
 
 namespace relay {
 	UserStreamPlayer::UserStreamPlayer() {
 	}
 
 	UserStreamPlayer::~UserStreamPlayer() {
+		ni = NULL;
+		tracker = NULL;
+
+		delete _gui; _gui = NULL;
+		delete _label; _label = NULL;
+		delete _toggle; _toggle = NULL;
+
 		std::cout << "UserStreamPlayer destructor!" << std::endl;
 	}
 
@@ -41,19 +50,51 @@ namespace relay {
 		tracker = UserTracker::getInstance();
 
 		_currentFrame = 0;
-		_totalframes = 100;
+		_state = PLAYING;
+		_shouldLoop = true;
+
+		// GUI
+		_gui = new mowa::sgui::SimpleGUI( ci::app::App::get() );
+		_gui->textColor = ColorA(1,1,1,1);
+		_gui->lightColor = ColorA(1, 0, 1, 1);
+		_gui->darkColor = ColorA(0.05,0.05,0.05, 1);
+		_gui->bgColor = ColorA(0.15, 0.15, 0.15, 1.0);
+		_label = _gui->addLabel("Playing");
+		_loopButton = _gui->addParam("Loop", &_shouldLoop, _shouldLoop);
+		_gui->addSeparator();
+		_frameSlider = _gui->addParam("Frame:", &_currentFrame, 0, _totalframes, 0);
+		_gui->addSeparator();
+		_toggle = _gui->addButton("Pause");
+		_toggle->registerClick( this, &UserStreamPlayer::onToggleRecordingClicked );
 	}
 
 	void UserStreamPlayer::update() {
-		_currentFrame++;
+
+		if(_state == PLAYING && _currentFrame <= _totalframes) _currentFrame++;
+
+		// Loop
+		if( _shouldLoop && _currentFrame > _totalframes ) {
+			_currentFrame = 0;
+		}
+
+		if(_frameSlider) {
+			std::stringstream ss;
+			ss << "Frame: " << _currentFrame << " of " << _totalframes;
+			_frameSlider->name = ss.str();
+		}
 	}
 
 	void UserStreamPlayer::draw() {
-
+		_gui->draw();
 	}
 
 	void UserStreamPlayer::exit() {
+		ni = NULL;
+		tracker = NULL;
 
+		delete _gui; _gui = NULL;
+		delete _label; _label = NULL;
+		delete _toggle; _toggle = NULL;
 	}
 
 	void UserStreamPlayer::play() {
@@ -66,6 +107,21 @@ namespace relay {
 	void UserStreamPlayer::restart() {
 		_currentFrame = 0;
 		_state = PLAYING;
+	}
+
+	bool UserStreamPlayer::onToggleRecordingClicked( ci::app::MouseEvent event ) {
+
+		if(_state == PLAYING) {
+			_label->name = "PAUSED";
+			_toggle->name = "PLAY";
+			pause();
+		} else if (_state == PAUSED ) {
+			_label->name = "PLAYING";
+			_toggle->name = "PAUSE";
+			play();
+		}
+
+		return true;
 	}
 
 	SKELETON::SKELETON UserStreamPlayer::getSkeleton() {

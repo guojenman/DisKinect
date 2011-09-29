@@ -14,16 +14,13 @@
 #include "IUserStream.h"
 #include "UserStreamFrame.h"
 #include "json/value.h"
-
+#include "cinder/app/MouseEvent.h"
 
 // Forward declerations
-namespace SKELETON {
-	struct SKELETON;
-	struct SKELETON_JOINT;
-}
+namespace SKELETON { struct SKELETON; struct SKELETON_JOINT; }
+namespace mowa { namespace sgui { class LabelControl; class ButtonControl; class BoolVarControl; class IntVarControl; class SimpleGUI; }}
 class WuCinderNITE;
 class UserTracker;
-
 
 namespace relay {
 	class UserStreamPlayer : public IUserStream {
@@ -43,15 +40,25 @@ namespace relay {
 		void pause();
 		void restart();
 
+		///// CALLBACKS
+		bool onToggleRecordingClicked( ci::app::MouseEvent event );
 		///// ACCESSORS
 		void setJson( const std::string &aPath );
 		void setJson( Json::Value *aJsonValue );
 
+		int _currentFrame;
 	private:
 		PlayerState _state;
-		int _currentFrame;
+		bool _shouldLoop;
 		int _totalframes;
 		std::vector<UserStreamFrame*> _recording;
+
+		// GUI
+		mowa::sgui::LabelControl* _label;	// Label that displays crrent state
+		mowa::sgui::ButtonControl* _toggle;	// Toggle button
+		mowa::sgui::BoolVarControl* _loopButton;	// Toggle button
+		mowa::sgui::IntVarControl* _frameSlider;
+		mowa::sgui::SimpleGUI* _gui;		// SimpleGUI instance
 
 		Json::Value _json;
 		std::string _jsonString;

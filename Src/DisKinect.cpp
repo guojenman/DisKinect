@@ -9,6 +9,9 @@
 
 #include "UserRelay.h"
 
+#include <OpenGL.framework/Headers/gl.h>
+#include <OpenGL.framework/Headers/glext.h>
+
 #include "WuCinderNITE.h"
 #include "UserTracker.h"
 #include "SkeletonStruct.h"
@@ -63,9 +66,10 @@ void DisKinect::draw()
 	gl::clear(ColorA(0, 0, 0, 0), true);
 
 	// These will be moved to userRelay->draw later
-	userRelay->renderDepthMap();
-	userRelay->renderSkeleton();
+	//userRelay->renderDepthMap();
+	//userRelay->renderSkeleton();
 	userRelay->draw();
+	userRelay->renderSkeleton();
 }
 
 void DisKinect::shutdown()
@@ -75,6 +79,7 @@ void DisKinect::shutdown()
 }
 
 void DisKinect::keyUp(KeyEvent event)
+
 {
 	if (event.getChar() == KeyEvent::KEY_q) {
 		quit();

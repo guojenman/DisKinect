@@ -18,6 +18,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/signals2.hpp>
+#include <boost/signals.hpp>
 
 #include <XnOpenNI.h>
 #include <XnCppWrapper.h>

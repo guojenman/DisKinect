@@ -9,6 +9,7 @@
  *      	 It relies on a UserStreamLive instance for kinect data
  */
 
+#pragma once
 #ifndef UserStreamRecorder_H_
 #define UserStreamRecorder_H_
 
@@ -17,15 +18,13 @@
 #include "IUserStream.h"
 #include "UserStreamLive.h"
 #include "UserStreamFrame.h"
-#include "simplegui/SimpleGUI.h"
 #include "cinder/app/Event.h"
+#include "cinder/app/MouseEvent.h"
 
 
 // Forward declerations
-namespace SKELETON {
-	struct SKELETON;
-	struct SKELETON_JOINT;
-}
+namespace SKELETON { struct SKELETON; struct SKELETON_JOINT; }
+namespace mowa { namespace sgui { class LabelControl; class ButtonControl; class SimpleGUI; }}
 
 namespace relay {
 class UserStreamRecorder : public IUserStream  {

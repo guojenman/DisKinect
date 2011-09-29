@@ -22,6 +22,8 @@
 #include "UserTracker.h"
 #include "SkeletonStruct.h"
 
+#include "simplegui/SimpleGUI.h"
+
 namespace relay {
 
 	UserStreamRecorder::UserStreamRecorder() {
@@ -83,7 +85,7 @@ namespace relay {
 
 		delete _livestream; _livestream = NULL;
 		delete _gui; _gui = NULL;
-		_label = NULL;
+		delete _label; _label = NULL;
 	}
 
 
