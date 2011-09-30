@@ -25,7 +25,6 @@
 
 namespace relay {
 	UserRelay::UserRelay( WuCinderNITE* t_ni, UserTracker* t_tracker ) {
-		// TODO Auto-generated constructor stub
 		this->ni = t_ni;
 		this->tracker = t_tracker;
 
