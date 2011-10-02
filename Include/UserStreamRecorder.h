@@ -25,6 +25,7 @@
 // Forward declerations
 namespace SKELETON { struct SKELETON; struct SKELETON_JOINT; }
 namespace mowa { namespace sgui { class LabelControl; class ButtonControl; class SimpleGUI; }}
+namespace Json { class Value; }
 
 namespace relay {
 class UserStreamRecorder : public IUserStream  {
@@ -39,6 +40,8 @@ class UserStreamRecorder : public IUserStream  {
 		void update();
 		void draw();
 		void exit();
+
+		Json::Value getRecordAsJSONValue();
 		SKELETON::SKELETON getSkeleton();
 
 		// Callbacks

@@ -23,6 +23,10 @@
 #include "UserStreamRecorder.h"
 #include "UserStreamPlayer.h"
 
+#include "simplegui/SimpleGUI.h"
+#include "Constants.h"
+using namespace Constants::Debug;
+
 namespace relay {
 	UserRelay::UserRelay( WuCinderNITE* t_ni, UserTracker* t_tracker ) {
 		this->ni = t_ni;
@@ -44,8 +48,7 @@ namespace relay {
 		player->setJson("jsontest.json");			// Note the UserStreamPlayer requires the JSON to be set before 'enter' - set via string path or Json::Value
 		this->fsm->setInitialState( player );
 
-		mCamEye = ci::Vec3f(0, 0, -500.0f);
-		mCamLookAt = ci::Vec3f::zero();
+		setupDebug();
 	}
 
 	UserRelay::~UserRelay() {
@@ -57,14 +60,38 @@ namespace relay {
 		std::cout << "UserRelay destructor!" << std::endl;
 	}
 
+	void UserRelay::setupDebug() {
+		mCamEye = ci::Vec3f(0, 0, -500.0f);
+		mCamLookAt = ci::Vec3f::zero();
+
+		// GUI
+		if( USE_GUI ) {
+			_debugGUI = new mowa::sgui::SimpleGUI( ci::app::App::get() );
+			_debugGUI->textColor = ColorA(1,1,1,1);
+			_debugGUI->lightColor = ColorA(1, 0, 1, 1);
+			_debugGUI->darkColor = ColorA(0.05,0.05,0.05, 1);
+			_debugGUI->bgColor = ColorA(0.15, 0.15, 0.15, 1.0);
+			_debugGUI->addColumn();
+			_debugGUI->addColumn();
+			_debugGUI->addColumn();
+			_debugGUI->addLabel( "SetState" );
+
+			_debugGUI->addButton("Live")->registerClick( this, &UserRelay::setStateLive );
+			_debugGUI->addButton("Recording")->registerClick( this, &UserRelay::setStateRecorder );
+			_debugGUI->addButton("Playback")->registerClick( this, &UserRelay::setStatePlayback );
+		}
+	}
+
 	void UserRelay::update() {
-		SKELETON::SKELETON aSkeleton;
-		mCam.setPerspective(60.0f, cinder::app::App::get()->getWindowAspectRatio(), 1.0f, ni->maxDepth);
-		mCam.lookAt(mCamEye, mCamLookAt);
 		fsm->update();
 	}
 
-	void UserRelay::draw(){
+	void UserRelay::draw() {
+		mCam.setPerspective(60.0f, cinder::app::App::get()->getWindowAspectRatio(), 1.0f, ni->maxDepth);
+		mCam.lookAt(mCamEye, mCamLookAt);
+		renderDepthMap();
+		renderSkeleton();
+		renderGUI();
 		fsm->draw();
 	}
 
@@ -72,11 +99,26 @@ namespace relay {
 		return fsm->getSkeleton();
 	}
 
+
+	///// Debug drawing
+	void UserRelay::renderGUI() {
+		if( !USE_GUI ) return;
+		_debugGUI->draw();
+	}
+
 	void UserRelay::renderDepthMap() {
-		ni->renderDepthMap( cinder::app::App::get()->getWindowBounds() );
+		if( !DRAW_DEPTHMAP ) return;
+
+		ci::Area anArea =  cinder::app::App::get()->getWindowBounds();
+//		anArea.setX2( anArea.getX2() * 0.25 );
+//		anArea.setY2( anArea.getY2() * 0.25 );
+		ci::gl::disableDepthRead();
+		ni->renderDepthMap(anArea);
 	}
 
 	void UserRelay::renderSkeleton() {
+		if( !DRAW_SKELETON ) return;
+
 		SKELETON::SKELETON aSkeleton = getSkeleton();
 
 		ci::gl::pushMatrices();
@@ -84,4 +126,14 @@ namespace relay {
 			ni->renderSkeleton( aSkeleton , 0 );
 		ci::gl::popMatrices();
 	}
+
+	// Debug state switching
+	bool UserRelay::setStateLive( ci::app::MouseEvent event ) { this->fsm->changeState( new relay::UserStreamLive() ); return true; };
+	bool UserRelay::setStateRecorder( ci::app::MouseEvent event ) { this->fsm->changeState( new relay::UserStreamRecorder() ); return true; };
+	bool UserRelay::setStatePlayback( ci::app::MouseEvent event ) {
+		UserStreamPlayer* player = new relay::UserStreamPlayer();
+		player->setJson("jsontest.json");
+		this->fsm->changeState( player );
+		return true;
+	};
 }

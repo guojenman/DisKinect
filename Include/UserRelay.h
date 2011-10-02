@@ -21,6 +21,7 @@
 #include "cinder/Camera.h"
 #include "cinder/Vector.h"
 #include "json/json.h"
+#include "cinder/app/MouseEvent.h"
 
 // Forward declerations
 namespace SKELETON {
@@ -29,6 +30,7 @@ namespace SKELETON {
 }
 class WuCinderNITE;
 class UserTracker;
+namespace mowa { namespace sgui { class SimpleGUI; } }
 
 namespace relay {
 	class UserRelay {
@@ -36,25 +38,30 @@ namespace relay {
 		UserRelay( WuCinderNITE* t_ni, UserTracker* t_tracker );
 		virtual ~UserRelay();
 
+		void setupDebug();
 		void update();
 		SKELETON::SKELETON getSkeleton();
 
 		void renderDepthMap();
 		void renderSkeleton();
+		void renderGUI();
 		void draw();
 
 	private:
 		WuCinderNITE* ni;
 		UserTracker* tracker;
-
-		Json::Value 			_jsonRoot;   // will contains the root value after parsing.
-
 		relay::UserStreamStateManager* fsm;
 
 		// Debug
 		ci::CameraPersp mCam;
 		ci::Vec3f mCamEye;
 		ci::Vec3f mCamLookAt;
+		mowa::sgui::SimpleGUI* _debugGUI;
+
+		void debugDraw();
+		bool setStateLive( ci::app::MouseEvent event );
+		bool setStateRecorder( ci::app::MouseEvent event );
+		bool setStatePlayback( ci::app::MouseEvent event );
 	};
 
 } /* relay */

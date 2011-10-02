@@ -15,6 +15,7 @@
 #include "UserStreamFrame.h"
 #include "json/value.h"
 #include "cinder/app/MouseEvent.h"
+#include "cinder/app/FileDropEvent.h"
 
 // Forward declerations
 namespace SKELETON { struct SKELETON; struct SKELETON_JOINT; }
@@ -34,6 +35,8 @@ namespace relay {
 		void update();
 		void draw();
 		void exit();
+		bool fileDrop( ci::app::FileDropEvent event );
+
 		SKELETON::SKELETON getSkeleton();
 
 		void play();
@@ -42,6 +45,8 @@ namespace relay {
 
 		///// CALLBACKS
 		bool onToggleRecordingClicked( ci::app::MouseEvent event );
+		int filedropCallbackId;
+
 		///// ACCESSORS
 		void setJson( const std::string &aPath );
 		void setJson( Json::Value *aJsonValue );

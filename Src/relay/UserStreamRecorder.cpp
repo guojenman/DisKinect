@@ -34,7 +34,7 @@ namespace relay {
 	UserStreamRecorder::~UserStreamRecorder() {
 		delete _livestream; _livestream = NULL;
 		delete _gui; _gui = NULL;
-		_label = NULL;
+		delete _label; _label = NULL;
 		std::cout << "UserStreamRecorder destructor!" << std::endl;
 	}
 
@@ -127,28 +127,29 @@ namespace relay {
 
 		return true;
 	}
-	bool UserStreamRecorder::onSaveClicked( ci::app::MouseEvent event ) {
-		stopRecording();
 
+	Json::Value UserStreamRecorder::getRecordAsJSONValue() {
+		stopRecording();
 
 		Json::Value json;
 		Json::Value root;
-		for( std::vector<UserStreamFrame*>::iterator i = _recording.begin();
-				i != _recording.end();
-				++i) {
+		for (std::vector<UserStreamFrame*>::iterator i = _recording.begin(); i != _recording.end(); ++i) {
 			UserStreamFrame* aFrame = *i;
 			root.append( aFrame->toJSON() );
 		}
 
 		json["root"] = root;
-		// Write fast version to console
-//		Json::FastWriter writer;
-		std::cout << json.toStyledString() << std::endl;
+		return json;
+	}
 
+	bool UserStreamRecorder::onSaveClicked( ci::app::MouseEvent event ) {
+		Json::Value json = getRecordAsJSONValue();
+
+		// Write to console for debug
+		std::cout << json.toStyledString() << std::endl;
 
 		// Save nice version to disk
 		saveToDisk( json.toStyledString() );
-
 		return true;
 	}
 
@@ -157,12 +158,12 @@ namespace relay {
 		using namespace boost::posix_time;
 	    using namespace boost::gregorian;
 
-
 		// Use boost to figure out the current time on local machine
 		ptime now = second_clock::local_time();
 
 		std::stringstream ss;
-		ss << now.date().month() <<  now.date().day() << "_" << ci::app::App::get()->getElapsedFrames();
+		ss << now;
+		//ss << now.date().month() <<  now.date().day() << "_" << ci::app::App::get()->getElapsedFrames();
 		std::string timeStamp = ss.str();
 
 		// Write the file to the documents directory
