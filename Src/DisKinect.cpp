@@ -8,6 +8,7 @@
 #include "cinder/Camera.h"
 
 #include "UserRelay.h"
+#include "Puppeteer.h"
 
 #include <OpenGL.framework/Headers/gl.h>
 #include <OpenGL.framework/Headers/glext.h>
@@ -30,6 +31,7 @@ public:
 
 	void keyUp(KeyEvent event);
 	relay::UserRelay* userRelay;
+	puppeteer::Puppeteer* puppetier;
 };
 
 void DisKinect::prepareSettings( AppBasic::Settings *settings )
@@ -45,31 +47,33 @@ void DisKinect::setup()
 	mapMode.nYRes = 480;
 
 	WuCinderNITE* aNi = WuCinderNITE::getInstance();
-	aNi->setup("Resources/SkeletonRec.oni");
-//	aNi->setup("Resources/Sample-User.xml", mapMode, true, true);
+//	aNi->setup("Resources/SkeletonRec.oni");
+	aNi->setup("Resources/Sample-User.xml", mapMode, true, true);
 //	aNi->startUpdating();
 	aNi->mContext.StartGeneratingAll();
 
 	UserTracker* aTracker = UserTracker::getInstance();
 
 	userRelay = new relay::UserRelay( aNi, aTracker );
+	puppetier = new puppeteer::Puppeteer();
 }
 
 
 void DisKinect::update()
 {
 	userRelay->update();
+
 }
 
 void DisKinect::draw()
 {
 	gl::clear(ColorA(0, 0, 0, 0), true);
-
-	// These will be moved to userRelay->draw later
-	//userRelay->renderDepthMap();
-	//userRelay->renderSkeleton();
+	WuCinderNITE::getInstance()->renderDepthMap(getWindowBounds());
 	userRelay->draw();
 	userRelay->renderSkeleton();
+
+	SKELETON::SKELETON skeleton = userRelay->getSkeleton();
+	puppetier->update(skeleton);
 }
 
 void DisKinect::shutdown()
