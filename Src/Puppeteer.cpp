@@ -1,14 +1,14 @@
 #include "cinder/app/App.h"
-#include "cinder/MayaCamUI.h"
-#include "cinder/Matrix22.h"
+#include "cinder/Camera.h"
+#include "cinder/PolyLine.h"
 #include "Puppeteer.h"
 #include "XnTypes.h"
+
+#include "WuCinderNITE.h"
 
 using namespace ci;
 
 namespace puppeteer {
-
-MayaCamUI cam;
 
 Puppeteer::Puppeteer() {
 }
@@ -18,28 +18,44 @@ Puppeteer::~Puppeteer() {
 
 void Puppeteer::update(SKELETON::SKELETON& skeleton)
 {
-	Vec3f torso = skeleton.joints[XN_SKEL_LEFT_HIP].position - skeleton.joints[XN_SKEL_LEFT_SHOULDER].position;
-	Vec3f lElbow = skeleton.joints[XN_SKEL_LEFT_ELBOW].position - skeleton.joints[XN_SKEL_NECK].position;
-	Vec3f lHand = skeleton.joints[XN_SKEL_LEFT_HAND].position - skeleton.joints[XN_SKEL_LEFT_ELBOW].position;
-	Vec3f lKnee = skeleton.joints[XN_SKEL_LEFT_KNEE].position - skeleton.joints[XN_SKEL_LEFT_HIP].position;
-	Vec3f rHand = skeleton.joints[XN_SKEL_RIGHT_HAND].position - skeleton.joints[XN_SKEL_RIGHT_ELBOW].position;
-	Vec3f rKnee = skeleton.joints[XN_SKEL_RIGHT_KNEE].position - skeleton.joints[XN_SKEL_RIGHT_HIP].position;
+	if ( skeleton.joints[XN_SKEL_LEFT_SHOULDER].confidence == 0 || skeleton.joints[XN_SKEL_RIGHT_SHOULDER].confidence == 0 ) {
+		return;
+	}
 
-	float thetaXZ = acos(torso.xz().normalized().dot(lElbow.xz().normalized()));
-	Vec2f vecXZ = Matrix22<float>::createRotation(thetaXZ) * Vec2f(0.0f, -5.0f);
+	Vec3f &lShoulder = skeleton.joints[XN_SKEL_LEFT_SHOULDER].position;
+	Vec3f &rShoulder = skeleton.joints[XN_SKEL_RIGHT_SHOULDER].position;
+	Vec3f &neck = skeleton.joints[XN_SKEL_NECK].position;
 
-	float thetaYZ = acos(torso.yz().normalized().dot(lElbow.yz().normalized()));
-	Vec2f vecYZ = Matrix22<float>::createRotation(thetaYZ) * Vec2f(0.0f, -5.0f);
+	// calculate length for both left and right arms based on skeleton size
+	float lLen = lShoulder.distance(skeleton.joints[XN_SKEL_LEFT_ELBOW].position)
+			+ skeleton.joints[XN_SKEL_LEFT_ELBOW].position.distance(skeleton.joints[XN_SKEL_LEFT_HAND].position);
+	float rLen = rShoulder.distance(skeleton.joints[XN_SKEL_RIGHT_ELBOW].position)
+			+ skeleton.joints[XN_SKEL_RIGHT_ELBOW].position.distance(skeleton.joints[XN_SKEL_RIGHT_HAND].position);
 
-	glLineWidth(3.0f);
+	// get the 3 axis aligned to the body
+	Vec3f axisX = (skeleton.joints[XN_SKEL_LEFT_SHOULDER].position - skeleton.joints[XN_SKEL_RIGHT_SHOULDER].position).normalized();
+	Vec3f axisY = (skeleton.joints[XN_SKEL_NECK].position - skeleton.joints[XN_SKEL_TORSO].position).normalized();
+	Vec3f axisZ = axisX.cross(axisY).normalized();
+
+
+	// totally dirty test code below
+
+	ci::CameraPersp mCam;
+	mCam.setPerspective(60.0f, cinder::app::App::get()->getWindowAspectRatio(), 1.0f, WuCinderNITE::getInstance()->maxDepth);
+	mCam.lookAt(ci::Vec3f(0, 0, -500.0f), ci::Vec3f::zero());
+
+	PolyLine<Vec3f> poly;
+	poly.setClosed(true);
+	poly.push_back(lShoulder - axisY * lLen);
+	poly.push_back(lShoulder - axisY * lLen + axisX * lLen);
+	poly.push_back(lShoulder + axisY * lLen + axisX * lLen);
+	poly.push_back(lShoulder + axisY * lLen);
+
 
 	gl::pushMatrices();
-	gl::setMatrices(cam.getCamera());
-	gl::color(Color(1.0f, 0, 0));
-	gl::drawLine(Vec2f::zero(), vecXZ);
-
-	gl::color(Color(0, 1.0f, 0));
-	gl::drawLine(Vec2f::zero(), vecYZ);
+	gl::setMatrices(mCam);
+	glLineWidth(1.0f);
+	gl::draw(poly);
 	gl::popMatrices();
 
 }

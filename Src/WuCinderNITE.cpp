@@ -256,16 +256,6 @@ void WuCinderNITE::update()
 				skeletons[i].joints[j].position.x = joint.position.position.X;
 				skeletons[i].joints[j].position.y = joint.position.position.Y;
 				skeletons[i].joints[j].position.z = joint.position.position.Z;
-
-//				skeletons[i].joints[j].orientation.m00 = joint.orientation.orientation.elements[0];
-//				skeletons[i].joints[j].orientation.m01 = joint.orientation.orientation.elements[1];
-//				skeletons[i].joints[j].orientation.m02 = joint.orientation.orientation.elements[2];
-//				skeletons[i].joints[j].orientation.m10 = joint.orientation.orientation.elements[3];
-//				skeletons[i].joints[j].orientation.m11 = joint.orientation.orientation.elements[4];
-//				skeletons[i].joints[j].orientation.m12 = joint.orientation.orientation.elements[5];
-//				skeletons[i].joints[j].orientation.m20 = joint.orientation.orientation.elements[6];
-//				skeletons[i].joints[j].orientation.m21 = joint.orientation.orientation.elements[7];
-//				skeletons[i].joints[j].orientation.m22 = joint.orientation.orientation.elements[8];
 			}
 		} else {
 			for(int j = 1; j < MAX_JOINTS; j++) {

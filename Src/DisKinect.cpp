@@ -47,8 +47,8 @@ void DisKinect::setup()
 	mapMode.nYRes = 480;
 
 	WuCinderNITE* aNi = WuCinderNITE::getInstance();
-//	aNi->setup("Resources/SkeletonRec.oni");
-	aNi->setup("Resources/Sample-User.xml", mapMode, true, true);
+	aNi->setup("Resources/SkeletonRec.oni");
+//	aNi->setup("Resources/Sample-User.xml", mapMode, true, true);
 //	aNi->startUpdating();
 	aNi->mContext.StartGeneratingAll();
 
