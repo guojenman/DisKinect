@@ -67,13 +67,14 @@ void Puppeteer::update(SKELETON::SKELETON& skeleton)
 	gl::pushMatrices();
 	gl::setMatrices(mCam);
 
+	// original bounding box
 	glLineWidth(1.0f);
 	gl::color(Color(1, 0, 0));
 	gl::pushModelView();
 	gl::draw(poly);
 	gl::popModelView();
 
-	Vec3f axisAlign = Vec3f::xAxis().normalized();
+	// transformed bounding box
 	gl::color(Color(0, 1, 0));
 	gl::pushModelView();
 	gl::scale(.2f, .2f, .2f);
