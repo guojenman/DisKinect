@@ -1,6 +1,10 @@
 #include "cinder/app/App.h"
 #include "cinder/Camera.h"
 #include "cinder/PolyLine.h"
+#include "cinder/Quaternion.h"
+#include "cinder/Matrix22.h"
+#include "cinder/Matrix33.h"
+#include "cinder/Matrix44.h"
 #include "Puppeteer.h"
 #include "XnTypes.h"
 
@@ -45,18 +49,42 @@ void Puppeteer::update(SKELETON::SKELETON& skeleton)
 	mCam.lookAt(ci::Vec3f(0, 0, -500.0f), ci::Vec3f::zero());
 
 	PolyLine<Vec3f> poly;
-	poly.setClosed(true);
 	poly.push_back(lShoulder - axisY * lLen);
 	poly.push_back(lShoulder - axisY * lLen + axisX * lLen);
 	poly.push_back(lShoulder + axisY * lLen + axisX * lLen);
 	poly.push_back(lShoulder + axisY * lLen);
+	poly.push_back(lShoulder - axisY * lLen);
+	poly.push_back(lShoulder - axisY * lLen + axisZ * lLen); //
+	poly.push_back(lShoulder - axisY * lLen + axisZ * lLen + axisX * lLen);
+	poly.push_back(lShoulder + axisY * lLen + axisZ * lLen + axisX * lLen);
+	poly.push_back(lShoulder + axisY * lLen + axisZ * lLen);
+	poly.push_back(lShoulder - axisY * lLen + axisZ * lLen);
+
+	Vec3f vec1 = axisY * lLen;
+	Vec3f vec2 = Vec3f(0, lLen, 0);
 
 
 	gl::pushMatrices();
 	gl::setMatrices(mCam);
+
 	glLineWidth(1.0f);
+	gl::color(Color(1, 0, 0));
+	gl::pushModelView();
 	gl::draw(poly);
+	gl::popModelView();
+
+	Vec3f axisAlign = Vec3f::xAxis().normalized();
+	gl::color(Color(0, 1, 0));
+	gl::pushModelView();
+	gl::scale(.2f, .2f, .2f);
+	gl::rotate(Quatf(vec1.cross(vec2), -acos(vec1.dot(vec2))));
+	gl::translate(-1.0f * lShoulder);
+	gl::draw(poly);
+	gl::popModelView();
+
 	gl::popMatrices();
+
+	gl::color(Color(1, 1, 1));
 
 }
 
