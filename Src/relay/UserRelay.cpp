@@ -122,7 +122,7 @@ namespace relay {
 		SKELETON::SKELETON aSkeleton = getSkeleton();
 
 		ci::gl::pushMatrices();
-		ci::gl::setMatrices(mCam);
+		ci::gl::setMatrices( *Constants::camera() );
 			ni->renderSkeleton( aSkeleton , 0 );
 		ci::gl::popMatrices();
 	}

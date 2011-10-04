@@ -6,8 +6,10 @@
  */
 #ifndef CONSTANTS_H_
 #define CONSTANTS_H_
-
+namespace cinder { class CameraPersp; };
 namespace Constants {
+	extern cinder::CameraPersp* camera();
+
 	namespace Debug {
 		static bool DRAW_SKELETON = true;
 		static bool DRAW_DEPTHMAP = true;
