@@ -36,17 +36,17 @@ namespace relay {
 		this->fsm = new relay::UserStreamStateManager();
 
 		// Test the live stream
-//		relay::UserStreamLive* live = new relay::UserStreamRecorder();
-//		this->fsm->setInitialState( live );
+		relay::UserStreamLive* live = new relay::UserStreamLive();
+		this->fsm->setInitialState( live );
 
 		// Test the recorder
 //		relay::UserStreamRecorder* recorder = new relay::UserStreamRecorder();
 //		this->fsm->setInitialState( recorder );
 
 		// Test using the player
-		relay::UserStreamPlayer* player = new relay::UserStreamPlayer();
-		player->setJson("jsontest.json");			// Note the UserStreamPlayer requires the JSON to be set before 'enter' - set via string path or Json::Value
-		this->fsm->setInitialState( player );
+//		relay::UserStreamPlayer* player = new relay::UserStreamPlayer();
+//		player->setJson("jsontest.json");			// Note the UserStreamPlayer requires the JSON to be set before 'enter' - set via string path or Json::Value
+//		this->fsm->setInitialState( player );
 
 		setupDebug();
 	}

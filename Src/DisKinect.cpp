@@ -6,8 +6,10 @@
 #include "cinder/Vector.h"
 #include "cinder/Rand.h"
 #include "cinder/Camera.h"
+#include "cinder/MayaCamUI.h"
 
 #include "UserRelay.h"
+#include "Puppeteer.h"
 
 #include <OpenGL.framework/Headers/gl.h>
 #include <OpenGL.framework/Headers/glext.h>
@@ -30,6 +32,8 @@ public:
 
 	void keyUp(KeyEvent event);
 	relay::UserRelay* userRelay;
+	puppeteer::Puppeteer* puppetier;
+	MayaCamUI mMayaCam;
 };
 
 void DisKinect::prepareSettings( AppBasic::Settings *settings )
@@ -39,6 +43,7 @@ void DisKinect::prepareSettings( AppBasic::Settings *settings )
 
 void DisKinect::setup()
 {
+
 	XnMapOutputMode mapMode;
 	mapMode.nFPS = 30;
 	mapMode.nXRes = 640;
@@ -50,15 +55,22 @@ void DisKinect::setup()
 //	aNi->startUpdating();
 	aNi->mContext.StartGeneratingAll();
 
+	ci::CameraPersp cam;
+	cam.setPerspective(60.0f, cinder::app::App::get()->getWindowAspectRatio(), 1.0f, WuCinderNITE::getInstance()->maxDepth);
+	cam.lookAt(ci::Vec3f(0, 0, -500.0f), ci::Vec3f::zero());
+	mMayaCam.setCurrentCam(cam);
+
 	UserTracker* aTracker = UserTracker::getInstance();
 
 	userRelay = new relay::UserRelay( aNi, aTracker );
+	puppetier = new puppeteer::Puppeteer();
 }
 
 
 void DisKinect::update()
 {
 	userRelay->update();
+
 }
 
 void DisKinect::draw()
