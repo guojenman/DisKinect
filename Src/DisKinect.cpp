@@ -76,12 +76,9 @@ void DisKinect::update()
 void DisKinect::draw()
 {
 	gl::clear(ColorA(0, 0, 0, 0), true);
-	WuCinderNITE::getInstance()->renderDepthMap(getWindowBounds());
-	userRelay->draw();
-	userRelay->renderSkeleton();
 
-	SKELETON::SKELETON skeleton = userRelay->getSkeleton();
-	puppetier->update(skeleton);
+	// These will be moved to userRelay->draw later
+	userRelay->draw();
 }
 
 void DisKinect::shutdown()
@@ -91,7 +88,6 @@ void DisKinect::shutdown()
 }
 
 void DisKinect::keyUp(KeyEvent event)
-
 {
 	if (event.getChar() == KeyEvent::KEY_q) {
 		quit();

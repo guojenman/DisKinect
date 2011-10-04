@@ -17,13 +17,15 @@
 #include "UserStreamRecorder.h"
 #include "UserStreamPlayer.h"
 
-
 #include "WuCinderNITE.h"
 #include "UserTracker.h"
 #include "SkeletonStruct.h"
 
 #include "json/reader.h"
 #include "simplegui/SimpleGUI.h"
+
+#include "Constants.h"
+#include "cinder/Stream.h"
 
 namespace relay {
 	UserStreamPlayer::UserStreamPlayer() {
@@ -36,6 +38,8 @@ namespace relay {
 		delete _gui; _gui = NULL;
 		delete _label; _label = NULL;
 		delete _toggle; _toggle = NULL;
+		delete _loopButton; _loopButton = NULL;
+		delete _frameSlider; _frameSlider = NULL;
 
 		std::cout << "UserStreamPlayer destructor!" << std::endl;
 	}
@@ -52,20 +56,22 @@ namespace relay {
 		_currentFrame = 0;
 		_state = PLAYING;
 		_shouldLoop = true;
+		filedropCallbackId = ci::app::App::get()->registerFileDrop( this, &UserStreamPlayer::fileDrop );
 
-		// GUI
-		_gui = new mowa::sgui::SimpleGUI( ci::app::App::get() );
-		_gui->textColor = ColorA(1,1,1,1);
-		_gui->lightColor = ColorA(1, 0, 1, 1);
-		_gui->darkColor = ColorA(0.05,0.05,0.05, 1);
-		_gui->bgColor = ColorA(0.15, 0.15, 0.15, 1.0);
-		_label = _gui->addLabel("Playing");
-		_loopButton = _gui->addParam("Loop", &_shouldLoop, _shouldLoop);
-		_gui->addSeparator();
-		_frameSlider = _gui->addParam("Frame:", &_currentFrame, 0, _totalframes, 0);
-		_gui->addSeparator();
-		_toggle = _gui->addButton("Pause");
-		_toggle->registerClick( this, &UserStreamPlayer::onToggleRecordingClicked );
+		if( Constants::Debug::USE_GUI ) {
+			_gui = new mowa::sgui::SimpleGUI( ci::app::App::get() );
+			_gui->textColor = ColorA(1,1,1,1);
+			_gui->lightColor = ColorA(1, 0, 1, 1);
+			_gui->darkColor = ColorA(0.05,0.05,0.05, 1);
+			_gui->bgColor = ColorA(0.15, 0.15, 0.15, 1.0);
+			_label = _gui->addLabel("Playing");
+			_loopButton = _gui->addParam("Loop", &_shouldLoop, _shouldLoop);
+			_gui->addSeparator();
+			_frameSlider = _gui->addParam("Frame:", &_currentFrame, 0, _totalframes, 0);
+			_gui->addSeparator();
+			_toggle = _gui->addButton("Pause");
+			_toggle->registerClick( this, &UserStreamPlayer::onToggleRecordingClicked );
+		}
 	}
 
 	void UserStreamPlayer::update() {
@@ -85,16 +91,22 @@ namespace relay {
 	}
 
 	void UserStreamPlayer::draw() {
-		_gui->draw();
+		if( Constants::Debug::USE_GUI ) {
+			_gui->draw();
+		}
 	}
 
 	void UserStreamPlayer::exit() {
 		ni = NULL;
 		tracker = NULL;
 
+		ci::app::App::get()->unregisterFileDrop( filedropCallbackId );
+
 		delete _gui; _gui = NULL;
 		delete _label; _label = NULL;
 		delete _toggle; _toggle = NULL;
+		delete _loopButton; _loopButton = NULL;
+		delete _frameSlider; _frameSlider = NULL;
 	}
 
 	void UserStreamPlayer::play() {
@@ -107,6 +119,25 @@ namespace relay {
 	void UserStreamPlayer::restart() {
 		_currentFrame = 0;
 		_state = PLAYING;
+	}
+
+
+	bool UserStreamPlayer::fileDrop( ci::app::FileDropEvent event ) {
+		if(event.getNumFiles() != 1) return false;
+
+		std::string fileRef = event.getFile(0);
+		std::cout << fileRef << std::endl;
+		setJson( "/Users/mariogonzalez/GIT/DisKinect/Debug/DisKinect.app/Contents/Resources/jsontest.json" );
+//		ci::IStreamFileRef stream = ci::loadFileStream(fileRef);
+//
+//		std::stringstream output;
+//		while (stream->isEof() == false) {
+//			output << stream->readLine();
+//		}
+//
+//		Json::Value
+//		std::cout << "Output" << output.str() << std::endl;
+		return true;
 	}
 
 	bool UserStreamPlayer::onToggleRecordingClicked( ci::app::MouseEvent event ) {
@@ -147,6 +178,7 @@ namespace relay {
 		// Read the filestream
 		ifstream filestream;
 
+		std::cout << "ResourcePath: " << aPath << " : " << ci::app::App::get()->getResourcePath(aPath).c_str() << std::endl;
 		// load from resources directory so we can modify it while we work
 		filestream.open( ci::app::App::get()->getResourcePath(aPath).c_str(), ifstream::in);
 
@@ -167,6 +199,7 @@ namespace relay {
 	}
 
 	void UserStreamPlayer::parseJson( Json::Value *aJsonValue ) {
+		_recording.clear();
 		// Create a userframe for each json object
 		Json::Value root = (*aJsonValue)["root"];
 
@@ -177,6 +210,7 @@ namespace relay {
 			_recording.push_back( userFrame );
         }
 
+        restart();
         std::cout << "Playback stream created with '" << userFrame->framenumber << "' frames" << std::endl;
 	}
 }
