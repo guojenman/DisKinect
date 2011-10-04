@@ -54,6 +54,14 @@ SimpleGUI::SimpleGUI(App* app) {
 	init(app);
 	enabled = true;
 }
+
+SimpleGUI::~SimpleGUI() {
+	std::cout << "Removing gui " << std::endl;
+	selectedControl = NULL;
+	ci::app::App::get()->unregisterMouseDown( cbMouseDown );
+	ci::app::App::get()->unregisterMouseUp( cbMouseUp );
+	ci::app::App::get()->unregisterMouseDrag( cbMouseDrag );
+}
 	
 void SimpleGUI::init(App* app) {	
 	textFont = Font(loadResource("pf_tempesta_seven.ttf"), 8);
@@ -132,6 +140,18 @@ PanelControl* SimpleGUI::addPanel() {
 	control->parentGui = this;	
 	controls.push_back(control);
 	return control;
+}
+
+void SimpleGUI::removeControl( Control* controlToRemove ) {
+	std::vector<Control*>::iterator it = controls.begin();
+	while( it!= controls.end() ) {
+		Control* control = *it;
+		if( control == controlToRemove ) {
+			controls.erase( it );
+			return;
+		}
+		++it;
+	}
 }
 	
 void SimpleGUI::draw() {	
@@ -242,13 +262,18 @@ bool SimpleGUI::onMouseDown(MouseEvent event) {
 	
 	std::vector<Control*>::iterator it = controls.begin();	
 	while(it != controls.end()) {
-		Control* control = *it++;
-		if (control->activeArea.contains(event.getPos())) {
-			selectedControl = control;
-			selectedControl->onMouseDown(event);	
-			return true;
+		Control* control = *it;
+		if(control) {
+			if (control->activeArea.contains(event.getPos())) {
+				selectedControl = control;
+				selectedControl->onMouseDown(event);
+				return true;
+			}
 		}
+		it++;
 	}	
+
+	std::cout << "Control count: " << controls.size() << std::endl;
 	return false;
 }
 
@@ -301,6 +326,8 @@ Control* SimpleGUI::getControlByName(const std::string& name) {
 	}
 	return NULL;
 }
+
+
 
 //-----------------------------------------------------------------------------
 	

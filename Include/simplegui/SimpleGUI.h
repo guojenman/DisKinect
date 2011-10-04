@@ -83,6 +83,7 @@ public:
 	};
 public:
 	SimpleGUI(App* app);
+	~SimpleGUI();
 	bool	isSelected() { return selectedControl != NULL; }
 	std::vector<Control*>& getControls() { return controls; }	
 	
@@ -97,6 +98,8 @@ public:
 	
 	bool	isEnabled();
 	void	setEnabled(bool state);
+	void	removeControl( Control* controlToRemove );
+
 
 	FloatVarControl* 	addParam(const std::string& paramName, float* var, float min=0, float max=1, float defaultValue = 0);
 	IntVarControl*		addParam(const std::string& paramName, int* var, int min=0, int max=1, int defaultValue = 0);
