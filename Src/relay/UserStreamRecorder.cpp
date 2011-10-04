@@ -105,11 +105,12 @@ namespace relay {
 	}
 
 	void UserStreamRecorder::recordState() {
-
 		SKELETON::SKELETON aSkeleton = _livestream->getSkeleton();
 		UserStreamFrame* aFrame = new UserStreamFrame( _framenumber, aSkeleton );
 		_recording.push_back( aFrame );
 		_framenumber++;
+
+		std::cout << "Recording frame:" << _framenumber << std::endl;
 	}
 
 	/**
@@ -119,7 +120,10 @@ namespace relay {
 		_state = aState;
 		_label->setText( _state == NOT_RECORDERING ? "Idle" : "Recording!" );
 		_toggle->name = _state == NOT_RECORDERING ? "START" : "STOP";
+
+		std::cout << "State = " << _state << std::endl;
 	}
+
 	// SimpleGUI Callbacks
 	bool UserStreamRecorder::onToggleRecordingClicked( ci::app::MouseEvent event ) {
 		if( _state == NOT_RECORDERING ) startRecording();
