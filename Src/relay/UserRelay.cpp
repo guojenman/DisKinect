@@ -14,6 +14,7 @@
 
 #include "UserRelay.h"
 #include "cinder/app/App.h"
+#include "cinder/MayaCamUI.h"
 
 #include "WuCinderNITE.h"
 #include "UserTracker.h"
@@ -61,9 +62,6 @@ namespace relay {
 	}
 
 	void UserRelay::setupDebug() {
-		mCamEye = ci::Vec3f(0, 0, -500.0f);
-		mCamLookAt = ci::Vec3f::zero();
-
 		// GUI
 		if( USE_GUI ) {
 			_debugGUI = new mowa::sgui::SimpleGUI( ci::app::App::get() );
@@ -87,8 +85,6 @@ namespace relay {
 	}
 
 	void UserRelay::draw() {
-		mCam.setPerspective(60.0f, cinder::app::App::get()->getWindowAspectRatio(), 1.0f, ni->maxDepth);
-		mCam.lookAt(mCamEye, mCamLookAt);
 		renderDepthMap();
 		renderSkeleton();
 		renderGUI();
@@ -104,6 +100,9 @@ namespace relay {
 	void UserRelay::renderGUI() {
 		if( !USE_GUI ) return;
 		_debugGUI->draw();
+		gl::disableDepthRead();
+		gl::disableDepthWrite();
+		gl::enableAlphaBlending();
 	}
 
 	void UserRelay::renderDepthMap() {
@@ -122,7 +121,7 @@ namespace relay {
 		SKELETON::SKELETON aSkeleton = getSkeleton();
 
 		ci::gl::pushMatrices();
-		ci::gl::setMatrices( *Constants::camera() );
+		ci::gl::setMatrices( Constants::mayaCam()->getCamera() );
 			ni->renderSkeleton( aSkeleton , 0 );
 		ci::gl::popMatrices();
 	}

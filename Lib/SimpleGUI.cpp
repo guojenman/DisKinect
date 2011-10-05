@@ -139,8 +139,8 @@ void SimpleGUI::draw() {
 
 	gl::pushMatrices();
 	gl::setMatricesWindow(getWindowSize());
-	gl::disableDepthRead();	
-	gl::disableDepthWrite();		
+	gl::disableDepthRead();
+	gl::disableDepthWrite();
 	gl::enableAlphaBlending();
 
 	Vec2f position = Vec2f(spacing, spacing);
