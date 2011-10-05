@@ -12,6 +12,7 @@
 
 #include "IUserStream.h"
 #include "json/json.h"
+#include "boost/bind.hpp"
 
 // Forward declerations
 namespace SKELETON {
@@ -27,6 +28,13 @@ namespace relay {
 
 	class UserStreamRepeater : public IUserStream {
 		public:
+			enum REPEATER_STATE {
+				WAITING_TO_RECORD,
+				RECORDING,
+				FIRST_PLAYBACK,
+				PLAYBACK_LOOP
+			};
+
 			UserStreamRepeater();
 			virtual ~UserStreamRepeater();
 
@@ -37,14 +45,17 @@ namespace relay {
 			SKELETON::SKELETON getSkeleton();
 
 		private:
-			void deallocStates();
-			UserStreamRecorder* recorder;
-			UserStreamPlayer* player;
-			IUserStream* current;
+			UserStreamRecorder* recorder;			// Records userstream
+			UserStreamPlayer* player;				// Players userstream
+			IUserStream* current;					// recorder/player
 
-			bool _didStartRecording;
-			bool _didFinishRecording;
-			Json::Value _recording;
+			REPEATER_STATE _state;					// Current state ( REPEATER_STATE )
+			void setState( REPEATER_STATE aState );
+			REPEATER_STATE getState() { return _state; };
+
+			Json::Value _recording;					// In memory json recording fed to 'player'
+
+			bool canStartRecording();		// Atleast a user, and atleast some movement
 	};
 }
 #endif /* USERSTREAMREPEATER_H_ */

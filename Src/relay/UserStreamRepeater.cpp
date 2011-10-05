@@ -48,31 +48,37 @@ namespace relay {
 		recorder = new UserStreamRecorder();
 		recorder->enter();
 		current = recorder;
-		_didStartRecording = false;
-//
-//		_didFinishRecording = _didMakeRecording = false;
+
+		_state = WAITING_TO_RECORD;
 	}
 
 	void UserStreamRepeater::update() {
 
 		static int frameCounter;
-		if( getSkeleton().isTracking && !_didStartRecording) {
+		if( getState() == WAITING_TO_RECORD && canStartRecording() ) {
 			std::cout << "Starting recording" << std::endl;
 			recorder->startRecording();
 			current = recorder;
-			_didStartRecording = true;
+			setState( RECORDING );
 		}
 
-		if( recorder->getState() == UserStreamRecorder::RECORDING && ++frameCounter == 75) {
+		// Check if we've recorded enough
+		if( getState() == RECORDING && ++frameCounter == 75) {
+
 			std::cout << "Stop recording!" << std::endl;
+
+			// Stop recording, get json, and destroy recorder
 			recorder->stopRecording();
 			_recording = recorder->getRecordAsJSONValue();
-
 			recorder->exit();
+
+			// Start playback
 			player = new UserStreamPlayer();
 			player->setJson( &_recording );
 			player->enter();
 			current = player;
+
+			setState( FIRST_PLAYBACK );
 		}
 
 		if(current)
@@ -101,6 +107,16 @@ namespace relay {
 	void UserStreamRepeater::exit() {
 		ni = NULL;
 		tracker = NULL;
+	}
+
+	void UserStreamRepeater::setState( REPEATER_STATE aState ) {
+		// Some fancy stuff goes here
+		_state = aState;
+	}
+
+	bool UserStreamRepeater::canStartRecording() {
+		std::cout << "Current Delta: " << tracker->getTotalDist() << std::endl;
+		return getSkeleton().isTracking && tracker->getTotalDist() > 15;
 	}
 }
 

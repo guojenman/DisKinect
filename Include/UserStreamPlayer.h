@@ -16,6 +16,7 @@
 #include "json/value.h"
 #include "cinder/app/MouseEvent.h"
 #include "cinder/app/FileDropEvent.h"
+#include <boost/signals2.hpp>
 
 // Forward declerations
 namespace SKELETON { struct SKELETON; struct SKELETON_JOINT; }
@@ -51,10 +52,13 @@ namespace relay {
 		void setJson( const std::string &aPath );
 		void setJson( Json::Value *aJsonValue );
 
-		int _currentFrame;
+		int getCurrentFrame() { return _currentFrame; }
+		int getTotalFrames() { return _totalframes; }
+
 	private:
 		PlayerState _state;
 		bool _shouldLoop;
+		int _currentFrame;
 		int _totalframes;
 		std::vector<UserStreamFrame*> _recording;
 

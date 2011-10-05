@@ -84,9 +84,7 @@ void DisKinect::draw()
 {
 	gl::clear(ColorA(0, 0, 0, 0), true);
 
-	// These will be moved to userRelay->draw later
 	userRelay->draw();
-
 
 	SKELETON::SKELETON skeleton = userRelay->getSkeleton();
 	puppetier->update(skeleton);
