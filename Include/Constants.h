@@ -13,7 +13,7 @@ namespace Constants {
 	namespace Debug {
 		static bool DRAW_SKELETON = true;
 		static bool DRAW_DEPTHMAP = true;
-		static bool USE_GUI = true;
+		static bool USE_GUI = false;
 	};
 }
 

@@ -27,7 +27,17 @@ namespace relay {
 
 	UserStreamRepeater::~UserStreamRepeater() {
 		// TODO Auto-generated destructor stub
-		deallocStates();
+		if( recorder ) {
+			recorder->exit();
+			delete recorder; recorder = NULL;
+		}
+
+		if( player ) {
+			player->exit();
+			delete player; player = NULL;
+		}
+
+		current = NULL;
 		ni = NULL;
 		tracker = NULL;
 	}
@@ -56,7 +66,17 @@ namespace relay {
 		if( recorder->getState() == UserStreamRecorder::RECORDING && ++frameCounter == 75) {
 			std::cout << "Stop recording!" << std::endl;
 			recorder->stopRecording();
+			_recording = recorder->getRecordAsJSONValue();
+
+			recorder->exit();
+			player = new UserStreamPlayer();
+			player->setJson( &_recording );
+			player->enter();
+			current = player;
 		}
+
+		if(current)
+			current->update();
 	}
 
 	void UserStreamRepeater::draw() {
@@ -81,21 +101,6 @@ namespace relay {
 	void UserStreamRepeater::exit() {
 		ni = NULL;
 		tracker = NULL;
-	}
-
-	// Clean up
-	void UserStreamRepeater::deallocStates() {
-		if( recorder ) {
-			recorder->exit();
-			delete recorder; recorder = NULL;
-		}
-
-		if( player ) {
-			player->exit();
-			delete player; player = NULL;
-		}
-
-		current = NULL;
 	}
 }
 

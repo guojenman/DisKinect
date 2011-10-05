@@ -50,8 +50,8 @@ namespace relay {
 //		this->fsm->setInitialState( player );
 
 		// Test repeater (records in memory then plays it back)
-		UserStreamRepeater* repeater = new relay::UserStreamRepeater();
-		this->fsm->setInitialState( repeater);
+//		UserStreamRepeater* repeater = new relay::UserStreamRepeater();
+//		this->fsm->setInitialState( repeater);
 
 		setupDebug();
 	}
@@ -92,12 +92,12 @@ namespace relay {
 	}
 
 	void UserRelay::draw() {
-		mCam.setPerspective(60.0f, cinder::app::App::get()->getWindowAspectRatio(), 1.0f, ni->maxDepth);
-		mCam.lookAt(mCamEye, mCamLookAt);
-		renderDepthMap();
+//		mCam.setPerspective(60.0f, cinder::app::App::get()->getWindowAspectRatio(), 1.0f, ni->maxDepth);
+//		mCam.lookAt(mCamEye, mCamLookAt);
+//		renderDepthMap();
 		renderSkeleton();
-		renderGUI();
-		fsm->draw();
+//		renderGUI();
+//		fsm->draw();
 	}
 
 	SKELETON::SKELETON UserRelay::getSkeleton() {
@@ -108,7 +108,11 @@ namespace relay {
 	///// Debug drawing
 	void UserRelay::renderGUI() {
 		if( !USE_GUI ) return;
-		_debugGUI->draw();
+
+//		_debugGUI->draw();
+//		ci::gl::disableDepthRead();
+//		ci::gl::disableDepthWrite();
+//		ci::gl::enableAlphaBlending();
 	}
 
 	void UserRelay::renderDepthMap() {

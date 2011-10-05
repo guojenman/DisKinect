@@ -11,6 +11,7 @@
 #define USERSTREAMREPEATER_H_
 
 #include "IUserStream.h"
+#include "json/json.h"
 
 // Forward declerations
 namespace SKELETON {
@@ -43,6 +44,7 @@ namespace relay {
 
 			bool _didStartRecording;
 			bool _didFinishRecording;
+			Json::Value _recording;
 	};
 }
 #endif /* USERSTREAMREPEATER_H_ */

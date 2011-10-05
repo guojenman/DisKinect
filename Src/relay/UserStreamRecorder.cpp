@@ -23,6 +23,7 @@
 #include "SkeletonStruct.h"
 
 #include "simplegui/SimpleGUI.h"
+#include "Constants.h"
 
 namespace relay {
 
@@ -45,17 +46,19 @@ namespace relay {
 		_livestream = new UserStreamLive();
 		_livestream->enter();
 
-		_gui = new mowa::sgui::SimpleGUI( ci::app::App::get() );
-		_gui->textColor = ColorA(1,1,1,1);
-		_gui->lightColor = ColorA(1, 0, 1, 1);
-		_gui->darkColor = ColorA(0.05,0.05,0.05, 1);
-		_gui->bgColor = ColorA(0.15, 0.15, 0.15, 1.0);
-		_gui->addLabel("RECORDER");
-		_gui->addSeparator();
-		_label = _gui->addLabel("Idle");
-		_gui->addSeparator();
-		_toggle = _gui->addButton("START");
-		_toggle->registerClick( this, &UserStreamRecorder::onToggleRecordingClicked );
+		if( Constants::Debug::USE_GUI ) {
+			_gui = new mowa::sgui::SimpleGUI( ci::app::App::get() );
+			_gui->textColor = ColorA(1,1,1,1);
+			_gui->lightColor = ColorA(1, 0, 1, 1);
+			_gui->darkColor = ColorA(0.05,0.05,0.05, 1);
+			_gui->bgColor = ColorA(0.15, 0.15, 0.15, 1.0);
+			_gui->addLabel("RECORDER");
+			_gui->addSeparator();
+			_label = _gui->addLabel("Idle");
+			_gui->addSeparator();
+			_toggle = _gui->addButton("START");
+			_toggle->registerClick( this, &UserStreamRecorder::onToggleRecordingClicked );
+		}
 
 		_framenumber = 0;
 		_state = NOT_RECORDERING;
@@ -72,7 +75,9 @@ namespace relay {
 
 	void UserStreamRecorder::draw() {
 		_livestream->draw();
-		_gui->draw();
+
+		if( _gui )
+			_gui->draw();
 	}
 
 	SKELETON::SKELETON UserStreamRecorder::getSkeleton() {
@@ -99,9 +104,6 @@ namespace relay {
 	void UserStreamRecorder::stopRecording() {
 		if( _state == NOT_RECORDERING ) return;
 		setState( NOT_RECORDERING );
-
-		ci::app::MouseEvent fakeEvent;
-		onSaveClicked( fakeEvent );
 	}
 
 	void UserStreamRecorder::recordState() {
@@ -118,16 +120,22 @@ namespace relay {
 	 */
 	void UserStreamRecorder::setState( RecorderState aState ) {
 		_state = aState;
-		_label->setText( _state == NOT_RECORDERING ? "Idle" : "Recording!" );
-		_toggle->name = _state == NOT_RECORDERING ? "START" : "STOP";
 
-		std::cout << "State = " << _state << std::endl;
+		if( _gui ) {
+			_label->setText( _state == NOT_RECORDERING ? "Idle" : "Recording!" );
+			_toggle->name = _state == NOT_RECORDERING ? "START" : "STOP";
+		}
 	}
 
 	// SimpleGUI Callbacks
 	bool UserStreamRecorder::onToggleRecordingClicked( ci::app::MouseEvent event ) {
-		if( _state == NOT_RECORDERING ) startRecording();
-		else stopRecording();
+		if( _state == NOT_RECORDERING ) {
+			startRecording();
+		} else {
+			stopRecording();
+			ci::app::MouseEvent fakeEvent;
+			onSaveClicked( fakeEvent );
+		}
 
 		return true;
 	}
@@ -150,7 +158,7 @@ namespace relay {
 		Json::Value json = getRecordAsJSONValue();
 
 		// Write to console for debug
-		std::cout << json.toStyledString() << std::endl;
+//		std::cout << json.toStyledString() << std::endl;
 
 		// Save nice version to disk
 		saveToDisk( json.toStyledString() );

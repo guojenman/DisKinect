@@ -6,7 +6,7 @@
 		<cconfiguration id="cdt.managedbuild.config.gnu.macosx.exe.debug.403169942">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.macosx.exe.debug.403169942" moduleId="org.eclipse.cdt.core.settings" name="Debug">
 				<macros>
-					<stringMacro name="CINDER_PATH" type="VALUE_PATH_DIR" value="/Users/mariogonzalez/GIT/LIBRARY/Cinder"/>
+					<stringMacro name="CINDER_PATH" type="VALUE_PATH_DIR" value="${ProjDirPath}/CINDER_PATH_LINK"/>
 				</macros>
 				<externalSettings/>
 				<extensions>
@@ -330,7 +330,7 @@
 		<cconfiguration id="cdt.managedbuild.config.macosx.exe.release.1987240909">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.macosx.exe.release.1987240909" moduleId="org.eclipse.cdt.core.settings" name="Release">
 				<macros>
-					<stringMacro name="CINDER_PATH" type="VALUE_PATH_DIR" value="/Users/guojianwu/Documents/Libraries/Cinder"/>
+					<stringMacro name="CINDER_PATH" type="VALUE_PATH_DIR" value="${ProjDirPath}/CINDER_PATH_LINK"/>
 				</macros>
 				<externalSettings/>
 				<extensions>
