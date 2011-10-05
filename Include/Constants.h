@@ -22,7 +22,7 @@ namespace Constants {
 		static bool USE_GUI = true;
 		static bool CREATE_TIMELAPSE = true;
 		static bool USE_ARDUINO = true;
-		static bool USE_RECORDED_ONI = true;
+		static bool USE_RECORDED_ONI = false;
 		static bool USE_IDLE_TIMER = true;
 	};
 
@@ -41,8 +41,8 @@ namespace Constants {
 		}
 
 		static const int FRAMES_BEFORE_CONSIDERED_REAL_USER = 10;
-		static const int FRAMES_BEFORE_PLAYING_RECORDING = 1000;
-		static const float CHANCE_OF_PLAYING_RECORDING_WHEN_IDLE = 0.0001f;
+		static const int FRAMES_BEFORE_PLAYING_RECORDING = 8000;
+		static const float CHANCE_OF_PLAYING_RECORDING_WHEN_IDLE = 0.00001f;
 	}
 
 	namespace TimeLapse {

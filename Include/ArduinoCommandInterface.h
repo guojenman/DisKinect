@@ -30,6 +30,9 @@ private:
 	// SimpleGUI
     mowa::sgui::SimpleGUI* _gui;		// SimpleGUI instance
     void addButton( std::string name, std::string command );		// Adds a button to the gui, registers the clickevent and stores it in a std::map
-    bool onGuiButtonClicked( ci::app::MouseEvent event );
-    std::map< mowa::sgui::ButtonControl*, std::string > _buttonMap; // Map each button to an axis
+
+    bool onGuiButtonClicked( ci::app::MouseEvent event );			//
+    bool onResetClicked( ci::app::MouseEvent event );			//
+
+    std::map< mowa::sgui::ButtonControl*, std::string > _buttonMap; // Map each button to a string
 };

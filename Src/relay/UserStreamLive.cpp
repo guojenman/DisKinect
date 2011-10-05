@@ -89,15 +89,8 @@ namespace relay {
 
 	// not
 	bool UserStreamLive::wantsToExit() {
-		if( _framesInactive >= Constants::relay::FRAMES_BEFORE_PLAYING_RECORDING ) {
-
-			float chance = ci::Rand::randFloat();
-			std::cout << "Chance: " << chance << std::endl;
-
-			return chance < Constants::relay::CHANCE_OF_PLAYING_RECORDING_WHEN_IDLE;
-		}
-		return false;
-//		return _framesInactive >= Constants::relay::FRAMES_BEFORE_PLAYING_RECORDING
-//				&& chance <  Constants::relay::CHANCE_OF_PLAYING_RECORDING_WHEN_IDLE;
+		float chance = ci::Rand::randFloat();
+		return _framesInactive >= Constants::relay::FRAMES_BEFORE_PLAYING_RECORDING
+				&& chance <  Constants::relay::CHANCE_OF_PLAYING_RECORDING_WHEN_IDLE;
 	};
 }

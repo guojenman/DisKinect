@@ -37,7 +37,10 @@ void ArduinoCommandInterface::setupGUI() {
 	int yPadding = 145;
 	_gui->addColumn( (SimpleGUI::labelSize.x + SimpleGUI::spacing) * 0, yPadding);
 	_gui->addParam("IgnoreKinect", &ignoreExternalSendRequest, ignoreExternalSendRequest);
+	mowa::sgui::ButtonControl* button = _gui->addButton( "Set As Zero" );
+	button->registerClick( this, &ArduinoCommandInterface::onResetClicked );
 
+	_gui->addColumn( (SimpleGUI::labelSize.x + SimpleGUI::spacing) * 1, yPadding);
 	addButton( "LeftArmX_up", "q" );
 	addButton( "LeftArmX_down", "w" );
 
@@ -47,8 +50,7 @@ void ArduinoCommandInterface::setupGUI() {
 	addButton( "LeftArmY_up", "z" );
 	addButton( "LeftArmY_down", "x" );
 
-
-	_gui->addColumn( (SimpleGUI::labelSize.x + SimpleGUI::spacing) * 1, yPadding);
+	_gui->addColumn( (SimpleGUI::labelSize.x + SimpleGUI::spacing) * 2, yPadding);
 	addButton( "RightArmX_up", "o" );
 	addButton( "RightArmX_down", "p" );
 
@@ -58,11 +60,11 @@ void ArduinoCommandInterface::setupGUI() {
 	addButton( "RightArmY_up", "n" );
 	addButton( "RightArmY_down", "m" );
 
-	_gui->addColumn( (SimpleGUI::labelSize.x + SimpleGUI::spacing) * 2, yPadding);
+	_gui->addColumn( (SimpleGUI::labelSize.x + SimpleGUI::spacing) * 3, yPadding);
 	addButton( "LeftLeg_up", "d" );
 	addButton( "LeftLeg_down", "f" );
 
-	_gui->addColumn( (SimpleGUI::labelSize.x + SimpleGUI::spacing) * 3, yPadding);
+	_gui->addColumn( (SimpleGUI::labelSize.x + SimpleGUI::spacing) * 4, yPadding);
 	addButton( "RightLeg_up", "h" );
 	addButton( "RightLeg_down", "j" );
 }
@@ -70,6 +72,7 @@ void ArduinoCommandInterface::setupGUI() {
 void ArduinoCommandInterface::addButton( std::string name, std::string command ) {
 	mowa::sgui::ButtonControl* button = _gui->addButton( name );
 	button->registerClick( this, &ArduinoCommandInterface::onGuiButtonClicked );
+
 	_buttonMap.insert( std::pair< mowa::sgui::ButtonControl*, std::string >(button, command) );
 }
 
@@ -121,5 +124,9 @@ bool ArduinoCommandInterface::onGuiButtonClicked( ci::app::MouseEvent event ) {
 
 	std::cout << "ForceSend!" << iter->second << std::endl;
 	sendMessageImp( iter->second, true );
+}
+
+bool ArduinoCommandInterface::onResetClicked( ci::app::MouseEvent event ) {
+	sendMessageImp( "r", true );
 }
 

@@ -82,8 +82,7 @@ void DisKinect::setup()
 }
 
 
-void DisKinect::update()
-{
+void DisKinect::update() {
 	userRelay->update();
 
 	SKELETON::SKELETON skeleton = userRelay->getSkeleton();
