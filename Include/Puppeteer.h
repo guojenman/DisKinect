@@ -12,6 +12,7 @@ public:
 	virtual ~Puppeteer();
 
 	void update(SKELETON::SKELETON& skeleton);
+
 };
 
 } /* namespace puppetier */

@@ -17,6 +17,7 @@
 #include "WuCinderNITE.h"
 #include "UserTracker.h"
 #include "SkeletonStruct.h"
+#include "Constants.h"
 
 using namespace ci;
 using namespace app;
@@ -29,6 +30,9 @@ public:
 	void update();
 	void draw();
 	void shutdown();
+	void mouseDown( MouseEvent event );
+	void mouseDrag( MouseEvent event );
+
 
 	void keyUp(KeyEvent event);
 	relay::UserRelay* userRelay;
@@ -55,10 +59,14 @@ void DisKinect::setup()
 //	aNi->startUpdating();
 	aNi->mContext.StartGeneratingAll();
 
-	ci::CameraPersp cam;
-	cam.setPerspective(60.0f, cinder::app::App::get()->getWindowAspectRatio(), 1.0f, WuCinderNITE::getInstance()->maxDepth);
-	cam.lookAt(ci::Vec3f(0, 0, -500.0f), ci::Vec3f::zero());
-	mMayaCam.setCurrentCam(cam);
+
+
+	CameraPersp* cam = Constants::camera();
+	cam->setPerspective(60.0f, cinder::app::App::get()->getWindowAspectRatio(), 1.0f, WuCinderNITE::getInstance()->maxDepth);
+	cam->lookAt(ci::Vec3f(0, 0, -500.0f), ci::Vec3f::zero());
+
+	MayaCamUI* mayaCam = Constants::mayaCam();
+	mayaCam->setCurrentCam(*cam);
 
 	UserTracker* aTracker = UserTracker::getInstance();
 
@@ -70,7 +78,6 @@ void DisKinect::setup()
 void DisKinect::update()
 {
 	userRelay->update();
-
 }
 
 void DisKinect::draw()
@@ -79,12 +86,17 @@ void DisKinect::draw()
 
 	// These will be moved to userRelay->draw later
 	userRelay->draw();
+
+
+	SKELETON::SKELETON skeleton = userRelay->getSkeleton();
+	puppetier->update(skeleton);
 }
 
 void DisKinect::shutdown()
 {
 	console() << "quitting..." << std::endl;
 	delete userRelay;
+	delete puppetier;
 }
 
 void DisKinect::keyUp(KeyEvent event)
@@ -92,6 +104,16 @@ void DisKinect::keyUp(KeyEvent event)
 	if (event.getChar() == KeyEvent::KEY_q) {
 		quit();
 	}
+}
+void DisKinect::mouseDown( MouseEvent event )
+{
+	MayaCamUI* mayaCam = Constants::mayaCam();
+	mayaCam->mouseDown(event.getPos());
+}
+void DisKinect::mouseDrag( MouseEvent event )
+{
+	MayaCamUI* mayaCam = Constants::mayaCam();
+	mayaCam->mouseDrag(event.getPos(), event.isLeftDown(), event.isMiddleDown(), event.isRightDown());
 }
 
 CINDER_APP_BASIC( DisKinect, RendererGl )

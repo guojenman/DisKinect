@@ -18,7 +18,6 @@
 
 
 #include "UserStreamStateManager.h"
-#include "cinder/Camera.h"
 #include "cinder/Vector.h"
 #include "json/json.h"
 #include "cinder/app/MouseEvent.h"
@@ -53,9 +52,6 @@ namespace relay {
 		relay::UserStreamStateManager* fsm;
 
 		// Debug
-		ci::CameraPersp mCam;
-		ci::Vec3f mCamEye;
-		ci::Vec3f mCamLookAt;
 		mowa::sgui::SimpleGUI* _debugGUI;
 
 		void debugDraw();
