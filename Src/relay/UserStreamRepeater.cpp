@@ -115,7 +115,7 @@ namespace relay {
 	}
 
 	bool UserStreamRepeater::canStartRecording() {
-		std::cout << "Current Delta: " << tracker->getTotalDist() << std::endl;
+//		std::cout << "Current Delta: " << tracker->getTotalDist() << std::endl;
 		return getSkeleton().isTracking && tracker->getTotalDist() > 15;
 	}
 }

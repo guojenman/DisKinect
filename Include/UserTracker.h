@@ -32,7 +32,7 @@ public:
 	unsigned int	activeTickTotlerance;
 
 	float totalDist;
-	float getTotalDist() { return totalDist; };
+	float getTotalDist() { return totalDist > 1.5e+05 ? 0 : totalDist; }; // Temp fix to prevent it from taking NaN values into account causing bad readouts
 
 private:
 	struct UserInfo {

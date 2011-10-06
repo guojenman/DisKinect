@@ -48,6 +48,12 @@ void DisKinect::prepareSettings( AppBasic::Settings *settings )
 void DisKinect::setup()
 {
 
+	ci::Vec3f temp = ci::Vec3f(0, 1, 0);
+	temp.rotateY( 100 );
+//	temp.normalize();
+	std::cout << temp << std::endl;
+
+
 	XnMapOutputMode mapMode;
 	mapMode.nFPS = 30;
 	mapMode.nXRes = 640;

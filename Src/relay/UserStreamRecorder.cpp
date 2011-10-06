@@ -112,7 +112,7 @@ namespace relay {
 		_recording.push_back( aFrame );
 		_framenumber++;
 
-		std::cout << "Recording frame:" << _framenumber << std::endl;
+//		std::cout << "Recording frame:" << _framenumber << std::endl;
 	}
 
 	/**

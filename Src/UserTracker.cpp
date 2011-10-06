@@ -89,12 +89,50 @@ void UserTracker::update()
 					? skeleton.joints[XN_SKEL_RIGHT_KNEE].position : it->kneeR;
 
 			totalDist = 0;
-			totalDist += shoulderL.distanceSquared(it->shoulderL);
-			totalDist += shoulderR.distanceSquared(it->shoulderR);
-			totalDist += handL.distanceSquared(it->handL);
-			totalDist += handR.distanceSquared(it->handR);
-			totalDist += kneeL.distanceSquared(it->kneeL);
-			totalDist += kneeR.distanceSquared(it->kneeR);
+			int validJoints = 0;
+			if( skeleton.joints[XN_SKEL_LEFT_SHOULDER].confidence == 1 ) {
+				totalDist += shoulderL.distanceSquared(it->shoulderL);
+
+				std::cout << totalDist << std::endl;
+				++validJoints;
+			}
+
+			if( skeleton.joints[XN_SKEL_RIGHT_SHOULDER].confidence == 1 ) {
+				totalDist += shoulderR.distanceSquared(it->shoulderR);
+				std::cout << totalDist << std::endl;
+				++validJoints;
+			}
+
+			if( skeleton.joints[XN_SKEL_LEFT_HAND].confidence == 1 ) {
+				totalDist += handL.distanceSquared(it->handL);
+
+				std::cout << totalDist << std::endl;
+				++validJoints;
+			}
+
+			if( skeleton.joints[XN_SKEL_RIGHT_HAND].confidence == 1 ) {
+				totalDist += handR.distanceSquared(it->handR);
+
+				std::cout << totalDist << std::endl;
+				++validJoints;
+			}
+
+			if( skeleton.joints[XN_SKEL_LEFT_KNEE].confidence == 1 ) {
+				totalDist += kneeL.distanceSquared(it->kneeL);
+
+				std::cout << totalDist << std::endl;
+				++validJoints;
+			}
+
+			if( skeleton.joints[XN_SKEL_RIGHT_KNEE].confidence == 1 ) {
+				totalDist += kneeR.distanceSquared(it->kneeR);
+
+				std::cout << totalDist << std::endl;
+				++validJoints;
+			}
+
+
+			std::cout << "TotalDist: " << totalDist << " ValidJoints: " << validJoints << std::endl;
 
 			if (totalDist <= activeMotionTolerance) {
 				if (++it->motionAtZeroDuration == activeTickTotlerance) {
@@ -106,6 +144,11 @@ void UserTracker::update()
 					it->isActive = true;
 				}
 			}
+
+
+
+			std::cout << "Total Delta:"<< totalDist << std::endl;
+//			std::cout << "Total Delta:"<< totalDist << std::endl;
 
 			it->shoulderL = shoulderL;
 			it->shoulderR = shoulderR;
