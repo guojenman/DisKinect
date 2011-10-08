@@ -14,6 +14,8 @@
 #include "UserStreamRecorder.h"
 #include "UserStreamPlayer.h"
 
+#include "Constants.h"
+
 
 namespace relay {
 	UserStreamRepeater::UserStreamRepeater() {
@@ -49,6 +51,7 @@ namespace relay {
 		recorder->enter();
 		current = recorder;
 
+		_cumalitiveDelta = 0;
 		_state = WAITING_TO_RECORD;
 	}
 
@@ -56,16 +59,18 @@ namespace relay {
 
 		static int frameCounter;
 		if( getState() == WAITING_TO_RECORD && canStartRecording() ) {
-			std::cout << "Starting recording" << std::endl;
+			std::cout << "UserStreamRepeater: Starting recording!" << std::endl;
 			recorder->startRecording();
 			current = recorder;
+			_numberOfFramesToRecord = ci::Rand::randInt( Constants::relay::repeater::MIN_FRAMES_TO_RECORD, Constants::relay::repeater::MAX_FRAMES_TO_RECORD );
+
 			setState( RECORDING );
 		}
 
 		// Check if we've recorded enough
-		if( getState() == RECORDING && ++frameCounter == 75) {
+		if( getState() == RECORDING && ++frameCounter == _numberOfFramesToRecord) {
 
-			std::cout << "Stop recording!" << std::endl;
+			std::cout << "UserStreamRepeater: Stopping recording!" << std::endl;
 
 			// Stop recording, get json, and destroy recorder
 			recorder->stopRecording();
@@ -116,7 +121,8 @@ namespace relay {
 
 	bool UserStreamRepeater::canStartRecording() {
 //		std::cout << "Current Delta: " << tracker->getTotalDist() << std::endl;
-		return getSkeleton().isTracking && tracker->getTotalDist() > 15;
+		_cumalitiveDelta += tracker->getTotalDist();
+		return getSkeleton().isTracking && _cumalitiveDelta > Constants::relay::repeater::MIN_CUMALTIVE_DELTA_BEFORE_RECORDING;
 	}
 }
 

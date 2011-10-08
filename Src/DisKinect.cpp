@@ -60,19 +60,17 @@ void DisKinect::setup()
 	mapMode.nYRes = 480;
 
 	WuCinderNITE* aNi = WuCinderNITE::getInstance();
-	aNi->setup("Resources/SkeletonRec.oni");
+	aNi->setup("Resources/1.oni");
 //	aNi->setup("Resources/Sample-User.xml", mapMode, true, true);
 //	aNi->startUpdating();
 	aNi->mContext.StartGeneratingAll();
 
 
 
-	CameraPersp* cam = Constants::camera();
-	cam->setPerspective(60.0f, cinder::app::App::get()->getWindowAspectRatio(), 1.0f, WuCinderNITE::getInstance()->maxDepth);
-	cam->lookAt(ci::Vec3f(0, 0, -500.0f), ci::Vec3f::zero());
-
-	MayaCamUI* mayaCam = Constants::mayaCam();
-	mayaCam->setCurrentCam(*cam);
+	ci::CameraPersp cam;
+	cam.setPerspective(60.0f, cinder::app::App::get()->getWindowAspectRatio(), 1.0f, WuCinderNITE::getInstance()->maxDepth);
+	cam.lookAt(ci::Vec3f(0, 0, -500.0f), ci::Vec3f::zero());
+	Constants::mayaCam()->setCurrentCam( cam );
 
 	UserTracker* aTracker = UserTracker::getInstance();
 
@@ -88,7 +86,7 @@ void DisKinect::update()
 
 void DisKinect::draw()
 {
-	gl::clear(ColorA(0, 0, 0, 0), true);
+	gl::clear( ColorA::black(), true);
 
 	userRelay->draw();
 

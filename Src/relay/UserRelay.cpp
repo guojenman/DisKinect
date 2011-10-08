@@ -82,6 +82,7 @@ namespace relay {
 			_debugGUI->addButton("Live")->registerClick( this, &UserRelay::setStateLive );
 			_debugGUI->addButton("Recording")->registerClick( this, &UserRelay::setStateRecorder );
 			_debugGUI->addButton("Playback")->registerClick( this, &UserRelay::setStatePlayback );
+			_debugGUI->addButton("Repeater")->registerClick( this, &UserRelay::setStateRepeater );
 		}
 	}
 
@@ -113,11 +114,13 @@ namespace relay {
 	void UserRelay::renderDepthMap() {
 		if( !DRAW_DEPTHMAP ) return;
 
-		ci::Area anArea =  cinder::app::App::get()->getWindowBounds();
-//		anArea.setX2( anArea.getX2() * 0.25 );
-//		anArea.setY2( anArea.getY2() * 0.25 );
+		int windowWidth = ci::app::App::get()->getWindowWidth();
+		int windowHeight = ci::app::App::get()->getWindowHeight();
+		float imageSize = ci::app::App::get()->getWindowWidth() * 0.25;
+
 		ci::gl::disableDepthRead();
-		ni->renderDepthMap(anArea);
+		ni->renderDepthMap( ci::Area(0, windowHeight - imageSize, imageSize, windowHeight ) );
+		ni->renderColor( ci::Area( imageSize, windowHeight - imageSize, imageSize * 2 , windowHeight ) );
 	}
 
 	void UserRelay::renderSkeleton() {
@@ -140,4 +143,5 @@ namespace relay {
 		this->fsm->changeState( player );
 		return true;
 	};
+	bool UserRelay::setStateRepeater( ci::app::MouseEvent event ) { this->fsm->changeState( new relay::UserStreamRepeater() ); return true; };
 }

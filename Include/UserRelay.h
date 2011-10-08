@@ -58,6 +58,7 @@ namespace relay {
 		bool setStateLive( ci::app::MouseEvent event );
 		bool setStateRecorder( ci::app::MouseEvent event );
 		bool setStatePlayback( ci::app::MouseEvent event );
+		bool setStateRepeater( ci::app::MouseEvent event );
 	};
 
 } /* relay */

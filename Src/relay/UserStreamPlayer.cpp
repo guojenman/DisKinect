@@ -96,7 +96,7 @@ namespace relay {
 	}
 
 	void UserStreamPlayer::draw() {
-		if( Constants::Debug::USE_GUI ) {
+		if( Constants::Debug::USE_GUI && _gui ) {
 			_gui->draw();
 		}
 	}

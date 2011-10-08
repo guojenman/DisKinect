@@ -8,10 +8,6 @@
 #include "cinder/MayaCamUI.h"
 #include "Constants.h"
 namespace Constants {
-	cinder::CameraPersp* camera() {
-		static cinder::CameraPersp* camera = new cinder::CameraPersp();
-		return camera;
-	}
 	cinder::MayaCamUI* mayaCam() {
 		static cinder::MayaCamUI* mayaCam = new cinder::MayaCamUI();
 		return mayaCam;

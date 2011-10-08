@@ -89,50 +89,29 @@ void UserTracker::update()
 					? skeleton.joints[XN_SKEL_RIGHT_KNEE].position : it->kneeR;
 
 			totalDist = 0;
+			float distance;
 			int validJoints = 0;
-			if( skeleton.joints[XN_SKEL_LEFT_SHOULDER].confidence == 1 ) {
-				totalDist += shoulderL.distanceSquared(it->shoulderL);
+			float maxDistance = 1e04;
 
-				std::cout << totalDist << std::endl;
-				++validJoints;
-			}
+			distance = shoulderL.distanceSquared(it->shoulderL);
+			if( distance < maxDistance ) { totalDist += distance; ++validJoints; };
 
-			if( skeleton.joints[XN_SKEL_RIGHT_SHOULDER].confidence == 1 ) {
-				totalDist += shoulderR.distanceSquared(it->shoulderR);
-				std::cout << totalDist << std::endl;
-				++validJoints;
-			}
+			distance = shoulderR.distanceSquared(it->shoulderR);
+			if( distance < maxDistance ) { totalDist += distance; ++validJoints; };
 
-			if( skeleton.joints[XN_SKEL_LEFT_HAND].confidence == 1 ) {
-				totalDist += handL.distanceSquared(it->handL);
+			distance = handL.distanceSquared(it->handL);
+			if( distance < maxDistance ) { totalDist += distance; ++validJoints; };
 
-				std::cout << totalDist << std::endl;
-				++validJoints;
-			}
+			distance = handR.distanceSquared(it->handR);
+			if( distance < maxDistance ) { totalDist += distance; ++validJoints; };
 
-			if( skeleton.joints[XN_SKEL_RIGHT_HAND].confidence == 1 ) {
-				totalDist += handR.distanceSquared(it->handR);
+			distance = kneeL.distanceSquared(it->kneeL);
+			if( distance < maxDistance ) { totalDist += distance; ++validJoints; };
 
-				std::cout << totalDist << std::endl;
-				++validJoints;
-			}
+			distance = kneeR.distanceSquared(it->kneeR);
+			if( distance < maxDistance ) { totalDist += distance; ++validJoints; };
 
-			if( skeleton.joints[XN_SKEL_LEFT_KNEE].confidence == 1 ) {
-				totalDist += kneeL.distanceSquared(it->kneeL);
-
-				std::cout << totalDist << std::endl;
-				++validJoints;
-			}
-
-			if( skeleton.joints[XN_SKEL_RIGHT_KNEE].confidence == 1 ) {
-				totalDist += kneeR.distanceSquared(it->kneeR);
-
-				std::cout << totalDist << std::endl;
-				++validJoints;
-			}
-
-
-			std::cout << "TotalDist: " << totalDist << " ValidJoints: " << validJoints << std::endl;
+//			std::cout << "TotalDist: " << totalDist << " ValidJoints: " << validJoints << std::endl;
 
 			if (totalDist <= activeMotionTolerance) {
 				if (++it->motionAtZeroDuration == activeTickTotlerance) {
@@ -147,7 +126,7 @@ void UserTracker::update()
 
 
 
-			std::cout << "Total Delta:"<< totalDist << std::endl;
+//			std::cout << "Total Delta:"<< totalDist << std::endl;
 //			std::cout << "Total Delta:"<< totalDist << std::endl;
 
 			it->shoulderL = shoulderL;
