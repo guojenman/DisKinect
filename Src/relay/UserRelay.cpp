@@ -45,9 +45,9 @@ namespace relay {
 //		this->fsm->setInitialState( recorder );
 
 		// Test using the player
-		relay::UserStreamPlayer* player = new relay::UserStreamPlayer();
-		player->setJson( ci::app::App::get()->getResourcePath("jsontest.json") );			// Note the UserStreamPlayer requires the JSON to be set before 'enter' - set via string path or Json::Value
-		this->fsm->setInitialState( player );
+//		relay::UserStreamPlayer* player = new relay::UserStreamPlayer();
+//		player->setJson( ci::app::App::get()->getResourcePath("jsontest.json") );			// Note the UserStreamPlayer requires the JSON to be set before 'enter' - set via string path or Json::Value
+//		this->fsm->setInitialState( player );
 
 		setupDebug();
 	}

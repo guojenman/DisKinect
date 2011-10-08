@@ -37,7 +37,6 @@ public:
 	void keyUp(KeyEvent event);
 	relay::UserRelay* userRelay;
 	puppeteer::Puppeteer* puppetier;
-	MayaCamUI mMayaCam;
 };
 
 void DisKinect::prepareSettings( AppBasic::Settings *settings )

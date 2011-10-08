@@ -4,6 +4,8 @@
 
 #include "SkeletonStruct.h"
 
+#include "ArduinoCommandInterface.h"
+
 namespace puppeteer {
 
 class Puppeteer {
@@ -12,6 +14,9 @@ public:
 	virtual ~Puppeteer();
 
 	void update(SKELETON::SKELETON& skeleton);
+
+private:
+	ArduinoCommandInterface arduino;
 
 };
 
