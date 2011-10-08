@@ -89,12 +89,29 @@ void UserTracker::update()
 					? skeleton.joints[XN_SKEL_RIGHT_KNEE].position : it->kneeR;
 
 			totalDist = 0;
-			totalDist += shoulderL.distanceSquared(it->shoulderL);
-			totalDist += shoulderR.distanceSquared(it->shoulderR);
-			totalDist += handL.distanceSquared(it->handL);
-			totalDist += handR.distanceSquared(it->handR);
-			totalDist += kneeL.distanceSquared(it->kneeL);
-			totalDist += kneeR.distanceSquared(it->kneeR);
+			float distance;
+			int validJoints = 0;
+			float maxDistance = 1e04;
+
+			distance = shoulderL.distanceSquared(it->shoulderL);
+			if( distance < maxDistance ) { totalDist += distance; ++validJoints; };
+
+			distance = shoulderR.distanceSquared(it->shoulderR);
+			if( distance < maxDistance ) { totalDist += distance; ++validJoints; };
+
+			distance = handL.distanceSquared(it->handL);
+			if( distance < maxDistance ) { totalDist += distance; ++validJoints; };
+
+			distance = handR.distanceSquared(it->handR);
+			if( distance < maxDistance ) { totalDist += distance; ++validJoints; };
+
+			distance = kneeL.distanceSquared(it->kneeL);
+			if( distance < maxDistance ) { totalDist += distance; ++validJoints; };
+
+			distance = kneeR.distanceSquared(it->kneeR);
+			if( distance < maxDistance ) { totalDist += distance; ++validJoints; };
+
+//			std::cout << "TotalDist: " << totalDist << " ValidJoints: " << validJoints << std::endl;
 
 			if (totalDist <= activeMotionTolerance) {
 				if (++it->motionAtZeroDuration == activeTickTotlerance) {
@@ -106,6 +123,11 @@ void UserTracker::update()
 					it->isActive = true;
 				}
 			}
+
+
+
+//			std::cout << "Total Delta:"<< totalDist << std::endl;
+//			std::cout << "Total Delta:"<< totalDist << std::endl;
 
 			it->shoulderL = shoulderL;
 			it->shoulderR = shoulderR;

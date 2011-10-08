@@ -6,9 +6,8 @@
  */
 #ifndef CONSTANTS_H_
 #define CONSTANTS_H_
-namespace cinder { class CameraPersp; class MayaCamUI; };
+namespace cinder { class MayaCamUI; };
 namespace Constants {
-	extern cinder::CameraPersp* camera();
 	extern cinder::MayaCamUI* mayaCam();
 
 	namespace Debug {
@@ -17,6 +16,17 @@ namespace Constants {
 		static bool DRAW_DEPTHMAP = true;
 		static bool USE_GUI = true;
 	};
+
+	namespace relay {
+		namespace repeater {
+			static float MIN_CUMALTIVE_DELTA_BEFORE_RECORDING = 1e05;	// At least this much movement has to accumulate while a user is active before we start recording
+
+			// Record somewhere between this many frames - arbitary numbers
+			// TODO: Stop recording after if delta decreases?
+			static float MIN_FRAMES_TO_RECORD = 75;
+			static float MAX_FRAMES_TO_RECORD = 300;
+		}
+	}
 }
 
 #endif /* CONSTANTS_H_ */

@@ -54,7 +54,9 @@ namespace relay {
 			REPEATER_STATE getState() { return _state; };
 
 			Json::Value _recording;					// In memory json recording fed to 'player'
+			int _numberOfFramesToRecord;
 
+			float _cumalitiveDelta;
 			bool canStartRecording();		// Atleast a user, and atleast some movement
 	};
 }
