@@ -22,6 +22,7 @@ UserTracker::UserTracker()
 	activeUserId = 0;
 	activeMotionTolerance = 2.0f;
 	activeTickTotlerance = 5;
+	totalDist = 0;
 	ni = WuCinderNITE::getInstance();
 	mSignalConnectionNewUser = ni->signalNewUser.connect( boost::bind(&UserTracker::onNewUser, this, boost::lambda::_1) );
 	mSignalConnectionLostUser = ni->signalLostUser.connect( boost::bind(&UserTracker::onLostUser, this, boost::lambda::_1) );
@@ -60,7 +61,7 @@ void UserTracker::onLostUser(XnUserID nId)
 
 void UserTracker::update()
 {
-	float totalDist;
+	totalDist = 0;
 	float confidence = 0.5f;
 	// measure distance of important joints have moved from the last position
 	// and decide if the user is active or not - used for sorting, and gives us

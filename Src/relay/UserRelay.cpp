@@ -23,6 +23,7 @@
 #include "UserStreamLive.h"
 #include "UserStreamRecorder.h"
 #include "UserStreamPlayer.h"
+#include "UserStreamRepeater.h"
 
 #include "simplegui/SimpleGUI.h"
 #include "Constants.h"
@@ -37,8 +38,8 @@ namespace relay {
 		this->fsm = new relay::UserStreamStateManager();
 
 		// Test the live stream
-		relay::UserStreamLive* live = new relay::UserStreamLive();
-		this->fsm->setInitialState( live );
+//		relay::UserStreamLive* live = new relay::UserStreamLive();
+//		this->fsm->setInitialState( live );
 
 		// Test the recorder
 //		relay::UserStreamRecorder* recorder = new relay::UserStreamRecorder();
@@ -48,6 +49,10 @@ namespace relay {
 //		relay::UserStreamPlayer* player = new relay::UserStreamPlayer();
 //		player->setJson( ci::app::App::get()->getResourcePath("jsontest.json") );			// Note the UserStreamPlayer requires the JSON to be set before 'enter' - set via string path or Json::Value
 //		this->fsm->setInitialState( player );
+
+		// Test repeater (records in memory then plays it back)
+		UserStreamRepeater* repeater = new relay::UserStreamRepeater();
+		this->fsm->setInitialState( repeater);
 
 		setupDebug();
 	}

@@ -4,3 +4,4 @@ Resources/*.oni
 Resources/*jsontest*.json
 .DS_Store
 .settings
+CINDER_PATH_LINK

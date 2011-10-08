@@ -31,6 +31,9 @@ public:
 	float		activeMotionTolerance;
 	unsigned int	activeTickTotlerance;
 
+	float totalDist;
+	float getTotalDist() { return totalDist; };
+
 private:
 	struct UserInfo {
 		UserInfo(XnUserID nId):id(nId),isActive(false),motionAtZeroDuration(0){};

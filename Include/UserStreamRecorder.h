@@ -29,10 +29,9 @@ namespace Json { class Value; }
 
 namespace relay {
 class UserStreamRecorder : public IUserStream  {
-
-	enum RecorderState { NOT_RECORDERING, RECORDING };
-
 	public:
+		enum RecorderState { NOT_RECORDERING, RECORDING };
+
 		UserStreamRecorder();
 		virtual ~UserStreamRecorder();
 
@@ -43,6 +42,14 @@ class UserStreamRecorder : public IUserStream  {
 
 		Json::Value getRecordAsJSONValue();
 		SKELETON::SKELETON getSkeleton();
+
+		RecorderState getState() { return _state; };
+
+		// recording
+		void startRecording();	// Starts recording Kinect data
+		void recordState();		// Records a single frame of user Kinect data via UserStreamFrame
+		void stopRecording();	// Stops recording Kinect data
+		void saveToDisk( std::string jsonString );	// Save to disk
 
 		// Callbacks
 		bool onToggleRecordingClicked( ci::app::MouseEvent event );
@@ -62,12 +69,6 @@ class UserStreamRecorder : public IUserStream  {
 		uint32_t _framenumber;	// Current frame number of recording, set to zero on start
 
 		std::vector<UserStreamFrame*> _recording;	// Stores frames during recording
-
-		// recording
-		void startRecording();	// Starts recording Kinect data
-		void recordState();		// Records a single frame of user Kinect data via UserStreamFrame
-		void stopRecording();	// Stops recording Kinect data
-		void saveToDisk( std::string jsonString );	// Save to disk
 	};
 }
 

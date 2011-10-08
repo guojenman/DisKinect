@@ -29,6 +29,11 @@
 
 namespace relay {
 	UserStreamPlayer::UserStreamPlayer() {
+		_gui = NULL;
+		_label = NULL;
+		_toggle = NULL;
+		_loopButton = NULL;
+		_frameSlider = NULL;
 	}
 
 	UserStreamPlayer::~UserStreamPlayer() {
