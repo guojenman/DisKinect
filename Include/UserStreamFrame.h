@@ -13,6 +13,7 @@
 
 #include "json/value.h"
 #include "SkeletonStruct.h"
+#include <boost/shared_ptr.hpp>
 
 // Forward declerations
 namespace SKELETON {
@@ -31,7 +32,7 @@ namespace relay
 			virtual ~UserStreamFrame();
 
 			// Static creation of an instance
-			static UserStreamFrame* fromJSON( Json::Value json  );
+			static boost::shared_ptr<UserStreamFrame> fromJSON( Json::Value json  );
 			// Outputs to JSON string
 			Json::Value toJSON();
 
@@ -41,7 +42,8 @@ namespace relay
 			// Skeleton data
 			SKELETON::SKELETON skeleton;
 	};
-
 }
+
+typedef boost::shared_ptr<relay::UserStreamFrame> UserStreamFrame_ptr;
 
 #endif /* USERSTREAMFRAME_H_ */

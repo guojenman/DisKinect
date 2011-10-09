@@ -18,6 +18,7 @@
 #include "UserTracker.h"
 #include "SkeletonStruct.h"
 #include "Constants.h"
+#include "TimeLapseRGB.h"
 
 using namespace ci;
 using namespace app;
@@ -37,6 +38,7 @@ public:
 	void keyUp(KeyEvent event);
 	relay::UserRelay* userRelay;
 	puppeteer::Puppeteer* puppetier;
+	TimeLapseRGB* rgbSaver;
 };
 
 void DisKinect::prepareSettings( AppBasic::Settings *settings )
@@ -46,13 +48,6 @@ void DisKinect::prepareSettings( AppBasic::Settings *settings )
 
 void DisKinect::setup()
 {
-
-	ci::Vec3f temp = ci::Vec3f(0, 1, 0);
-	temp.rotateY( 100 );
-//	temp.normalize();
-	std::cout << temp << std::endl;
-
-
 	XnMapOutputMode mapMode;
 	mapMode.nFPS = 30;
 	mapMode.nXRes = 640;
@@ -60,7 +55,7 @@ void DisKinect::setup()
 
 	WuCinderNITE* aNi = WuCinderNITE::getInstance();
 	aNi->setup("Resources/1.oni");
-//	aNi->setup("Resources/Sample-User.xml", mapMode, true, true);
+//	aNi->setup("./Resources/Sample-User.xml", mapMode, true, true);
 //	aNi->startUpdating();
 	aNi->mContext.StartGeneratingAll();
 
@@ -75,6 +70,9 @@ void DisKinect::setup()
 
 	userRelay = new relay::UserRelay( aNi, aTracker );
 	puppetier = new puppeteer::Puppeteer();
+
+	if( Constants::Debug::CREATE_TIMELAPSE )
+		rgbSaver = new TimeLapseRGB();
 }
 
 
@@ -98,6 +96,7 @@ void DisKinect::shutdown()
 	console() << "quitting..." << std::endl;
 	delete userRelay;
 	delete puppetier;
+	delete rgbSaver; rgbSaver = NULL;
 }
 
 void DisKinect::keyUp(KeyEvent event)

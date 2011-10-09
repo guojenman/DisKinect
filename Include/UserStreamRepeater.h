@@ -13,6 +13,8 @@
 #include "IUserStream.h"
 #include "json/json.h"
 #include "boost/bind.hpp"
+#include "boost/signals2.hpp"
+#include <XnTypes.h>
 
 // Forward declerations
 namespace SKELETON {
@@ -53,11 +55,21 @@ namespace relay {
 			void setState( REPEATER_STATE aState );
 			REPEATER_STATE getState() { return _state; };
 
+			void startRecording();
+			void stopRecording();
+
 			Json::Value _recording;					// In memory json recording fed to 'player'
 			int _numberOfFramesToRecord;
 
 			float _cumalitiveDelta;
+			int _frameCounter;
 			bool canStartRecording();		// Atleast a user, and atleast some movement
+
+			boost::signals2::connection	_signalConnectionNewUser;
+			boost::signals2::connection	_signalConnectionLostUser;
+
+			void onNewUser(XnUserID nId);
+			void onLostUser(XnUserID nId);
 	};
 }
 #endif /* USERSTREAMREPEATER_H_ */

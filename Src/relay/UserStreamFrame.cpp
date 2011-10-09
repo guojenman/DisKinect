@@ -23,7 +23,7 @@ namespace relay
 	}
 	UserStreamFrame::~UserStreamFrame() {}
 
-	UserStreamFrame* UserStreamFrame::fromJSON( Json::Value json  ) {
+	UserStreamFrame_ptr UserStreamFrame::fromJSON( Json::Value json  ) {
 		SKELETON::SKELETON aSkeleton;
 
 		aSkeleton.isTracking = json["skeletonData"]["isTracking"].asBool();
@@ -38,7 +38,7 @@ namespace relay
 			aSkeleton.joints[i].position.z = (float)jointInfo[i]["position"]["z"].asDouble();
 		}
 
-		return new UserStreamFrame( json["framenumber"].asInt(), aSkeleton );
+		return UserStreamFrame_ptr( new UserStreamFrame( json["framenumber"].asInt(), aSkeleton ) );
 	}
 
 	Json::Value UserStreamFrame::toJSON() {

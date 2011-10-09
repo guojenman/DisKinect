@@ -15,6 +15,9 @@
 #include "UserStreamPlayer.h"
 
 #include "Constants.h"
+#include "cinder/Rand.h"
+
+#include <boost/lambda/lambda.hpp>
 
 
 namespace relay {
@@ -51,39 +54,26 @@ namespace relay {
 		recorder->enter();
 		current = recorder;
 
+
+//		ni = WuCinderNITE::getInstance();
+//		mSignalConnectionNewUser = ni->signalNewUser.connect( boost::bind(&UserTracker::onNewUser, this, boost::lambda::_1) );
+//		mSignalConnectionLostUser = ni->signalLostUser.connect( boost::bind(&UserTracker::onLostUser, this, boost::lambda::_1) );
+//		_signalConnectionLostUser = ni->signalLostUser.connect( boost::bind(&UserStreamRepeater::onLostUser, this, boost::lambda::_1 ) );
+//		_signalConnectionNewUser = ni->signalNewUser.connect( boost::bind(&UserStreamRepeater::onNewUser, this, boost::lambda::_1 ) );
+
 		_cumalitiveDelta = 0;
 		_state = WAITING_TO_RECORD;
 	}
 
 	void UserStreamRepeater::update() {
 
-		static int frameCounter;
+		// Ready to record?
 		if( getState() == WAITING_TO_RECORD && canStartRecording() ) {
-			std::cout << "UserStreamRepeater: Starting recording!" << std::endl;
-			recorder->startRecording();
-			current = recorder;
-			_numberOfFramesToRecord = ci::Rand::randInt( Constants::relay::repeater::MIN_FRAMES_TO_RECORD, Constants::relay::repeater::MAX_FRAMES_TO_RECORD );
-
-			setState( RECORDING );
+			startRecording();
 		}
-
 		// Check if we've recorded enough
-		if( getState() == RECORDING && ++frameCounter == _numberOfFramesToRecord) {
-
-			std::cout << "UserStreamRepeater: Stopping recording!" << std::endl;
-
-			// Stop recording, get json, and destroy recorder
-			recorder->stopRecording();
-			_recording = recorder->getRecordAsJSONValue();
-			recorder->exit();
-
-			// Start playback
-			player = new UserStreamPlayer();
-			player->setJson( &_recording );
-			player->enter();
-			current = player;
-
-			setState( FIRST_PLAYBACK );
+		if( getState() == RECORDING && recorder->getFrameNumber() == _numberOfFramesToRecord) {
+			stopRecording();
 		}
 
 		if(current)
@@ -119,10 +109,49 @@ namespace relay {
 		_state = aState;
 	}
 
+	void UserStreamRepeater::startRecording() {
+		std::cout << "UserStreamRepeater: Starting recording!" << std::endl;
+
+		recorder->startRecording();
+		current = recorder;
+		_numberOfFramesToRecord = ci::Rand::randInt( Constants::relay::repeater::MIN_FRAMES_TO_RECORD, Constants::relay::repeater::MAX_FRAMES_TO_RECORD );
+
+		setState( RECORDING );
+	}
+
+	void UserStreamRepeater::stopRecording() {
+
+		std::cout << "UserStreamRepeater: Stopping recording!" << std::endl;
+
+		// Stop recording, get json, and destroy recorder
+		recorder->stopRecording();
+		_recording = recorder->getRecordAsJSONValue();
+		recorder->exit();
+
+		// Start playback
+		player = new UserStreamPlayer();
+		player->setJson( &_recording );
+		player->enter();
+		current = player;
+
+		setState( FIRST_PLAYBACK );
+	}
+
 	bool UserStreamRepeater::canStartRecording() {
-//		std::cout << "Current Delta: " << tracker->getTotalDist() << std::endl;
 		_cumalitiveDelta += tracker->getTotalDist();
 		return getSkeleton().isTracking && _cumalitiveDelta > Constants::relay::repeater::MIN_CUMALTIVE_DELTA_BEFORE_RECORDING;
+	}
+
+	void UserStreamRepeater::onNewUser(XnUserID nId) {
+		if( getState() == RECORDING ) {
+//			stopRe
+		}
+
+		std::cout << "UserStreamRepeater - newUser!" << std::endl;
+	}
+
+	void UserStreamRepeater::onLostUser(XnUserID nId) {
+		std::cout << "UserStreamRepeater - lostUser!" << std::endl;
 	}
 }
 

@@ -338,19 +338,21 @@ void WuCinderNITE::updateDepthSurface()
 
 void WuCinderNITE::updateImageSurface()
 {
-	int w = mImageMeta.XRes();
-	const XnRGB24Pixel* pImage = mImageMeta.RGB24Data();
-	ci::Surface::Iter iter = mImageSurface.getIter( mDrawArea );
-	while( iter.line() ) {
-		pImage += w;
-		while( iter.pixel() ) {
-			iter.r() = pImage->nRed;
-			iter.g() = pImage->nGreen;
-			iter.b() = pImage->nBlue;
-			pImage--; // image is flipped, let's read backwards
+	mMutexImageSurface.lock();
+		int w = mImageMeta.XRes();
+		const XnRGB24Pixel* pImage = mImageMeta.RGB24Data();
+		ci::Surface::Iter iter = mImageSurface.getIter( mDrawArea );
+		while( iter.line() ) {
+			pImage += w;
+			while( iter.pixel() ) {
+				iter.r() = pImage->nRed;
+				iter.g() = pImage->nGreen;
+				iter.b() = pImage->nBlue;
+				pImage--; // image is flipped, let's read backwards
+			}
+			pImage += w;
 		}
-		pImage += w;
-	}
+	mMutexImageSurface.unlock();
 }
 
 ci::Surface8u WuCinderNITE::getDepthSurface()

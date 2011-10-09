@@ -166,6 +166,7 @@ namespace relay {
 		// To avoid throwing an exception - just return an empty skeleton struct if the current frame is greater than our size
 		// This can happen do to a race condition if update is called just before the file is loaded
 		if( frameToPlay < _recording.size() ) {
+
 			return _recording.at( frameToPlay )->skeleton;
 		} else {
 			SKELETON::SKELETON skeleton;
@@ -212,14 +213,12 @@ namespace relay {
 		// Create a userframe for each json object
 		Json::Value root = (*aJsonValue)["root"];
 
-		UserStreamFrame *userFrame;
         for( Json::ValueIterator itr = root.begin() ; itr != root.end() ; itr++ ) {
-        	userFrame = UserStreamFrame::fromJSON( (*itr) );
-			_totalframes = userFrame->framenumber + 1;
-			_recording.push_back( userFrame );
+        	_recording.push_back( UserStreamFrame::fromJSON( (*itr) ) );
+			_totalframes = _recording.back()->framenumber + 1;
         }
 
         restart();
-        std::cout << "Playback stream created with '" << userFrame->framenumber << "' frames" << std::endl;
+        std::cout << "Playback stream created with '" << _totalframes << "' frames" << std::endl;
 	}
 }

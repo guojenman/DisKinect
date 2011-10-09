@@ -1,4 +1,4 @@
-/*
+	/*
  * UserStreamRecorder.cpp
  *
  *  Created on: Sep 21, 2011
@@ -27,7 +27,10 @@ namespace SKELETON { struct SKELETON; struct SKELETON_JOINT; }
 namespace mowa { namespace sgui { class LabelControl; class ButtonControl; class SimpleGUI; }}
 namespace Json { class Value; }
 
+
+
 namespace relay {
+
 class UserStreamRecorder : public IUserStream  {
 	public:
 		enum RecorderState { NOT_RECORDERING, RECORDING };
@@ -50,6 +53,7 @@ class UserStreamRecorder : public IUserStream  {
 		void recordState();		// Records a single frame of user Kinect data via UserStreamFrame
 		void stopRecording();	// Stops recording Kinect data
 		void saveToDisk( std::string jsonString );	// Save to disk
+		uint32_t getFrameNumber() { return _framenumber; };
 
 		// Callbacks
 		bool onToggleRecordingClicked( ci::app::MouseEvent event );
@@ -68,7 +72,8 @@ class UserStreamRecorder : public IUserStream  {
 		RecorderState _state;	// Current state - either recording or idle
 		uint32_t _framenumber;	// Current frame number of recording, set to zero on start
 
-		std::vector<UserStreamFrame*> _recording;	// Stores frames during recording
+
+		std::vector< UserStreamFrame_ptr > _recording;	// Stores frames during recording
 	};
 }
 

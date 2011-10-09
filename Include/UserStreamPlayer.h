@@ -60,7 +60,7 @@ namespace relay {
 		bool _shouldLoop;
 		int _currentFrame;
 		int _totalframes;
-		std::vector<UserStreamFrame*> _recording;
+		std::vector< UserStreamFrame_ptr > _recording;
 
 		// GUI
 		mowa::sgui::LabelControl* _label;	// Label that displays crrent state

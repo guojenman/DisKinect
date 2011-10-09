@@ -14,7 +14,6 @@
 #include <stddef.h>
 #include <XnTypes.h>
 #include <boost/signals2.hpp>
-#include <boost/lambda/lambda.hpp>
 #include <list>
 #include <algorithm>
 #include "XnCppWrapper.h"

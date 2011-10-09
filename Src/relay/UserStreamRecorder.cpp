@@ -32,7 +32,9 @@ namespace relay {
 		_gui = NULL;
 		_label = NULL;
 	}
+
 	UserStreamRecorder::~UserStreamRecorder() {
+
 		delete _livestream; _livestream = NULL;
 		delete _gui; _gui = NULL;
 		delete _label; _label = NULL;
@@ -108,8 +110,7 @@ namespace relay {
 
 	void UserStreamRecorder::recordState() {
 		SKELETON::SKELETON aSkeleton = _livestream->getSkeleton();
-		UserStreamFrame* aFrame = new UserStreamFrame( _framenumber, aSkeleton );
-		_recording.push_back( aFrame );
+		_recording.push_back( UserStreamFrame_ptr( new UserStreamFrame( _framenumber, aSkeleton ) ) );
 		_framenumber++;
 
 //		std::cout << "Recording frame:" << _framenumber << std::endl;
@@ -145,8 +146,8 @@ namespace relay {
 
 		Json::Value json;
 		Json::Value root;
-		for (std::vector<UserStreamFrame*>::iterator i = _recording.begin(); i != _recording.end(); ++i) {
-			UserStreamFrame* aFrame = *i;
+		for (std::vector< UserStreamFrame_ptr >::iterator i = _recording.begin(); i != _recording.end(); ++i) {
+			UserStreamFrame_ptr aFrame = *i;
 			root.append( aFrame->toJSON() );
 		}
 

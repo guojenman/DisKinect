@@ -7,6 +7,8 @@
 
 #include "UserTracker.h"
 #include "SkeletonStruct.h"
+#include <boost/lambda/lambda.hpp>
+
 
 UserTracker* UserTracker::mInstance = NULL;
 UserTracker* UserTracker::getInstance()

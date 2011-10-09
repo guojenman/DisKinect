@@ -95,6 +95,9 @@ public:
 	XnPlane3D			mFloor;
 
 
+	boost::mutex		mMutexImageSurface;
+	ci::Surface8u		mImageSurface;
+
 protected:
 	WuCinderNITE();
 
@@ -114,7 +117,8 @@ protected:
 	bool				mIsCalibrated;
 	bool				mUseColorImage;
 	bool				mUseDepthMap;
-	ci::Surface8u		mImageSurface;
+
+
 	ci::Area			mDrawArea;
 	ci::Surface8u		mDepthSurface;
 	float 				mDepthHistogram[MAX_DEPTH];
