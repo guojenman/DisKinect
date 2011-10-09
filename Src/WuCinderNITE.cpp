@@ -219,6 +219,7 @@ void WuCinderNITE::update()
 {
 
 	XnStatus status = XN_STATUS_OK;
+	mMutex.lock();
 	status = mContext.WaitAndUpdateAll();
 	if( status != XN_STATUS_OK ) {
 		ci::app::console() << "no update" << endl;
@@ -246,23 +247,25 @@ void WuCinderNITE::update()
 		updateImageSurface();
 	}
 
-	XnSkeletonJointTransformation joint;
-	for(int i = 1; i < MAX_USERS; i++) {
-		skeletons[i].isTracking = mUserGen.GetSkeletonCap().IsTracking(i);
-		if (skeletons[i].isTracking) {
-			for(int j = 1; j < MAX_JOINTS; j++) {
-				mUserGen.GetSkeletonCap().GetSkeletonJoint(i, (XnSkeletonJoint)j, joint);
-				skeletons[i].joints[j].confidence = joint.position.fConfidence;
-				skeletons[i].joints[j].position.x = joint.position.position.X;
-				skeletons[i].joints[j].position.y = joint.position.position.Y;
-				skeletons[i].joints[j].position.z = joint.position.position.Z;
-			}
-		} else {
-			for(int j = 1; j < MAX_JOINTS; j++) {
-				skeletons[i].joints[j].confidence = 0;
+
+		XnSkeletonJointTransformation joint;
+		for(int i = 1; i < MAX_USERS; i++) {
+			skeletons[i].isTracking = mUserGen.GetSkeletonCap().IsTracking(i);
+			if (skeletons[i].isTracking) {
+				for(int j = 1; j < MAX_JOINTS; j++) {
+					mUserGen.GetSkeletonCap().GetSkeletonJoint(i, (XnSkeletonJoint)j, joint);
+					skeletons[i].joints[j].confidence = joint.position.fConfidence;
+					skeletons[i].joints[j].position.x = joint.position.position.X;
+					skeletons[i].joints[j].position.y = joint.position.position.Y;
+					skeletons[i].joints[j].position.z = joint.position.position.Z;
+				}
+			} else {
+				for(int j = 1; j < MAX_JOINTS; j++) {
+					skeletons[i].joints[j].confidence = 0;
+				}
 			}
 		}
-	}
+		mMutex.unlock();
 }
 
 void WuCinderNITE::updateDepthSurface()

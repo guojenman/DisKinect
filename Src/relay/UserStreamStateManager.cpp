@@ -57,7 +57,7 @@ namespace relay {
 
 	void UserStreamStateManager::update() {
 
-		WuCinderNITE::getInstance()->update();
+//		WuCinderNITE::getInstance()->update();
 		UserTracker::getInstance()->update();
 
 		if( currentState ) {

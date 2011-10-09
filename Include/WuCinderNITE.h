@@ -95,6 +95,7 @@ public:
 	XnPlane3D			mFloor;
 
 
+	boost::mutex mMutex;
 	boost::mutex		mMutexImageSurface;
 	ci::Surface8u		mImageSurface;
 
@@ -111,7 +112,7 @@ protected:
 
 	volatile bool		mRunUpdates; // exits update thread if false
 	boost::shared_ptr<boost::thread>	mThread;
-	boost::mutex mMutex;
+
 
 	bool				mNeedPoseForCalibration;
 	bool				mIsCalibrated;

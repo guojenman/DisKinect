@@ -56,8 +56,8 @@ void DisKinect::setup()
 	WuCinderNITE* aNi = WuCinderNITE::getInstance();
 	aNi->setup("Resources/1.oni");
 //	aNi->setup("./Resources/Sample-User.xml", mapMode, true, true);
-//	aNi->startUpdating();
-	aNi->mContext.StartGeneratingAll();
+	aNi->startUpdating();
+//	aNi->mContext.StartGeneratingAll();
 
 
 
