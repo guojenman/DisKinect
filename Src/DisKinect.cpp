@@ -53,9 +53,16 @@ void DisKinect::setup()
 	mapMode.nXRes = 640;
 	mapMode.nYRes = 480;
 
+
 	WuCinderNITE* aNi = WuCinderNITE::getInstance();
-	aNi->setup("Resources/1.oni");
-//	aNi->setup("./Resources/Sample-User.xml", mapMode, true, true);
+	if (Constants::Debug::USE_RECORDED_ONI) {
+//		aNi->setup(getResourcePath("1.oni"));
+		aNi->setup(getResourcePath("SkeletonRec.oni"));
+	} else {
+		aNi->setup("./Resources/Sample-User.xml", mapMode, true, true);
+	}
+
+	aNi->useCalibrationFile(getResourcePath("calibration.dat"));
 //	aNi->startUpdating();
 	aNi->mContext.StartGeneratingAll();
 

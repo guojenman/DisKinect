@@ -186,6 +186,10 @@ void WuCinderNITE::setup(string xmlpath, XnMapOutputMode mapMode, bool useDepthM
 	registerCallbacks();
 }
 
+void WuCinderNITE::useCalibrationFile(string filepath)
+{
+	mCalibrationFile = filepath;
+}
 
 void WuCinderNITE::startUpdating()
 {
@@ -513,15 +517,20 @@ void WuCinderNITE::unregisterCallbacks()
 
 void XN_CALLBACK_TYPE WuCinderNITE::CB_NewUser(xn::UserGenerator& generator, XnUserID nId, void* pCookie)
 {
-	ci::app::console() << "new user " << nId << endl;
-	if (mInstance->mNeedPoseForCalibration) {
+	ci::app::console() << "new user " << nId << ci::app::App::get()->getResourcePath("calibration.dat") << endl;
+	if (!mInstance->mCalibrationFile.empty()) {
+		mInstance->mUserGen.GetSkeletonCap().LoadCalibrationDataFromFile(nId, mInstance->mCalibrationFile.c_str());
+		mInstance->startTracking(nId);
+	}
+	else if (mInstance->mNeedPoseForCalibration) {
 		if ((mInstance->useSingleCalibrationMode && mInstance->mIsCalibrated) || mInstance->mUserGen.GetSkeletonCap().IsCalibrated(nId)) {
 			mInstance->mUserGen.GetSkeletonCap().LoadCalibrationData(nId, mInstance->useSingleCalibrationMode ? 0 : nId);
 			mInstance->startTracking(nId);
 		} else {
 			mInstance->mUserGen.GetPoseDetectionCap().StartPoseDetection(mInstance->mCalibrationPose, nId);
 		}
-	} else {
+	}
+	else {
 		if ((mInstance->useSingleCalibrationMode && mInstance->mIsCalibrated) || mInstance->mUserGen.GetSkeletonCap().IsCalibrated(nId)) {
 			mInstance->mUserGen.GetSkeletonCap().LoadCalibrationData(nId, mInstance->useSingleCalibrationMode ? 0 : nId);
 			mInstance->startTracking(nId);

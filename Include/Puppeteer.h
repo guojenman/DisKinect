@@ -16,7 +16,10 @@ public:
 	void update(SKELETON::SKELETON& skeleton);
 
 private:
-	ArduinoCommandInterface arduino;
+	ArduinoCommandInterface* arduino;
+	double updateInterval;
+	double lastUpdateTime;
+	float arduinoUnit;
 
 };
 

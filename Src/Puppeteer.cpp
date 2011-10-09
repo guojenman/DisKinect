@@ -11,16 +11,26 @@
 #include "XnTypes.h"
 
 #include "Constants.h"
+#include <iosfwd>
 
-using namespace ci;
+using namespace cinder;
 
 namespace puppeteer {
 
 Puppeteer::Puppeteer() {
-	//arduino.setup("");
+	lastUpdateTime = 0.0f;
+	updateInterval = 0.5f;
+	arduinoUnit = 10.0f;
+	if (Constants::Debug::USE_ARDUINO) {
+		arduino = new ArduinoCommandInterface();
+		arduino->setup("tty.usbmodemfd131", false);
+	}
 }
 
 Puppeteer::~Puppeteer() {
+	if (Constants::Debug::USE_ARDUINO) {
+		delete arduino;
+	}
 }
 
 void Puppeteer::update(SKELETON::SKELETON& skeleton)
@@ -36,8 +46,8 @@ void Puppeteer::update(SKELETON::SKELETON& skeleton)
 	Vec3f &rKnee = skeleton.joints[XN_SKEL_RIGHT_KNEE].position;
 	float lLegLen = lKnee.distance(lHip);
 	float rLegLen = rKnee.distance(rHip);
-	float lLegPos = math<float>::clamp(1.0f - (lHip.y - lKnee.y + lLegLen * .25f) / (lLegLen * 1.25f), 0.0f, 1.0f);
-	float rLegPos = math<float>::clamp(1.0f - (rHip.y - rKnee.y + rLegLen * .25f) / (rLegLen * 1.25f), 0.0f, 1.0f);
+	double lLegPos = round(arduinoUnit * math<float>::clamp(1.0f - (lHip.y - lKnee.y + lLegLen * .25f) / (lLegLen * 1.25f), 0.0f, 1.0f));
+	double rLegPos = round(arduinoUnit * math<float>::clamp(1.0f - (rHip.y - rKnee.y + rLegLen * .25f) / (rLegLen * 1.25f), 0.0f, 1.0f));
 
 	// ----------------------------hands
 	Vec3f &lShoulder = skeleton.joints[XN_SKEL_LEFT_SHOULDER].position;
@@ -68,20 +78,31 @@ void Puppeteer::update(SKELETON::SKELETON& skeleton)
 	Vec3f lHand = m3.transformVec(skeleton.joints[XN_SKEL_LEFT_HAND].position - lShoulder);
 	Vec3f rHand = m3.transformVec(skeleton.joints[XN_SKEL_RIGHT_HAND].position - rShoulder);
 
-
 	// ----------------------------send to arduino
-	Vec3f lHandPos = Vec3f(
-		math<float>::clamp(lHand.x / lArmLen, 0.0f, 1.0f),
-		math<float>::clamp(lHand.z / lArmLen, 0.0f, 1.0f),
-		math<float>::clamp((lHand.y + lArmLen) / lArmLen * 2.0f, 0.0f, 1.0f)
-	);
-	Vec3f rHandPos = Vec3f(
-		math<float>::clamp(rHand.x / rArmLen * -1.0f, 0.0f, 1.0f),
-		math<float>::clamp(rHand.z / rArmLen, 0.0f, 1.0f),
-		math<float>::clamp((rHand.y + rArmLen) / rArmLen * 2.0f, 0.0f, 1.0f)
-	);
+	if (cinder::app::App::get()->getElapsedSeconds() - lastUpdateTime >= updateInterval) {
+		lastUpdateTime = cinder::app::App::get()->getElapsedSeconds();
+		Vec3f lHandPos = Vec3f(
+			round(arduinoUnit * math<float>::clamp(lHand.x / lArmLen, 0.0f, 1.0f)),
+			round(arduinoUnit * math<float>::clamp((lHand.y + lArmLen) / lArmLen * 2.0f, 0.0f, 1.0f)),
+			round(arduinoUnit * math<float>::clamp(lHand.z / lArmLen, 0.0f, 1.0f))
+		);
+		Vec3f rHandPos = Vec3f(
+			round(arduinoUnit * math<float>::clamp(rHand.x / rArmLen * -1.0f, 0.0f, 1.0f)),
+			round(arduinoUnit * math<float>::clamp((rHand.y + rArmLen) / rArmLen * 2.0f, 0.0f, 1.0f)),
+			round(arduinoUnit * math<float>::clamp(rHand.z / rArmLen, 0.0f, 1.0f))
+		);
 
-	//arduino.sendMessage();
+		ostringstream message;
+		message << rHandPos.x << "," << rHandPos.y << "," << rHandPos.z << ","
+				<< lHandPos.x << "," << lHandPos.y << "," << lHandPos.z << ","
+				<< rLegPos << ","
+				<< lLegPos << "|";
+
+		std::cout << message.str() << std::endl;
+		if (Constants::Debug::USE_ARDUINO) {
+			arduino->sendMessage(message.str());
+		}
+	}
 
 	// ----------------------------debug
 

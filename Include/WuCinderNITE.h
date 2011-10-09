@@ -15,6 +15,8 @@
 #include "cinder/gl/gl.h"
 #include "cinder/gl/Texture.h"
 
+#include "string.h"
+
 #include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/signals2.hpp>
@@ -54,6 +56,7 @@ public:
 
 	void setup(string xmlpath, XnMapOutputMode mapMode, bool useDepthMap = true, bool useColorImage = true);
 	void setup(string onipath);
+	void useCalibrationFile(string filepath);
 	void update();
 	void startUpdating();
 	void stopUpdating();
@@ -117,6 +120,7 @@ protected:
 	bool				mIsCalibrated;
 	bool				mUseColorImage;
 	bool				mUseDepthMap;
+	string				mCalibrationFile;
 
 
 	ci::Area			mDrawArea;
