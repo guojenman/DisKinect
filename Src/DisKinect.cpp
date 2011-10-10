@@ -62,7 +62,7 @@ void DisKinect::setup()
 
 	aNi->useCalibrationFile(getResourcePath("calibration.dat"));
 //	aNi->startUpdating();
-	aNi->mContext.StartGeneratingAll();
+	aNi->startGenerating();
 
 
 	float qDepth = WuCinderNITE::getInstance()->maxDepth * 0.25f;
@@ -78,6 +78,8 @@ void DisKinect::setup()
 
 	if( Constants::Debug::CREATE_TIMELAPSE )
 		rgbSaver = new TimeLapseRGB();
+	else
+		rgbSaver = NULL;
 }
 
 
@@ -102,6 +104,7 @@ void DisKinect::draw()
 void DisKinect::shutdown()
 {
 	console() << "quitting..." << std::endl;
+	WuCinderNITE::getInstance()->stopGenerating();
 	delete userRelay;
 	delete puppetier;
 	delete rgbSaver; rgbSaver = NULL;

@@ -18,9 +18,9 @@ namespace Constants {
 		static bool DRAW_SKELETON = true;
 		static bool DRAW_DEPTHMAP = true;
 		static bool USE_GUI = true;
-		static bool CREATE_TIMELAPSE = true;
+		static bool CREATE_TIMELAPSE = false;
 		static bool USE_ARDUINO = false;
-		static bool USE_RECORDED_ONI = true;
+		static bool USE_RECORDED_ONI = false;
 	};
 
 	namespace relay {

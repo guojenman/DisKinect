@@ -150,7 +150,7 @@ void WuCinderNITE::setup(string xmlpath, XnMapOutputMode mapMode, bool useDepthM
 		status = mDepthGen.SetMapOutputMode(mMapMode);
 		CHECK_RC(status, "Depth Settings", true);
 		mDepthSurface = ci::Surface8u(mMapMode.nXRes, mMapMode.nYRes, false);
-		maxDepth = mDepthGen.GetDeviceMaxDepth();
+		maxDepth = mDepthGen.GetDeviceMaxDepth() / 1000.0f;
 	} else {
 		maxDepth = 0;
 	}
@@ -190,6 +190,15 @@ void WuCinderNITE::setup(string xmlpath, XnMapOutputMode mapMode, bool useDepthM
 void WuCinderNITE::useCalibrationFile(string filepath)
 {
 	mCalibrationFile = filepath;
+}
+
+void WuCinderNITE::startGenerating()
+{
+	mContext.StartGeneratingAll();
+}
+void WuCinderNITE::stopGenerating()
+{
+	mContext.StopGeneratingAll();
 }
 
 void WuCinderNITE::startUpdating()

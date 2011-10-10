@@ -60,6 +60,10 @@ public:
 	void stopUpdating();
 	void shutdown();
 
+	// for use in single threaded applications
+	void startGenerating();
+	void stopGenerating();
+
 	ci::Surface8u getDepthSurface();
 	ci::Surface8u getImageSurface();
 	XnMapOutputMode getMapMode();
@@ -85,14 +89,6 @@ public:
 
 	unsigned short		maxDepth;
 	XnMapOutputMode		mMapMode;
-	xn::Context			mContext;
-	xn::DepthGenerator	mDepthGen;
-	xn::UserGenerator	mUserGen;
-	xn::ImageGenerator	mImageGen;
-	xn::SceneAnalyzer	mSceneAnalyzer;
-	xn::SceneMetaData	mSceneMeta;
-	xn::DepthMetaData	mDepthMeta;
-	xn::ImageMetaData	mImageMeta;
 	XnPlane3D			mFloor;
 
 
@@ -119,6 +115,15 @@ protected:
 	bool				mUseColorImage;
 	bool				mUseDepthMap;
 	std::string			mCalibrationFile;
+
+	xn::Context			mContext;
+	xn::DepthGenerator	mDepthGen;
+	xn::UserGenerator	mUserGen;
+	xn::ImageGenerator	mImageGen;
+	xn::SceneAnalyzer	mSceneAnalyzer;
+	xn::SceneMetaData	mSceneMeta;
+	xn::DepthMetaData	mDepthMeta;
+	xn::ImageMetaData	mImageMeta;
 
 
 	ci::Area			mDrawArea;
