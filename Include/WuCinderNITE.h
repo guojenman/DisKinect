@@ -22,7 +22,6 @@
 #include <boost/signals2.hpp>
 #include <boost/signals.hpp>
 
-#include <XnOpenNI.h>
 #include <XnCppWrapper.h>
 #include <XnCodecIDs.h>
 #include <XnStatusCodes.h>

@@ -33,9 +33,9 @@ public:
 	void shutdown();
 	void mouseDown( MouseEvent event );
 	void mouseDrag( MouseEvent event );
-
-
 	void keyUp(KeyEvent event);
+
+	UserTracker* userTracker;
 	relay::UserRelay* userRelay;
 	puppeteer::Puppeteer* puppetier;
 	TimeLapseRGB* rgbSaver;
@@ -50,8 +50,8 @@ void DisKinect::setup()
 {
 	WuCinderNITE* aNi = WuCinderNITE::getInstance();
 	if (Constants::Debug::USE_RECORDED_ONI) {
-//		aNi->setup(getResourcePath("1.oni"));
-		aNi->setup(getResourcePath("SkeletonRec.oni"));
+		aNi->setup(getResourcePath("1.oni"));
+//		aNi->setup(getResourcePath("SkeletonRec.oni"));
 	} else {
 		XnMapOutputMode mapMode;
 		mapMode.nFPS = 30;
@@ -68,12 +68,11 @@ void DisKinect::setup()
 	float qDepth = WuCinderNITE::getInstance()->maxDepth * 0.25f;
 	ci::CameraPersp cam;
 	cam.setPerspective(60.0f, cinder::app::App::get()->getWindowAspectRatio(), 1.0f, WuCinderNITE::getInstance()->maxDepth * 2.0f);
-	cam.lookAt(ci::Vec3f(qDepth, 0, -qDepth), Vec3f(0, 0, qDepth));
+	cam.lookAt(ci::Vec3f(qDepth, qDepth, -qDepth), Vec3f(0, 0, qDepth));
 	Constants::mayaCam()->setCurrentCam( cam );
 
-	UserTracker* aTracker = UserTracker::getInstance();
-
-	userRelay = new relay::UserRelay( aNi, aTracker );
+	userTracker = UserTracker::getInstance();
+	userRelay = new relay::UserRelay( aNi, userTracker );
 	puppetier = new puppeteer::Puppeteer();
 
 	if( Constants::Debug::CREATE_TIMELAPSE )
@@ -94,8 +93,8 @@ void DisKinect::draw()
 	gl::clear( ColorA::black(), true);
 
 	userRelay->draw();
-
 	puppetier->draw();
+	userTracker->draw();
 }
 
 void DisKinect::shutdown()

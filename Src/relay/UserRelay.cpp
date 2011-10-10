@@ -130,7 +130,7 @@ namespace relay {
 
 		ci::gl::pushMatrices();
 		ci::gl::setMatrices( Constants::mayaCam()->getCamera() );
-			ni->renderSkeleton( aSkeleton , 0 );
+			ni->renderSkeleton( aSkeleton , tracker->activeUserId );
 		ci::gl::popMatrices();
 	}
 
