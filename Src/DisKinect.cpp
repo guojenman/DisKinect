@@ -33,9 +33,9 @@ public:
 	void shutdown();
 	void mouseDown( MouseEvent event );
 	void mouseDrag( MouseEvent event );
-
-
 	void keyUp(KeyEvent event);
+
+	UserTracker* userTracker;
 	relay::UserRelay* userRelay;
 	puppeteer::Puppeteer* puppetier;
 	TimeLapseRGB* rgbSaver;
@@ -48,52 +48,63 @@ void DisKinect::prepareSettings( AppBasic::Settings *settings )
 
 void DisKinect::setup()
 {
-	XnMapOutputMode mapMode;
-	mapMode.nFPS = 30;
-	mapMode.nXRes = 640;
-	mapMode.nYRes = 480;
-
 	WuCinderNITE* aNi = WuCinderNITE::getInstance();
-	aNi->setup("Resources/1.oni");
-//	aNi->setup("./Resources/Sample-User.xml", mapMode, true, true);
-	aNi->startUpdating();
-//	aNi->mContext.StartGeneratingAll();
+	if (Constants::Debug::USE_RECORDED_ONI) {
+		aNi->setup(getResourcePath("1.oni"));
+//		aNi->setup(getResourcePath("SkeletonRec.oni"));
+	} else {
+		XnMapOutputMode mapMode;
+		mapMode.nFPS = 30;
+		mapMode.nXRes = 640;
+		mapMode.nYRes = 480;
+		aNi->setup("./Resources/Sample-User.xml", mapMode, true, true);
+	}
+
+	aNi->useCalibrationFile(getResourcePath("calibration.dat"));
+//	aNi->startUpdating();
+	aNi->startGenerating();
 
 
-
+	float qDepth = WuCinderNITE::getInstance()->maxDepth * 0.25f;
 	ci::CameraPersp cam;
-	cam.setPerspective(60.0f, cinder::app::App::get()->getWindowAspectRatio(), 1.0f, WuCinderNITE::getInstance()->maxDepth);
-	cam.lookAt(ci::Vec3f(0, 0, -500.0f), ci::Vec3f::zero());
+	cam.setPerspective(60.0f, cinder::app::App::get()->getWindowAspectRatio(), 1.0f, WuCinderNITE::getInstance()->maxDepth * 2.0f);
+//	cam.lookAt(ci::Vec3f(qDepth, qDepth, -qDepth), Vec3f(0, 0, qDepth));
+	cam.lookAt(ci::Vec3f(0, 0, -qDepth), ci::Vec3f::zero());
 	Constants::mayaCam()->setCurrentCam( cam );
 
-	UserTracker* aTracker = UserTracker::getInstance();
-
-	userRelay = new relay::UserRelay( aNi, aTracker );
+	userTracker = UserTracker::getInstance();
+	userTracker->activationZone = Constants::UserTracker::ACTIVATION_ZONE;
+	userRelay = new relay::UserRelay( aNi, userTracker );
 	puppetier = new puppeteer::Puppeteer();
 
-	if( Constants::Debug::CREATE_TIMELAPSE )
-		rgbSaver = new TimeLapseRGB();
+	if( Constants::Debug::CREATE_TIMELAPSE ) rgbSaver = new TimeLapseRGB();
+	else rgbSaver = NULL;
 }
 
 
 void DisKinect::update()
 {
 	userRelay->update();
+
+	SKELETON::SKELETON skeleton = userRelay->getSkeleton();
+	puppetier->update(skeleton);
 }
 
 void DisKinect::draw()
 {
 	gl::clear( ColorA::black(), true);
 
+	userTracker->draw();
 	userRelay->draw();
+	puppetier->draw();
 
-	SKELETON::SKELETON skeleton = userRelay->getSkeleton();
-	puppetier->update(skeleton);
 }
 
 void DisKinect::shutdown()
 {
 	console() << "quitting..." << std::endl;
+	WuCinderNITE::getInstance()->stopGenerating();
+
 	delete userRelay;
 	delete puppetier;
 	delete rgbSaver; rgbSaver = NULL;
@@ -113,7 +124,7 @@ void DisKinect::mouseDown( MouseEvent event )
 void DisKinect::mouseDrag( MouseEvent event )
 {
 	MayaCamUI* mayaCam = Constants::mayaCam();
-	mayaCam->mouseDrag(event.getPos(), event.isLeftDown(), event.isMiddleDown(), event.isRightDown());
+	mayaCam->mouseDrag(event.getPos(), event.isControlDown(), event.isAltDown(), event.isShiftDown());
 }
 
 CINDER_APP_BASIC( DisKinect, RendererGl )

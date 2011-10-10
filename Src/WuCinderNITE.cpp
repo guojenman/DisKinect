@@ -8,6 +8,7 @@
 #include "WuCinderNITE.h"
 #include "SkeletonStruct.h"
 #include <OpenGL.framework/Headers/gl.h>
+using namespace std;
 
 XnUInt32 mNITENumNITEUserColors = 10;
 XnFloat mNITEUserColors[][3] = {
@@ -85,7 +86,7 @@ void WuCinderNITE::setup(string onipath)
 
 		mDepthSurface = ci::Surface8u(mMapMode.nXRes, mMapMode.nYRes, false);
 		mDrawArea = ci::Area(0, 0, mMapMode.nXRes, mMapMode.nYRes);
-		maxDepth = mDepthGen.GetDeviceMaxDepth();
+		maxDepth = mDepthGen.GetDeviceMaxDepth() / 1000.0f;
 	} else {
 		mUseDepthMap = false;
 		maxDepth = 0;
@@ -149,7 +150,7 @@ void WuCinderNITE::setup(string xmlpath, XnMapOutputMode mapMode, bool useDepthM
 		status = mDepthGen.SetMapOutputMode(mMapMode);
 		CHECK_RC(status, "Depth Settings", true);
 		mDepthSurface = ci::Surface8u(mMapMode.nXRes, mMapMode.nYRes, false);
-		maxDepth = mDepthGen.GetDeviceMaxDepth();
+		maxDepth = mDepthGen.GetDeviceMaxDepth() / 1000.0f;
 	} else {
 		maxDepth = 0;
 	}
@@ -186,6 +187,19 @@ void WuCinderNITE::setup(string xmlpath, XnMapOutputMode mapMode, bool useDepthM
 	registerCallbacks();
 }
 
+void WuCinderNITE::useCalibrationFile(string filepath)
+{
+	mCalibrationFile = filepath;
+}
+
+void WuCinderNITE::startGenerating()
+{
+	mContext.StartGeneratingAll();
+}
+void WuCinderNITE::stopGenerating()
+{
+	mContext.StopGeneratingAll();
+}
 
 void WuCinderNITE::startUpdating()
 {
@@ -247,25 +261,23 @@ void WuCinderNITE::update()
 		updateImageSurface();
 	}
 
-
-		XnSkeletonJointTransformation joint;
-		for(int i = 1; i < MAX_USERS; i++) {
-			skeletons[i].isTracking = mUserGen.GetSkeletonCap().IsTracking(i);
-			if (skeletons[i].isTracking) {
-				for(int j = 1; j < MAX_JOINTS; j++) {
-					mUserGen.GetSkeletonCap().GetSkeletonJoint(i, (XnSkeletonJoint)j, joint);
-					skeletons[i].joints[j].confidence = joint.position.fConfidence;
-					skeletons[i].joints[j].position.x = joint.position.position.X;
-					skeletons[i].joints[j].position.y = joint.position.position.Y;
-					skeletons[i].joints[j].position.z = joint.position.position.Z;
-				}
-			} else {
-				for(int j = 1; j < MAX_JOINTS; j++) {
-					skeletons[i].joints[j].confidence = 0;
-				}
+	XnSkeletonJointTransformation joint;
+	for(int i = 1; i < MAX_USERS; i++) {
+		skeletons[i].isTracking = mUserGen.GetSkeletonCap().IsTracking(i);
+		if (skeletons[i].isTracking) {
+			for(int j = 1; j < MAX_JOINTS; j++) {
+				mUserGen.GetSkeletonCap().GetSkeletonJoint(i, (XnSkeletonJoint)j, joint);
+				skeletons[i].joints[j].confidence = joint.position.fConfidence;
+				skeletons[i].joints[j].position.x = joint.position.position.X / 1000.0f;
+				skeletons[i].joints[j].position.y = joint.position.position.Y / 1000.0f;
+				skeletons[i].joints[j].position.z = joint.position.position.Z / 1000.0f;
+			}
+		} else {
+			for(int j = 1; j < MAX_JOINTS; j++) {
+				skeletons[i].joints[j].confidence = 0;
 			}
 		}
-		mMutex.unlock();
+	}
 }
 
 void WuCinderNITE::updateDepthSurface()
@@ -404,9 +416,10 @@ void WuCinderNITE::renderSkeleton(SKELETON::SKELETON &skeleton, XnUserID nId)
 {
 	if (skeleton.isTracking) {
 		glLineWidth(3);
-		ci::gl::color(1-mNITEUserColors[nId % mNITENumNITEUserColors][0],
-							  1-mNITEUserColors[nId % mNITENumNITEUserColors][1],
-							  1-mNITEUserColors[nId % mNITENumNITEUserColors][2], 1);
+		int colorIndex = (nId) % mNITENumNITEUserColors;
+		ci::gl::color(mNITEUserColors[colorIndex][0],
+					  mNITEUserColors[colorIndex][1],
+					  mNITEUserColors[colorIndex][2], 1);
 
 		// HEAD TO NECK
 		renderLimb(skeleton, XN_SKEL_HEAD, XN_SKEL_NECK);
@@ -517,14 +530,19 @@ void WuCinderNITE::unregisterCallbacks()
 void XN_CALLBACK_TYPE WuCinderNITE::CB_NewUser(xn::UserGenerator& generator, XnUserID nId, void* pCookie)
 {
 	ci::app::console() << "new user " << nId << endl;
-	if (mInstance->mNeedPoseForCalibration) {
+	if (!mInstance->mCalibrationFile.empty()) {
+		mInstance->mUserGen.GetSkeletonCap().LoadCalibrationDataFromFile(nId, mInstance->mCalibrationFile.c_str());
+		mInstance->startTracking(nId);
+	}
+	else if (mInstance->mNeedPoseForCalibration) {
 		if ((mInstance->useSingleCalibrationMode && mInstance->mIsCalibrated) || mInstance->mUserGen.GetSkeletonCap().IsCalibrated(nId)) {
 			mInstance->mUserGen.GetSkeletonCap().LoadCalibrationData(nId, mInstance->useSingleCalibrationMode ? 0 : nId);
 			mInstance->startTracking(nId);
 		} else {
 			mInstance->mUserGen.GetPoseDetectionCap().StartPoseDetection(mInstance->mCalibrationPose, nId);
 		}
-	} else {
+	}
+	else {
 		if ((mInstance->useSingleCalibrationMode && mInstance->mIsCalibrated) || mInstance->mUserGen.GetSkeletonCap().IsCalibrated(nId)) {
 			mInstance->mUserGen.GetSkeletonCap().LoadCalibrationData(nId, mInstance->useSingleCalibrationMode ? 0 : nId);
 			mInstance->startTracking(nId);

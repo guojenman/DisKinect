@@ -132,16 +132,7 @@ namespace relay {
 
 		std::string fileRef = event.getFile(0);
 		std::cout << fileRef << std::endl;
-		setJson( "/Users/mariogonzalez/GIT/DisKinect/Resources/jsontest.json" );
-//		ci::IStreamFileRef stream = ci::loadFileStream(fileRef);
-//
-//		std::stringstream output;
-//		while (stream->isEof() == false) {
-//			output << stream->readLine();
-//		}
-//
-//		Json::Value
-//		std::cout << "Output" << output.str() << std::endl;
+		setJson( fileRef );
 		return true;
 	}
 
@@ -182,12 +173,12 @@ namespace relay {
 		Json::Reader reader;
 
 		// Read the filestream
-		ifstream filestream;
+		std::ifstream filestream;
 
 		// Load the file
 		std::cout << "UserStreamPlayer::setJson - Attempting to load:" << aPath << std::endl;
 
-		filestream.open( aPath.c_str(), ifstream::in);
+		filestream.open( aPath.c_str(), std::ifstream::in);
 		if( filestream == 0 ) {
 			std::cout << "UserStreamPlayer::setJson - Failed to load file. Ignoring..." << std::endl;
 		}

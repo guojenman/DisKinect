@@ -15,12 +15,13 @@
 #include "cinder/gl/gl.h"
 #include "cinder/gl/Texture.h"
 
+#include "string.h"
+
 #include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/signals2.hpp>
 #include <boost/signals.hpp>
 
-#include <XnOpenNI.h>
 #include <XnCppWrapper.h>
 #include <XnCodecIDs.h>
 #include <XnStatusCodes.h>
@@ -29,7 +30,6 @@
 
 // Forward decleration
 #include "SkeletonStruct.h"
-using namespace std;
 
 #define MAX_DEPTH 10000
 #define CHECK_RC(status, what, isFatal) \
@@ -52,12 +52,17 @@ public:
 
 	virtual ~WuCinderNITE();
 
-	void setup(string xmlpath, XnMapOutputMode mapMode, bool useDepthMap = true, bool useColorImage = true);
-	void setup(string onipath);
+	void setup(std::string xmlpath, XnMapOutputMode mapMode, bool useDepthMap = true, bool useColorImage = true);
+	void setup(std::string onipath);
+	void useCalibrationFile(std::string filepath);
 	void update();
 	void startUpdating();
 	void stopUpdating();
 	void shutdown();
+
+	// for use in single threaded applications
+	void startGenerating();
+	void stopGenerating();
 
 	ci::Surface8u getDepthSurface();
 	ci::Surface8u getImageSurface();
@@ -84,14 +89,6 @@ public:
 
 	unsigned short		maxDepth;
 	XnMapOutputMode		mMapMode;
-	xn::Context			mContext;
-	xn::DepthGenerator	mDepthGen;
-	xn::UserGenerator	mUserGen;
-	xn::ImageGenerator	mImageGen;
-	xn::SceneAnalyzer	mSceneAnalyzer;
-	xn::SceneMetaData	mSceneMeta;
-	xn::DepthMetaData	mDepthMeta;
-	xn::ImageMetaData	mImageMeta;
 	XnPlane3D			mFloor;
 
 
@@ -118,6 +115,16 @@ protected:
 	bool				mIsCalibrated;
 	bool				mUseColorImage;
 	bool				mUseDepthMap;
+	std::string			mCalibrationFile;
+
+	xn::Context			mContext;
+	xn::DepthGenerator	mDepthGen;
+	xn::UserGenerator	mUserGen;
+	xn::ImageGenerator	mImageGen;
+	xn::SceneAnalyzer	mSceneAnalyzer;
+	xn::SceneMetaData	mSceneMeta;
+	xn::DepthMetaData	mDepthMeta;
+	xn::ImageMetaData	mImageMeta;
 
 
 	ci::Area			mDrawArea;

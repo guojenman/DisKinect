@@ -24,6 +24,8 @@ private:
 	std::string _saveDirectory;	// Create and set the directory in the constructor to avoid cinder getHomeDirectory / createDirectories multi-threaded memory leak
 
 	void saveImage();
+	bool hasEnoughDiskSpace();
+	int64_t getEpochTime();
 };
 
 #endif /* TIMELAPSERGB_H_ */
