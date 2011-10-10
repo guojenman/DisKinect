@@ -7,6 +7,8 @@
 
 #include "UserTracker.h"
 #include "SkeletonStruct.h"
+#include "Constants.h"
+#include "cinder/MayaCamUI.h"
 #include <boost/lambda/lambda.hpp>
 
 
@@ -21,11 +23,14 @@ UserTracker* UserTracker::getInstance()
 
 UserTracker::UserTracker()
 {
+	ni = WuCinderNITE::getInstance();
+
 	activeUserId = 0;
 	activeMotionTolerance = 0.002f;
 	activeTickTotlerance = 0.005f;
+	activationZone = ci::Vec3f(0, 0, 2.5f);
 	totalDist = 0;
-	ni = WuCinderNITE::getInstance();
+
 	mSignalConnectionNewUser = ni->signalNewUser.connect( boost::bind(&UserTracker::onNewUser, this, boost::lambda::_1) );
 	mSignalConnectionLostUser = ni->signalLostUser.connect( boost::bind(&UserTracker::onLostUser, this, boost::lambda::_1) );
 }
@@ -90,6 +95,11 @@ void UserTracker::update()
 			ci::Vec3f &kneeR = skeleton.joints[XN_SKEL_RIGHT_KNEE].confidence > confidence
 					? skeleton.joints[XN_SKEL_RIGHT_KNEE].position : it->kneeR;
 
+			ci::Vec3f &torso = skeleton.joints[XN_SKEL_TORSO].confidence > confidence
+					? skeleton.joints[XN_SKEL_TORSO].position : it->torso;
+
+			it->distanceFromActivationZone = torso.distance(activationZone);
+
 			totalDist = 0;
 			float distance;
 			int validJoints = 0;
@@ -153,5 +163,19 @@ void UserTracker::update()
 		ci::app::console() << "no active user" << std::endl;
 		activeUserId = 0;
 	}
+}
+
+void UserTracker::draw()
+{
+	ci::gl::enableAlphaBlending();
+	ci::gl::pushMatrices();
+	ci::gl::setMatrices(Constants::mayaCam()->getCamera());
+		ci::gl::color(ci::ColorA(1, 1, 1, 0.2f));
+		ci::gl::pushModelView();
+		ci::gl::translate(ci::Vec3f(0, ni->mFloor.ptPoint.Y / 1000.0f, 0));
+		ci::gl::drawBillboard(activationZone, ci::Vec2f(0.5f, 0.5f), 0, ci::Vec3f::xAxis(), ci::Vec3f::zAxis());
+		ci::gl::popModelView();
+	ci::gl::popMatrices();
+	ci::gl::disableAlphaBlending();
 }
 

@@ -406,9 +406,10 @@ void WuCinderNITE::renderSkeleton(SKELETON::SKELETON &skeleton, XnUserID nId)
 {
 	if (skeleton.isTracking) {
 		glLineWidth(3);
-		ci::gl::color(1-mNITEUserColors[nId % mNITENumNITEUserColors][0],
-							  1-mNITEUserColors[nId % mNITENumNITEUserColors][1],
-							  1-mNITEUserColors[nId % mNITENumNITEUserColors][2], 1);
+		int colorIndex = (nId) % mNITENumNITEUserColors;
+		ci::gl::color(mNITEUserColors[colorIndex][0],
+					  mNITEUserColors[colorIndex][1],
+					  mNITEUserColors[colorIndex][2], 1);
 
 		// HEAD TO NECK
 		renderLimb(skeleton, XN_SKEL_HEAD, XN_SKEL_NECK);
