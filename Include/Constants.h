@@ -36,6 +36,7 @@ namespace Constants {
 
 	namespace TimeLapse {
 		static std::string DIRECTORY_NAME = "Diskinect";
+		static unsigned int MINIMUM_GIGABYTES_BEFORE_SAVE = 2;
 		static int SECONDS_BETWEEN_SNAPSHOT = 5;
 	}
 

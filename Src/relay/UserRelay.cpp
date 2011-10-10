@@ -38,8 +38,8 @@ namespace relay {
 		this->fsm = new relay::UserStreamStateManager();
 
 		// Test the live stream
-//		relay::UserStreamLive* live = new relay::UserStreamLive();
-//		this->fsm->setInitialState( live );
+		relay::UserStreamLive* live = new relay::UserStreamLive();
+		this->fsm->setInitialState( live );
 
 		// Test the recorder
 //		relay::UserStreamRecorder* recorder = new relay::UserStreamRecorder();
@@ -51,8 +51,8 @@ namespace relay {
 //		this->fsm->setInitialState( player );
 
 		// Test repeater (records in memory then plays it back)
-		UserStreamRepeater* repeater = new relay::UserStreamRepeater();
-		this->fsm->setInitialState( repeater);
+//		UserStreamRepeater* repeater = new relay::UserStreamRepeater();
+//		this->fsm->setInitialState( repeater);
 
 		setupDebug();
 	}
