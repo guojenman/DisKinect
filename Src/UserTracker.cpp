@@ -70,12 +70,13 @@ void UserTracker::update()
 {
 	totalDist = 0;
 	float confidence = 0.5f;
-	// measure distance of important joints have moved from the last position
-	// and decide if the user is active or not - used for sorting, and gives us
-	// the next active user, if user A stays still for too long (possible lost of user)
-	for(std::list<UserInfo>::iterator it = mUsers.begin(); it != mUsers.end();) {
-		SKELETON::SKELETON &skeleton = ni->skeletons[it->id];
-		if (skeleton.isTracking) {
+	ni->mMutex.lock();
+		// measure distance of important joints have moved from the last position
+		// and decide if the user is active or not - used for sorting, and gives us
+		// the next active user, if user A stays still for too long (possible lost of user)
+		for(std::list<UserInfo>::iterator it = mUsers.begin(); it != mUsers.end();) {
+			SKELETON::SKELETON &skeleton = ni->skeletons[it->id];
+			if (skeleton.isTracking) {
 
 			ci::Vec3f &shoulderL = skeleton.joints[XN_SKEL_LEFT_SHOULDER].confidence > confidence
 					? skeleton.joints[XN_SKEL_LEFT_SHOULDER].position : it->shoulderL;
@@ -138,20 +139,21 @@ void UserTracker::update()
 
 
 
-//			std::cout << "Total Delta:"<< totalDist << std::endl;
-//			std::cout << "Total Delta:"<< totalDist << std::endl;
+	//			std::cout << "Total Delta:"<< totalDist << std::endl;
+	//			std::cout << "Total Delta:"<< totalDist << std::endl;
 
-			it->shoulderL = shoulderL;
-			it->shoulderR = shoulderR;
-			it->handL = handL;
-			it->handR = handR;
-			it->kneeL = kneeL;
-			it->kneeR = kneeR;
-		} else {
-			it->isActive = false;
+				it->shoulderL = shoulderL;
+				it->shoulderR = shoulderR;
+				it->handL = handL;
+				it->handR = handR;
+				it->kneeL = kneeL;
+				it->kneeR = kneeR;
+			} else {
+				it->isActive = false;
+			}
+			it++;
 		}
-		it++;
-	}
+	ni->mMutex.unlock();
 	mUsers.sort();
 
 	if (!mUsers.empty() && mUsers.begin()->isActive) {

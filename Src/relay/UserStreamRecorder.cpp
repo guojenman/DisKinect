@@ -34,10 +34,10 @@ namespace relay {
 	}
 
 	UserStreamRecorder::~UserStreamRecorder() {
-
 		delete _livestream; _livestream = NULL;
 		delete _gui; _gui = NULL;
 		delete _label; _label = NULL;
+
 		std::cout << "UserStreamRecorder destructor!" << std::endl;
 	}
 
@@ -112,8 +112,6 @@ namespace relay {
 		SKELETON::SKELETON aSkeleton = _livestream->getSkeleton();
 		_recording.push_back( UserStreamFrame_ptr( new UserStreamFrame( _framenumber, aSkeleton ) ) );
 		_framenumber++;
-
-//		std::cout << "Recording frame:" << _framenumber << std::endl;
 	}
 
 	/**
@@ -180,7 +178,7 @@ namespace relay {
 		std::string timeStamp = ss.str();
 
 		// Write the file to the documents directory
-		std::string fileName = ci::getDocumentsDirectory() + "/Diskinect/Recording_" + timeStamp;
+		std::string fileName = ci::getHomeDirectory() + Constants::TimeLapse::DIRECTORY_NAME + "/_recordings/Recording_" + timeStamp;
 		ci::OStreamFileRef oStream = ci::writeFileStream( fileName + ".json", true );
 		oStream->writeData( jsonString.data(), jsonString.length() );
 	}
