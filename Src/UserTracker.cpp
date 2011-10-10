@@ -74,7 +74,7 @@ void UserTracker::update()
 		// measure distance of important joints have moved from the last position
 		// and decide if the user is active or not - used for sorting, and gives us
 		// the next active user, if user A stays still for too long (possible lost of user)
-		for(list<UserInfo>::iterator it = mUsers.begin(); it != mUsers.end();) {
+		for(std::list<UserInfo>::iterator it = mUsers.begin(); it != mUsers.end();) {
 			SKELETON::SKELETON &skeleton = ni->skeletons[it->id];
 			if (skeleton.isTracking) {
 

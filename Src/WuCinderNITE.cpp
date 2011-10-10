@@ -278,6 +278,7 @@ void WuCinderNITE::update()
 			}
 		}
 	}
+	mMutex.unlock();
 }
 
 void WuCinderNITE::updateDepthSurface()
