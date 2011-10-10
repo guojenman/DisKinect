@@ -92,9 +92,11 @@ public:
 	XnPlane3D			mFloor;
 
 
-	boost::mutex mMutex;
+	boost::mutex 		mMutex;
 	boost::mutex		mMutexImageSurface;
 	ci::Surface8u		mImageSurface;
+
+	bool isThreaded() { return mThread != NULL; }
 
 protected:
 	WuCinderNITE();

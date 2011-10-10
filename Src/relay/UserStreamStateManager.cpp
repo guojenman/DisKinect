@@ -57,7 +57,10 @@ namespace relay {
 
 	void UserStreamStateManager::update() {
 
-//		WuCinderNITE::getInstance()->update();
+		// Not threaded... call update
+		if( !WuCinderNITE::getInstance()->isThreaded() )
+			WuCinderNITE::getInstance()->update();
+
 		UserTracker::getInstance()->update();
 
 		if( currentState ) {

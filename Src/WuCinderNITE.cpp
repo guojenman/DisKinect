@@ -198,6 +198,9 @@ void WuCinderNITE::startGenerating()
 }
 void WuCinderNITE::stopGenerating()
 {
+	if( mThread ) {
+		stopUpdating();
+	}
 	mContext.StopGeneratingAll();
 }
 
@@ -222,8 +225,7 @@ void WuCinderNITE::stopUpdating()
 	mContext.StopGeneratingAll();
 }
 
-void WuCinderNITE::updateLoop()
-{
+void WuCinderNITE::updateLoop() {
 	while (mRunUpdates) {
 		update();
 	}
@@ -234,50 +236,50 @@ void WuCinderNITE::update()
 
 	XnStatus status = XN_STATUS_OK;
 	mMutex.lock();
-	status = mContext.WaitAndUpdateAll();
-	if( status != XN_STATUS_OK ) {
-		ci::app::console() << "no update" << endl;
-		return;
-	}
-	if( !mUserGen ) {
-		ci::app::console() << "No user generator" << endl;
-		return;
-	}
-	status = mContext.FindExistingNode(XN_NODE_TYPE_DEPTH, mDepthGen);
-	if( status != XN_STATUS_OK ) {
-		ci::app::console() << xnGetStatusString(status) << endl;
-		return;
-	}
+		status = mContext.WaitAndUpdateAll();
+		if( status != XN_STATUS_OK ) {
+			ci::app::console() << "no update" << endl;
+			return;
+		}
+		if( !mUserGen ) {
+			ci::app::console() << "No user generator" << endl;
+			return;
+		}
+		status = mContext.FindExistingNode(XN_NODE_TYPE_DEPTH, mDepthGen);
+		if( status != XN_STATUS_OK ) {
+			ci::app::console() << xnGetStatusString(status) << endl;
+			return;
+		}
 
-	mSceneAnalyzer.GetFloor(mFloor);
+		mSceneAnalyzer.GetFloor(mFloor);
 
-	mUserGen.GetUserPixels(0, mSceneMeta);
-	if (mUseDepthMap) {
-		mDepthGen.GetMetaData(mDepthMeta);
-		updateDepthSurface();
-	}
-	if (mUseColorImage) {
-		mImageGen.GetMetaData(mImageMeta);
-		updateImageSurface();
-	}
+		mUserGen.GetUserPixels(0, mSceneMeta);
+		if (mUseDepthMap) {
+			mDepthGen.GetMetaData(mDepthMeta);
+			updateDepthSurface();
+		}
+		if (mUseColorImage) {
+			mImageGen.GetMetaData(mImageMeta);
+			updateImageSurface();
+		}
 
-	XnSkeletonJointTransformation joint;
-	for(int i = 1; i < MAX_USERS; i++) {
-		skeletons[i].isTracking = mUserGen.GetSkeletonCap().IsTracking(i);
-		if (skeletons[i].isTracking) {
-			for(int j = 1; j < MAX_JOINTS; j++) {
-				mUserGen.GetSkeletonCap().GetSkeletonJoint(i, (XnSkeletonJoint)j, joint);
-				skeletons[i].joints[j].confidence = joint.position.fConfidence;
-				skeletons[i].joints[j].position.x = joint.position.position.X / 1000.0f;
-				skeletons[i].joints[j].position.y = joint.position.position.Y / 1000.0f;
-				skeletons[i].joints[j].position.z = joint.position.position.Z / 1000.0f;
-			}
-		} else {
-			for(int j = 1; j < MAX_JOINTS; j++) {
-				skeletons[i].joints[j].confidence = 0;
+		XnSkeletonJointTransformation joint;
+		for(int i = 1; i < MAX_USERS; i++) {
+			skeletons[i].isTracking = mUserGen.GetSkeletonCap().IsTracking(i);
+			if (skeletons[i].isTracking) {
+				for(int j = 1; j < MAX_JOINTS; j++) {
+					mUserGen.GetSkeletonCap().GetSkeletonJoint(i, (XnSkeletonJoint)j, joint);
+					skeletons[i].joints[j].confidence = joint.position.fConfidence;
+					skeletons[i].joints[j].position.x = joint.position.position.X / 1000.0f;
+					skeletons[i].joints[j].position.y = joint.position.position.Y / 1000.0f;
+					skeletons[i].joints[j].position.z = joint.position.position.Z / 1000.0f;
+				}
+			} else {
+				for(int j = 1; j < MAX_JOINTS; j++) {
+					skeletons[i].joints[j].confidence = 0;
+				}
 			}
 		}
-	}
 	mMutex.unlock();
 }
 

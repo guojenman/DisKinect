@@ -61,8 +61,8 @@ void DisKinect::setup()
 	}
 
 	aNi->useCalibrationFile(getResourcePath("calibration.dat"));
-	aNi->startUpdating();
-//	aNi->startGenerating();
+//	aNi->startUpdating();
+	aNi->startGenerating();
 
 
 	float qDepth = WuCinderNITE::getInstance()->maxDepth * 0.25f;
