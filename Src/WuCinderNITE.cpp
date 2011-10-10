@@ -517,7 +517,7 @@ void WuCinderNITE::unregisterCallbacks()
 
 void XN_CALLBACK_TYPE WuCinderNITE::CB_NewUser(xn::UserGenerator& generator, XnUserID nId, void* pCookie)
 {
-	ci::app::console() << "new user " << nId << ci::app::App::get()->getResourcePath("calibration.dat") << endl;
+	ci::app::console() << "new user " << nId << endl;
 	if (!mInstance->mCalibrationFile.empty()) {
 		mInstance->mUserGen.GetSkeletonCap().LoadCalibrationDataFromFile(nId, mInstance->mCalibrationFile.c_str());
 		mInstance->startTracking(nId);

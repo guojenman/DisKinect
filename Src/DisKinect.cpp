@@ -86,6 +86,9 @@ void DisKinect::setup()
 void DisKinect::update()
 {
 	userRelay->update();
+
+	SKELETON::SKELETON skeleton = userRelay->getSkeleton();
+	puppetier->update(skeleton);
 }
 
 void DisKinect::draw()
@@ -94,8 +97,7 @@ void DisKinect::draw()
 
 	userRelay->draw();
 
-	SKELETON::SKELETON skeleton = userRelay->getSkeleton();
-	puppetier->update(skeleton);
+	puppetier->draw();
 }
 
 void DisKinect::shutdown()
