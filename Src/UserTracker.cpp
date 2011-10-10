@@ -22,8 +22,8 @@ UserTracker* UserTracker::getInstance()
 UserTracker::UserTracker()
 {
 	activeUserId = 0;
-	activeMotionTolerance = 2.0f;
-	activeTickTotlerance = 5;
+	activeMotionTolerance = 0.002f;
+	activeTickTotlerance = 0.005f;
 	totalDist = 0;
 	ni = WuCinderNITE::getInstance();
 	mSignalConnectionNewUser = ni->signalNewUser.connect( boost::bind(&UserTracker::onNewUser, this, boost::lambda::_1) );
@@ -93,7 +93,7 @@ void UserTracker::update()
 			totalDist = 0;
 			float distance;
 			int validJoints = 0;
-			float maxDistance = 1e04;
+			float maxDistance = 10.0f;
 
 			distance = shoulderL.distanceSquared(it->shoulderL);
 			if( distance < maxDistance ) { totalDist += distance; ++validJoints; };

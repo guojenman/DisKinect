@@ -86,7 +86,7 @@ void WuCinderNITE::setup(string onipath)
 
 		mDepthSurface = ci::Surface8u(mMapMode.nXRes, mMapMode.nYRes, false);
 		mDrawArea = ci::Area(0, 0, mMapMode.nXRes, mMapMode.nYRes);
-		maxDepth = mDepthGen.GetDeviceMaxDepth();
+		maxDepth = mDepthGen.GetDeviceMaxDepth() / 1000.0f;
 	} else {
 		mUseDepthMap = false;
 		maxDepth = 0;
@@ -258,9 +258,9 @@ void WuCinderNITE::update()
 			for(int j = 1; j < MAX_JOINTS; j++) {
 				mUserGen.GetSkeletonCap().GetSkeletonJoint(i, (XnSkeletonJoint)j, joint);
 				skeletons[i].joints[j].confidence = joint.position.fConfidence;
-				skeletons[i].joints[j].position.x = joint.position.position.X;
-				skeletons[i].joints[j].position.y = joint.position.position.Y;
-				skeletons[i].joints[j].position.z = joint.position.position.Z;
+				skeletons[i].joints[j].position.x = joint.position.position.X / 1000.0f;
+				skeletons[i].joints[j].position.y = joint.position.position.Y / 1000.0f;
+				skeletons[i].joints[j].position.z = joint.position.position.Z / 1000.0f;
 			}
 		} else {
 			for(int j = 1; j < MAX_JOINTS; j++) {

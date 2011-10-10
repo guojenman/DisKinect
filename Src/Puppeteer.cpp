@@ -80,8 +80,9 @@ void Puppeteer::update(SKELETON::SKELETON& skeleton)
 	normalizationMatrix = m2 * m1;
 
 	handL = normalizationMatrix.transformVec(skeleton.joints[XN_SKEL_LEFT_HAND].position - shoulderL);
+	if (handL.x > 0) handL.x = 0;
 	handR = normalizationMatrix.transformVec(skeleton.joints[XN_SKEL_RIGHT_HAND].position - shoulderR);
-
+	if (handR.x < 0) handR.x = 0;
 	// ----------------------------send to arduino
 	if (cinder::app::App::get()->getElapsedSeconds() - lastUpdateTime >= updateInterval) {
 		lastUpdateTime = cinder::app::App::get()->getElapsedSeconds();
@@ -96,12 +97,12 @@ void Puppeteer::update(SKELETON::SKELETON& skeleton)
 			arduinoUnit * math<float>::clamp((handR.z / armLenR) * -1.0f, 0.0f, 1.0f)
 		);
 
-		handL.x = CHECK_DELTA(handL.x, lastHandPosL.x);
-		handL.y = CHECK_DELTA(handL.y, lastHandPosL.y);
-		handL.z = CHECK_DELTA(handL.z, lastHandPosL.z);
-		handR.x = CHECK_DELTA(handR.x, lastHandPosR.x);
-		handR.y = CHECK_DELTA(handR.y, lastHandPosR.y);
-		handR.z = CHECK_DELTA(handR.z, lastHandPosR.z);
+		handPosL.x = CHECK_DELTA(handPosL.x, lastHandPosL.x);
+		handPosL.y = CHECK_DELTA(handPosL.y, lastHandPosL.y);
+		handPosL.z = CHECK_DELTA(handPosL.z, lastHandPosL.z);
+		handPosR.x = CHECK_DELTA(handPosR.x, lastHandPosR.x);
+		handPosR.y = CHECK_DELTA(handPosR.y, lastHandPosR.y);
+		handPosR.z = CHECK_DELTA(handPosR.z, lastHandPosR.z);
 
 		std::ostringstream message;
 		message << round(handPosL.x) << "," << round(handPosL.y) << "," << round(handPosL.z) << ","
@@ -109,7 +110,7 @@ void Puppeteer::update(SKELETON::SKELETON& skeleton)
 				<< round(legPosL) << ","
 				<< round(legPosR) << "|";
 
-		std::cout << message.str() << std::endl;
+//		std::cout << message.str() << std::endl;
 		if (Constants::Debug::USE_ARDUINO) {
 			arduino->sendMessage(message.str());
 		}
@@ -160,8 +161,8 @@ void Puppeteer::draw()
 		MayaCamUI* mayaCam = Constants::mayaCam();
 		gl::setMatrices(mayaCam->getCamera());
 
-		float scale = .22f;
-		// original bounding box
+		float scale = 1.0f;
+		// original bounding boxes
 		gl::color(Color(0.5f, 0.5f, 0.5f));
 		gl::pushModelView();
 		gl::translate(shoulderL);
@@ -173,28 +174,33 @@ void Puppeteer::draw()
 		gl::draw(boundsR);
 		gl::popModelView();
 
+		// normalized bound boxes
 		gl::color(Color(0, 0, 1));
 		gl::pushModelView();
+		gl::translate(-.5f, 0, 0);
 		gl::scale(scale, scale, scale);
 		gl::rotate( Quatf(normalizationMatrix) );
 		gl::draw(boundsL);
 		gl::popModelView();
 
 		gl::pushModelView();
+		gl::translate(-.5f, 0, 0);
 		gl::scale(scale, scale, scale);
-		gl::drawCube(handL, Vec3f(100.0f, 100.0f, 100.0f));
+		gl::drawCube(handL, Vec3f(0.1f, 0.1f, 0.1f));
 		gl::popModelView();
 
 		gl::color(Color(0, 1, 0));
 		gl::pushModelView();
+		gl::translate(.5f, 0, 0);
 		gl::scale(scale, scale, scale);
 		gl::rotate( Quatf(normalizationMatrix) );
 		gl::draw(boundsR);
 		gl::popModelView();
 
 		gl::pushModelView();
+		gl::translate(.5f, 0, 0);
 		gl::scale(scale, scale, scale);
-		gl::drawCube(handR, Vec3f(100.0f, 100.0f, 100.0f));
+		gl::drawCube(handR, Vec3f(0.1f, 0.1f, 0.1f));
 		gl::popModelView();
 
 		gl::popMatrices();

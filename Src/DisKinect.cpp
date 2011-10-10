@@ -48,17 +48,15 @@ void DisKinect::prepareSettings( AppBasic::Settings *settings )
 
 void DisKinect::setup()
 {
-	XnMapOutputMode mapMode;
-	mapMode.nFPS = 30;
-	mapMode.nXRes = 640;
-	mapMode.nYRes = 480;
-
-
 	WuCinderNITE* aNi = WuCinderNITE::getInstance();
 	if (Constants::Debug::USE_RECORDED_ONI) {
 //		aNi->setup(getResourcePath("1.oni"));
 		aNi->setup(getResourcePath("SkeletonRec.oni"));
 	} else {
+		XnMapOutputMode mapMode;
+		mapMode.nFPS = 30;
+		mapMode.nXRes = 640;
+		mapMode.nYRes = 480;
 		aNi->setup("./Resources/Sample-User.xml", mapMode, true, true);
 	}
 
@@ -67,10 +65,10 @@ void DisKinect::setup()
 	aNi->mContext.StartGeneratingAll();
 
 
-
+	float qDepth = WuCinderNITE::getInstance()->maxDepth * 0.25f;
 	ci::CameraPersp cam;
-	cam.setPerspective(60.0f, cinder::app::App::get()->getWindowAspectRatio(), 1.0f, WuCinderNITE::getInstance()->maxDepth);
-	cam.lookAt(ci::Vec3f(0, 0, -500.0f), ci::Vec3f::zero());
+	cam.setPerspective(60.0f, cinder::app::App::get()->getWindowAspectRatio(), 1.0f, WuCinderNITE::getInstance()->maxDepth * 2.0f);
+	cam.lookAt(ci::Vec3f(qDepth, 0, -qDepth), Vec3f(0, 0, qDepth));
 	Constants::mayaCam()->setCurrentCam( cam );
 
 	UserTracker* aTracker = UserTracker::getInstance();
@@ -122,7 +120,7 @@ void DisKinect::mouseDown( MouseEvent event )
 void DisKinect::mouseDrag( MouseEvent event )
 {
 	MayaCamUI* mayaCam = Constants::mayaCam();
-	mayaCam->mouseDrag(event.getPos(), event.isLeftDown(), event.isMiddleDown(), event.isRightDown());
+	mayaCam->mouseDrag(event.getPos(), event.isControlDown(), event.isAltDown(), event.isShiftDown());
 }
 
 CINDER_APP_BASIC( DisKinect, RendererGl )
