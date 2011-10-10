@@ -2,12 +2,17 @@
  * WuCinderNITE.cpp
  *
  *  Created on: Jul 23, 2011
- *      Author: guojianwu
+ *      Author: guojian wu
+ *      Authod: mario gonzalez
  */
 
 #include "WuCinderNITE.h"
 #include "SkeletonStruct.h"
 #include <OpenGL.framework/Headers/gl.h>
+#include <XnCppWrapper.h>
+#include <XnCodecIDs.h>
+#include <XnStatusCodes.h>
+
 using namespace std;
 
 XnUInt32 mNITENumNITEUserColors = 10;
@@ -41,6 +46,15 @@ WuCinderNITE::WuCinderNITE() {
 	mNeedPoseForCalibration = false;
 	mIsCalibrated = false;
 	mRunUpdates = false;
+
+	mContext = new xn::Context();
+	mDepthGen = new xn::DepthGenerator();
+	mUserGen = new xn::UserGenerator();
+	mImageGen = new xn::ImageGenerator();
+	mSceneAnalyzer = new xn::SceneAnalyzer();
+	mSceneMeta = new xn::SceneMetaData();
+	mDepthMeta = new xn::DepthMetaData();
+	mImageMeta = new xn::ImageMetaData();
 }
 
 WuCinderNITE::~WuCinderNITE() {
@@ -48,14 +62,23 @@ WuCinderNITE::~WuCinderNITE() {
 	if (mRunUpdates) {
 		stopUpdating();
 	}
-	mContext.Shutdown();
-	mContext.Release();
-	mDepthGen.Release();
-	mUserGen.Release();
-	mImageGen.Release();
-	mSceneAnalyzer.Release();
 	signalNewUser.disconnect_all_slots();
 	signalLostUser.disconnect_all_slots();
+	mContext->Shutdown();
+	mContext->Release();
+	mDepthGen->Release();
+	mUserGen->Release();
+	mImageGen->Release();
+	mSceneAnalyzer->Release();
+
+	delete mContext;
+	delete mDepthGen;
+	delete mUserGen;
+	delete mImageGen;
+	delete mSceneAnalyzer;
+	delete mSceneMeta;
+	delete mDepthMeta;
+	delete mImageMeta;
 }
 
 void WuCinderNITE::shutdown()
@@ -71,35 +94,35 @@ void WuCinderNITE::setup(string onipath)
 	mMapMode.nXRes = 0;
 	XnStatus status = XN_STATUS_OK;
 	xn::EnumerationErrors errors;
-	status = mContext.Init();
+	status = mContext->Init();
 	CHECK_RC(status, "Init", true);
 
-	status = mContext.OpenFileRecording(onipath.c_str());
+	status = mContext->OpenFileRecording(onipath.c_str());
 	CHECK_RC(status, "Recording", true);
 
-	status = mContext.FindExistingNode(XN_NODE_TYPE_DEPTH, mDepthGen);
+	status = mContext->FindExistingNode(XN_NODE_TYPE_DEPTH, *mDepthGen);
 	if (status == XN_STATUS_OK) {
 		mUseDepthMap = true;
 
-		status = mDepthGen.GetMapOutputMode(mMapMode);
+		status = mDepthGen->GetMapOutputMode(mMapMode);
 		CHECK_RC(status, "Retrieving XnMapOutputMode", true);
 
 		mDepthSurface = ci::Surface8u(mMapMode.nXRes, mMapMode.nYRes, false);
 		mDrawArea = ci::Area(0, 0, mMapMode.nXRes, mMapMode.nYRes);
-		maxDepth = mDepthGen.GetDeviceMaxDepth() / 1000.0f;
+		maxDepth = mDepthGen->GetDeviceMaxDepth() / 1000.0f;
 	} else {
 		mUseDepthMap = false;
 		maxDepth = 0;
 	}
 
-	status = mContext.FindExistingNode(XN_NODE_TYPE_IMAGE, mImageGen);
+	status = mContext->FindExistingNode(XN_NODE_TYPE_IMAGE, *mImageGen);
 	if (status != XN_STATUS_OK) {
 		mUseColorImage = true;
-		status = mImageGen.Create(mContext);
+		status = mImageGen->Create(*mContext);
 		CHECK_RC(status, "Image Gen", true);
 
 		if (mMapMode.nXRes == 0) {
-			status = mImageGen.GetMapOutputMode(mMapMode);
+			status = mImageGen->GetMapOutputMode(mMapMode);
 			CHECK_RC(status, "Retrieving XnMapOutputMode", true);
 		}
 
@@ -108,21 +131,21 @@ void WuCinderNITE::setup(string onipath)
 		mUseColorImage = false;
 	}
 
-	status = mContext.FindExistingNode(XN_NODE_TYPE_USER, mUserGen);
+	status = mContext->FindExistingNode(XN_NODE_TYPE_USER, *mUserGen);
 	if (status != XN_STATUS_OK) {
-		status = mUserGen.Create(mContext);
+		status = mUserGen->Create(*mContext);
 		CHECK_RC(status, "User Gen", true);
 	}
-	mUserGen.GetSkeletonCap().SetSkeletonProfile(XN_SKEL_PROFILE_ALL);
+	mUserGen->GetSkeletonCap().SetSkeletonProfile(XN_SKEL_PROFILE_ALL);
 
-	if (!mUserGen.IsCapabilitySupported((const char*)XN_CAPABILITY_SKELETON)) {
+	if (!mUserGen->IsCapabilitySupported((const char*)XN_CAPABILITY_SKELETON)) {
 		ci::app::console() << "Supplied user generator doesn't support skeleton" << endl;
 		exit(-1);
 	}
 
-	status = mContext.FindExistingNode(XN_NODE_TYPE_SCENE, mSceneAnalyzer);
+	status = mContext->FindExistingNode(XN_NODE_TYPE_SCENE, *mSceneAnalyzer);
 	if (status != XN_STATUS_OK) {
-		status = mSceneAnalyzer.Create(mContext);
+		status = mSceneAnalyzer->Create(*mContext);
 		CHECK_RC(status, "Scene Analyzer", true);
 	}
 
@@ -137,50 +160,50 @@ void WuCinderNITE::setup(string xmlpath, XnMapOutputMode mapMode, bool useDepthM
 
 	XnStatus status = XN_STATUS_OK;
 	xn::EnumerationErrors errors;
-	status = mContext.InitFromXmlFile(xmlpath.c_str(), &errors);
+	status = mContext->InitFromXmlFile(xmlpath.c_str(), &errors);
 	CHECK_RC(status, "Init", true);
 
 
 	if (mUseDepthMap) {
-		status = mContext.FindExistingNode(XN_NODE_TYPE_DEPTH, mDepthGen);
+		status = mContext->FindExistingNode(XN_NODE_TYPE_DEPTH, *mDepthGen);
 		if (status != XN_STATUS_OK) {
-			status = mDepthGen.Create(mContext);
+			status = mDepthGen->Create(*mContext);
 			CHECK_RC(status, "Depth Creating", true);
 		}
-		status = mDepthGen.SetMapOutputMode(mMapMode);
+		status = mDepthGen->SetMapOutputMode(mMapMode);
 		CHECK_RC(status, "Depth Settings", true);
 		mDepthSurface = ci::Surface8u(mMapMode.nXRes, mMapMode.nYRes, false);
-		maxDepth = mDepthGen.GetDeviceMaxDepth() / 1000.0f;
+		maxDepth = mDepthGen->GetDeviceMaxDepth() / 1000.0f;
 	} else {
 		maxDepth = 0;
 	}
 
 	if (mUseColorImage) {
-		status = mContext.FindExistingNode(XN_NODE_TYPE_IMAGE, mImageGen);
+		status = mContext->FindExistingNode(XN_NODE_TYPE_IMAGE, *mImageGen);
 		if (status != XN_STATUS_OK) {
-			status = mImageGen.Create(mContext);
+			status = mImageGen->Create(*mContext);
 			CHECK_RC(status, "Image Gen", true);
 		}
-		status = mImageGen.SetMapOutputMode(mMapMode);
+		status = mImageGen->SetMapOutputMode(mMapMode);
 		CHECK_RC(status, "Image Settings", true);
 		mImageSurface = ci::Surface8u(mMapMode.nXRes, mMapMode.nYRes, false);
 	}
 
-	status = mContext.FindExistingNode(XN_NODE_TYPE_USER, mUserGen);
+	status = mContext->FindExistingNode(XN_NODE_TYPE_USER, *mUserGen);
 	if (status != XN_STATUS_OK) {
-		status = mUserGen.Create(mContext);
+		status = mUserGen->Create(*mContext);
 		CHECK_RC(status, "User Gen", true);
 	}
-	mUserGen.GetSkeletonCap().SetSkeletonProfile(XN_SKEL_PROFILE_ALL);
+	mUserGen->GetSkeletonCap().SetSkeletonProfile(XN_SKEL_PROFILE_ALL);
 
-	if (!mUserGen.IsCapabilitySupported((const char*)XN_CAPABILITY_SKELETON)) {
+	if (!mUserGen->IsCapabilitySupported((const char*)XN_CAPABILITY_SKELETON)) {
 		ci::app::console() << "Supplied user generator doesn't support skeleton" << endl;
 		exit(-1);
 	}
 
-	status = mContext.FindExistingNode(XN_NODE_TYPE_SCENE, mSceneAnalyzer);
+	status = mContext->FindExistingNode(XN_NODE_TYPE_SCENE, *mSceneAnalyzer);
 	if (status != XN_STATUS_OK) {
-		status = mSceneAnalyzer.Create(mContext);
+		status = mSceneAnalyzer->Create(*mContext);
 		CHECK_RC(status, "Scene Analyzer", true);
 	}
 
@@ -194,11 +217,11 @@ void WuCinderNITE::useCalibrationFile(string filepath)
 
 void WuCinderNITE::startGenerating()
 {
-	mContext.StartGeneratingAll();
+	mContext->StartGeneratingAll();
 }
 void WuCinderNITE::stopGenerating()
 {
-	mContext.StopGeneratingAll();
+	mContext->StopGeneratingAll();
 }
 
 void WuCinderNITE::startUpdating()
@@ -207,7 +230,7 @@ void WuCinderNITE::startUpdating()
 		return;
 	}
 	mRunUpdates = true;
-	mContext.StartGeneratingAll();
+	mContext->StartGeneratingAll();
 	mThread = boost::shared_ptr<boost::thread>(new boost::thread(boost::bind(&WuCinderNITE::updateLoop, this)));
 }
 
@@ -219,7 +242,7 @@ void WuCinderNITE::stopUpdating()
 	mRunUpdates = false;
 
 	mThread->join();
-	mContext.StopGeneratingAll();
+	mContext->StopGeneratingAll();
 }
 
 void WuCinderNITE::updateLoop()
@@ -233,7 +256,7 @@ void WuCinderNITE::update()
 {
 
 	XnStatus status = XN_STATUS_OK;
-	status = mContext.WaitAndUpdateAll();
+	status = mContext->WaitAndUpdateAll();
 	if( status != XN_STATUS_OK ) {
 		ci::app::console() << "no update" << endl;
 		return;
@@ -242,30 +265,30 @@ void WuCinderNITE::update()
 		ci::app::console() << "No user generator" << endl;
 		return;
 	}
-	status = mContext.FindExistingNode(XN_NODE_TYPE_DEPTH, mDepthGen);
+	status = mContext->FindExistingNode(XN_NODE_TYPE_DEPTH, *mDepthGen);
 	if( status != XN_STATUS_OK ) {
 		ci::app::console() << xnGetStatusString(status) << endl;
 		return;
 	}
 
-	mSceneAnalyzer.GetFloor(mFloor);
+	mSceneAnalyzer->GetFloor(mFloor);
 
-	mUserGen.GetUserPixels(0, mSceneMeta);
+	mUserGen->GetUserPixels(0, *mSceneMeta);
 	if (mUseDepthMap) {
-		mDepthGen.GetMetaData(mDepthMeta);
+		mDepthGen->GetMetaData(*mDepthMeta);
 		updateDepthSurface();
 	}
 	if (mUseColorImage) {
-		mImageGen.GetMetaData(mImageMeta);
+		mImageGen->GetMetaData(*mImageMeta);
 		updateImageSurface();
 	}
 
 	XnSkeletonJointTransformation joint;
 	for(int i = 1; i < MAX_USERS; i++) {
-		skeletons[i].isTracking = mUserGen.GetSkeletonCap().IsTracking(i);
+		skeletons[i].isTracking = mUserGen->GetSkeletonCap().IsTracking(i);
 		if (skeletons[i].isTracking) {
 			for(int j = 1; j < MAX_JOINTS; j++) {
-				mUserGen.GetSkeletonCap().GetSkeletonJoint(i, (XnSkeletonJoint)j, joint);
+				mUserGen->GetSkeletonCap().GetSkeletonJoint(i, (XnSkeletonJoint)j, joint);
 				skeletons[i].joints[j].confidence = joint.position.fConfidence;
 				skeletons[i].joints[j].position.x = joint.position.position.X / 1000.0f;
 				skeletons[i].joints[j].position.y = joint.position.position.Y / 1000.0f;
@@ -281,14 +304,14 @@ void WuCinderNITE::update()
 
 void WuCinderNITE::updateDepthSurface()
 {
-	int w = mDepthMeta.XRes();
-	int h = mDepthMeta.YRes();
+	int w = mDepthMeta->XRes();
+	int h = mDepthMeta->YRes();
 	unsigned int numPoints = 0;
 	unsigned int nValue = 0;
 	unsigned int nHistValue = 0;
 
-	const XnDepthPixel* pDepth = mDepthMeta.Data();
-	const XnLabel* pLabels = mSceneMeta.Data();
+	const XnDepthPixel* pDepth = mDepthMeta->Data();
+	const XnLabel* pLabels = mSceneMeta->Data();
 	bool hasSceneData = pLabels != 0;
 
 	// set all items of the array to 0
@@ -313,7 +336,7 @@ void WuCinderNITE::updateDepthSurface()
 		}
 	}
 
-	pDepth = mDepthMeta.Data();
+	pDepth = mDepthMeta->Data();
 	ci::Surface::Iter iter = mDepthSurface.getIter( mDrawArea );
 	while( iter.line() ) {
 		while( iter.pixel() ) {
@@ -353,8 +376,8 @@ void WuCinderNITE::updateDepthSurface()
 void WuCinderNITE::updateImageSurface()
 {
 	mMutexImageSurface.lock();
-		int w = mImageMeta.XRes();
-		const XnRGB24Pixel* pImage = mImageMeta.RGB24Data();
+		int w = mImageMeta->XRes();
+		const XnRGB24Pixel* pImage = mImageMeta->RGB24Data();
 		ci::Surface::Iter iter = mImageSurface.getIter( mDrawArea );
 		while( iter.line() ) {
 			pImage += w;
@@ -476,15 +499,15 @@ void WuCinderNITE::renderLimb(SKELETON::SKELETON &skeleton, XnSkeletonJoint eJoi
 		pt[1].X = skeleton.joints[eJoint2].position.x;
 		pt[2].Y = skeleton.joints[eJoint2].position.y;
 		pt[3].Z = skeleton.joints[eJoint2].position.z;
-		mDepthGen.ConvertRealWorldToProjective(2, pt, pt);
+		mDepthGen->ConvertRealWorldToProjective(2, pt, pt);
 		ci::gl::drawLine(ci::Vec2f(pt[0].X, pt[0].Y), ci::Vec2f(pt[1].X, pt[1].Y));
 	}
 }
 
 void WuCinderNITE::startTracking(XnUserID nId)
 {
-	mUserGen.GetSkeletonCap().StartTracking(nId);
-	mUserGen.GetSkeletonCap().SetSmoothing(0.5f);
+	mUserGen->GetSkeletonCap().StartTracking(nId);
+	mUserGen->GetSkeletonCap().SetSmoothing(0.5f);
 	if (waitForTrackingToSingalNewUser) {
 		signalNewUser(nId);
 	}
@@ -493,36 +516,36 @@ void WuCinderNITE::startTracking(XnUserID nId)
 void WuCinderNITE::registerCallbacks()
 {
 	XnStatus status = XN_STATUS_OK;
-	status = mUserGen.RegisterUserCallbacks(mInstance->CB_NewUser, mInstance->CB_LostUser, NULL, hUserCBs);
+	status = mUserGen->RegisterUserCallbacks(mInstance->CB_NewUser, mInstance->CB_LostUser, NULL, hUserCBs);
 	CHECK_RC(status, "User callbacks", true);
 
-	status = mUserGen.GetSkeletonCap().RegisterCalibrationCallbacks(mInstance->CB_CalibrationStart, mInstance->CB_CalibrationEnd, NULL, hCalibrationPhasesCBs);
+	status = mUserGen->GetSkeletonCap().RegisterCalibrationCallbacks(mInstance->CB_CalibrationStart, mInstance->CB_CalibrationEnd, NULL, hCalibrationPhasesCBs);
 	CHECK_RC(status, "Calibrations callbacks 1", true);
 
-	status = mUserGen.GetSkeletonCap().RegisterToCalibrationComplete(mInstance->CB_CalibrationComplete, NULL, hCalibrationCompleteCBs);
+	status = mUserGen->GetSkeletonCap().RegisterToCalibrationComplete(mInstance->CB_CalibrationComplete, NULL, hCalibrationCompleteCBs);
 	CHECK_RC(status, "Calibrations callbacks 2", true);
 
-	if (mUserGen.GetSkeletonCap().NeedPoseForCalibration()) {
+	if (mUserGen->GetSkeletonCap().NeedPoseForCalibration()) {
 		mNeedPoseForCalibration = true;
-		if (!mUserGen.IsCapabilitySupported((const char*)XN_CAPABILITY_POSE_DETECTION)) {
+		if (!mUserGen->IsCapabilitySupported((const char*)XN_CAPABILITY_POSE_DETECTION)) {
 			ci::app::console() << "Need pose for calibration but device does not support it" << endl;
 			exit(-1);
 		}
 
-		status = mUserGen.GetPoseDetectionCap().RegisterToPoseCallbacks(mInstance->CB_PoseDetected, NULL, NULL, hPoseCBs);
+		status = mUserGen->GetPoseDetectionCap().RegisterToPoseCallbacks(mInstance->CB_PoseDetected, NULL, NULL, hPoseCBs);
 		CHECK_RC(status, "Pose callbacks", true);
 
-		mUserGen.GetSkeletonCap().GetCalibrationPose(mCalibrationPose);
+		mUserGen->GetSkeletonCap().GetCalibrationPose(mCalibrationPose);
 	}
 }
 
 void WuCinderNITE::unregisterCallbacks()
 {
-	mUserGen.UnregisterUserCallbacks(hUserCBs);
-	mUserGen.GetSkeletonCap().UnregisterCalibrationCallbacks(hCalibrationPhasesCBs);
-	mUserGen.GetSkeletonCap().UnregisterFromCalibrationComplete(hCalibrationCompleteCBs);
-	if (mUserGen.GetSkeletonCap().NeedPoseForCalibration()) {
-		mUserGen.GetPoseDetectionCap().UnregisterFromPoseCallbacks(hPoseCBs);
+	mUserGen->UnregisterUserCallbacks(hUserCBs);
+	mUserGen->GetSkeletonCap().UnregisterCalibrationCallbacks(hCalibrationPhasesCBs);
+	mUserGen->GetSkeletonCap().UnregisterFromCalibrationComplete(hCalibrationCompleteCBs);
+	if (mUserGen->GetSkeletonCap().NeedPoseForCalibration()) {
+		mUserGen->GetPoseDetectionCap().UnregisterFromPoseCallbacks(hPoseCBs);
 	}
 }
 
@@ -530,23 +553,23 @@ void XN_CALLBACK_TYPE WuCinderNITE::CB_NewUser(xn::UserGenerator& generator, XnU
 {
 	ci::app::console() << "new user " << nId << endl;
 	if (!mInstance->mCalibrationFile.empty()) {
-		mInstance->mUserGen.GetSkeletonCap().LoadCalibrationDataFromFile(nId, mInstance->mCalibrationFile.c_str());
+		mInstance->mUserGen->GetSkeletonCap().LoadCalibrationDataFromFile(nId, mInstance->mCalibrationFile.c_str());
 		mInstance->startTracking(nId);
 	}
 	else if (mInstance->mNeedPoseForCalibration) {
-		if ((mInstance->useSingleCalibrationMode && mInstance->mIsCalibrated) || mInstance->mUserGen.GetSkeletonCap().IsCalibrated(nId)) {
-			mInstance->mUserGen.GetSkeletonCap().LoadCalibrationData(nId, mInstance->useSingleCalibrationMode ? 0 : nId);
+		if ((mInstance->useSingleCalibrationMode && mInstance->mIsCalibrated) || mInstance->mUserGen->GetSkeletonCap().IsCalibrated(nId)) {
+			mInstance->mUserGen->GetSkeletonCap().LoadCalibrationData(nId, mInstance->useSingleCalibrationMode ? 0 : nId);
 			mInstance->startTracking(nId);
 		} else {
-			mInstance->mUserGen.GetPoseDetectionCap().StartPoseDetection(mInstance->mCalibrationPose, nId);
+			mInstance->mUserGen->GetPoseDetectionCap().StartPoseDetection(mInstance->mCalibrationPose, nId);
 		}
 	}
 	else {
-		if ((mInstance->useSingleCalibrationMode && mInstance->mIsCalibrated) || mInstance->mUserGen.GetSkeletonCap().IsCalibrated(nId)) {
-			mInstance->mUserGen.GetSkeletonCap().LoadCalibrationData(nId, mInstance->useSingleCalibrationMode ? 0 : nId);
+		if ((mInstance->useSingleCalibrationMode && mInstance->mIsCalibrated) || mInstance->mUserGen->GetSkeletonCap().IsCalibrated(nId)) {
+			mInstance->mUserGen->GetSkeletonCap().LoadCalibrationData(nId, mInstance->useSingleCalibrationMode ? 0 : nId);
 			mInstance->startTracking(nId);
 		} else {
-			mInstance->mUserGen.GetSkeletonCap().RequestCalibration(nId, TRUE);
+			mInstance->mUserGen->GetSkeletonCap().RequestCalibration(nId, TRUE);
 		}
 	}
 	if (!mInstance->waitForTrackingToSingalNewUser) {
@@ -567,9 +590,9 @@ void XN_CALLBACK_TYPE WuCinderNITE::CB_CalibrationEnd(xn::SkeletonCapability& ca
 	ci::app::console() << "CB_CalibrationEnd " << nId << (bSuccess ? " success" : " failed")  << endl;
 	if (!bSuccess) {
 		if (mInstance->mNeedPoseForCalibration) {
-			mInstance->mUserGen.GetPoseDetectionCap().StartPoseDetection(mInstance->mCalibrationPose, nId);
+			mInstance->mUserGen->GetPoseDetectionCap().StartPoseDetection(mInstance->mCalibrationPose, nId);
 		} else {
-			mInstance->mUserGen.GetSkeletonCap().RequestCalibration(nId, TRUE);
+			mInstance->mUserGen->GetSkeletonCap().RequestCalibration(nId, TRUE);
 		}
 	}
 }
@@ -580,19 +603,19 @@ void XN_CALLBACK_TYPE WuCinderNITE::CB_CalibrationComplete(xn::SkeletonCapabilit
 		if (!mInstance->mIsCalibrated) {
 			if (mInstance->useSingleCalibrationMode) {
 				mInstance->mIsCalibrated = TRUE;
-				mInstance->mUserGen.GetSkeletonCap().SaveCalibrationData(nId, 0);
+				mInstance->mUserGen->GetSkeletonCap().SaveCalibrationData(nId, 0);
 			} else {
-				mInstance->mUserGen.GetSkeletonCap().SaveCalibrationData(nId, nId);
+				mInstance->mUserGen->GetSkeletonCap().SaveCalibrationData(nId, nId);
 			}
 			mInstance->startTracking(nId);
 		}
-		mInstance->mUserGen.GetPoseDetectionCap().StopPoseDetection(nId);
+		mInstance->mUserGen->GetPoseDetectionCap().StopPoseDetection(nId);
 	}
 }
 void XN_CALLBACK_TYPE WuCinderNITE::CB_PoseDetected(xn::PoseDetectionCapability& capability, const XnChar* strPose, XnUserID nId, void* pCookie)
 {
 	ci::app::console() << "pose detected for user " << nId << endl;
-	mInstance->mUserGen.GetPoseDetectionCap().StopPoseDetection(nId);
-	mInstance->mUserGen.GetSkeletonCap().RequestCalibration(nId, TRUE);
+	mInstance->mUserGen->GetPoseDetectionCap().StopPoseDetection(nId);
+	mInstance->mUserGen->GetSkeletonCap().RequestCalibration(nId, TRUE);
 }
 

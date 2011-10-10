@@ -15,21 +15,29 @@
 #include "cinder/gl/gl.h"
 #include "cinder/gl/Texture.h"
 
-#include "string.h"
+#include "SkeletonStruct.h"
 
 #include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/signals2.hpp>
 #include <boost/signals.hpp>
-
-#include <XnCppWrapper.h>
-#include <XnCodecIDs.h>
-#include <XnStatusCodes.h>
 #include <XnTypes.h>
+#include <string>
 
 
 // Forward decleration
-#include "SkeletonStruct.h"
+namespace xn {
+	class Context;
+	class DepthGenerator;
+	class UserGenerator;
+	class ImageGenerator;
+	class SceneAnalyzer;
+	class SceneMetaData;
+	class DepthMetaData;
+	class ImageMetaData;
+	class SkeletonCapability;
+	class PoseDetectionCapability;
+}
 
 #define MAX_DEPTH 10000
 #define CHECK_RC(status, what, isFatal) \
@@ -116,14 +124,14 @@ protected:
 	bool				mUseDepthMap;
 	std::string			mCalibrationFile;
 
-	xn::Context			mContext;
-	xn::DepthGenerator	mDepthGen;
-	xn::UserGenerator	mUserGen;
-	xn::ImageGenerator	mImageGen;
-	xn::SceneAnalyzer	mSceneAnalyzer;
-	xn::SceneMetaData	mSceneMeta;
-	xn::DepthMetaData	mDepthMeta;
-	xn::ImageMetaData	mImageMeta;
+	xn::Context*		mContext;
+	xn::DepthGenerator*	mDepthGen;
+	xn::UserGenerator*	mUserGen;
+	xn::ImageGenerator*	mImageGen;
+	xn::SceneAnalyzer*	mSceneAnalyzer;
+	xn::SceneMetaData*	mSceneMeta;
+	xn::DepthMetaData*	mDepthMeta;
+	xn::ImageMetaData*	mImageMeta;
 
 
 	ci::Area			mDrawArea;
