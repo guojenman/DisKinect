@@ -8,6 +8,7 @@
 #include "WuCinderNITE.h"
 #include "SkeletonStruct.h"
 #include <OpenGL.framework/Headers/gl.h>
+using namespace std;
 
 XnUInt32 mNITENumNITEUserColors = 10;
 XnFloat mNITEUserColors[][3] = {

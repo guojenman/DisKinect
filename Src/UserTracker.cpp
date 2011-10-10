@@ -52,7 +52,7 @@ void UserTracker::onNewUser(XnUserID nId)
 
 void UserTracker::onLostUser(XnUserID nId)
 {
-	for(list<UserInfo>::iterator it = mUsers.begin(); it != mUsers.end();) {
+	for(std::list<UserInfo>::iterator it = mUsers.begin(); it != mUsers.end();) {
 		if (it->id == nId) {
 			mUsers.erase(it);
 			break;
@@ -68,7 +68,7 @@ void UserTracker::update()
 	// measure distance of important joints have moved from the last position
 	// and decide if the user is active or not - used for sorting, and gives us
 	// the next active user, if user A stays still for too long (possible lost of user)
-	for(list<UserInfo>::iterator it = mUsers.begin(); it != mUsers.end();) {
+	for(std::list<UserInfo>::iterator it = mUsers.begin(); it != mUsers.end();) {
 		SKELETON::SKELETON &skeleton = ni->skeletons[it->id];
 		if (skeleton.isTracking) {
 
@@ -147,10 +147,10 @@ void UserTracker::update()
 	if (!mUsers.empty() && mUsers.begin()->isActive) {
 		if (mUsers.begin()->id != activeUserId) {
 			activeUserId = mUsers.begin()->id;
-			ci::app::console() << mUsers.begin()->id << endl;
+			ci::app::console() << mUsers.begin()->id << std::endl;
 		}
 	} else if (activeUserId != 0) {
-		ci::app::console() << "no active user" << endl;
+		ci::app::console() << "no active user" << std::endl;
 		activeUserId = 0;
 	}
 }

@@ -182,12 +182,12 @@ namespace relay {
 		Json::Reader reader;
 
 		// Read the filestream
-		ifstream filestream;
+		std::ifstream filestream;
 
 		// Load the file
 		std::cout << "UserStreamPlayer::setJson - Attempting to load:" << aPath << std::endl;
 
-		filestream.open( aPath.c_str(), ifstream::in);
+		filestream.open( aPath.c_str(), std::ifstream::in);
 		if( filestream == 0 ) {
 			std::cout << "UserStreamPlayer::setJson - Failed to load file. Ignoring..." << std::endl;
 		}

@@ -103,7 +103,7 @@ void Puppeteer::update(SKELETON::SKELETON& skeleton)
 		handR.y = CHECK_DELTA(handR.y, lastHandPosR.y);
 		handR.z = CHECK_DELTA(handR.z, lastHandPosR.z);
 
-		ostringstream message;
+		std::ostringstream message;
 		message << round(handPosL.x) << "," << round(handPosL.y) << "," << round(handPosL.z) << ","
 				<< round(handPosR.x) << "," << round(handPosR.y) << "," << round(handPosR.z) << ","
 				<< round(legPosL) << ","

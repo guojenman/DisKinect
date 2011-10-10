@@ -31,7 +31,6 @@
 
 // Forward decleration
 #include "SkeletonStruct.h"
-using namespace std;
 
 #define MAX_DEPTH 10000
 #define CHECK_RC(status, what, isFatal) \
@@ -54,9 +53,9 @@ public:
 
 	virtual ~WuCinderNITE();
 
-	void setup(string xmlpath, XnMapOutputMode mapMode, bool useDepthMap = true, bool useColorImage = true);
-	void setup(string onipath);
-	void useCalibrationFile(string filepath);
+	void setup(std::string xmlpath, XnMapOutputMode mapMode, bool useDepthMap = true, bool useColorImage = true);
+	void setup(std::string onipath);
+	void useCalibrationFile(std::string filepath);
 	void update();
 	void startUpdating();
 	void stopUpdating();
@@ -120,7 +119,7 @@ protected:
 	bool				mIsCalibrated;
 	bool				mUseColorImage;
 	bool				mUseDepthMap;
-	string				mCalibrationFile;
+	std::string			mCalibrationFile;
 
 
 	ci::Area			mDrawArea;

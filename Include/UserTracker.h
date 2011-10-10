@@ -55,7 +55,7 @@ private:
 	void onLostUser(XnUserID nId);
 
 	WuCinderNITE*		ni;
-	list<UserInfo>		mUsers;
+	std::list<UserInfo>	mUsers;
 	boost::signals2::connection	mSignalConnectionNewUser;
 	boost::signals2::connection	mSignalConnectionLostUser;
 
