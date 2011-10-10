@@ -173,7 +173,7 @@ void UserTracker::draw()
 		ci::gl::color(ci::ColorA(1, 1, 1, 0.2f));
 		ci::gl::pushModelView();
 		ci::gl::translate(ci::Vec3f(0, ni->mFloor.ptPoint.Y / 1000.0f, 0));
-		ci::gl::drawBillboard(activationZone, ci::Vec2f(1.0f, 1.0f), 0, ci::Vec3f::xAxis(), ci::Vec3f::zAxis());
+		ci::gl::drawBillboard(activationZone, ci::Vec2f(0.5f, 0.5f), 0, ci::Vec3f::xAxis(), ci::Vec3f::zAxis());
 		ci::gl::popModelView();
 	ci::gl::popMatrices();
 	ci::gl::disableAlphaBlending();

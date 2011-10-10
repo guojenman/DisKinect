@@ -72,6 +72,7 @@ void DisKinect::setup()
 	Constants::mayaCam()->setCurrentCam( cam );
 
 	userTracker = UserTracker::getInstance();
+	userTracker->activationZone = Constants::UserTracker::ACTIVATION_ZONE;
 	userRelay = new relay::UserRelay( aNi, userTracker );
 	puppetier = new puppeteer::Puppeteer();
 
@@ -92,9 +93,10 @@ void DisKinect::draw()
 {
 	gl::clear( ColorA::black(), true);
 
+	userTracker->draw();
 	userRelay->draw();
 	puppetier->draw();
-	userTracker->draw();
+
 }
 
 void DisKinect::shutdown()

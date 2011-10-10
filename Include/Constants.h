@@ -7,6 +7,7 @@
 #ifndef CONSTANTS_H_
 #define CONSTANTS_H_
 #include <iostream>
+#include "cinder/Vector.h"
 
 namespace cinder { class MayaCamUI; };
 namespace Constants {
@@ -24,7 +25,7 @@ namespace Constants {
 
 	namespace relay {
 		namespace repeater {
-			static float MIN_CUMALTIVE_DELTA_BEFORE_RECORDING = 1e05;	// At least this much movement has to accumulate while a user is active before we start recording
+			static float MIN_CUMALTIVE_DELTA_BEFORE_RECORDING = 100.0f;	// At least this much movement has to accumulate while a user is active before we start recording
 
 			// Record somewhere between this many frames - arbitary numbers
 			// TODO: instead, stop recording after if delta decreases?
@@ -36,6 +37,10 @@ namespace Constants {
 	namespace TimeLapse {
 		static std::string DIRECTORY_NAME = "Diskinect";
 		static int SECONDS_BETWEEN_SNAPSHOT = 5;
+	}
+
+	namespace UserTracker {
+		static ci::Vec3f ACTIVATION_ZONE = ci::Vec3f(0.0f, 0.0f, 2.5f);
 	}
 }
 
