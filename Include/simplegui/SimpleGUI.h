@@ -85,6 +85,7 @@ public:
 	SimpleGUI(App* app);
 	~SimpleGUI();
 	bool	isSelected() { return selectedControl != NULL; }
+	Control* getSelectedControl() { return selectedControl; };
 	std::vector<Control*>& getControls() { return controls; }	
 	
 	bool	onMouseDown(MouseEvent event);

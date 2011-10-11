@@ -15,6 +15,7 @@
 #include "UserRelay.h"
 #include "cinder/app/App.h"
 #include "cinder/MayaCamUI.h"
+#include "cinder/Rand.h"
 
 #include "WuCinderNITE.h"
 #include "UserTracker.h"
@@ -33,6 +34,8 @@ namespace relay {
 	UserRelay::UserRelay( WuCinderNITE* t_ni, UserTracker* t_tracker ) {
 		this->ni = t_ni;
 		this->tracker = t_tracker;
+
+		setupGesturemap();
 
 		// Create the FSM and set the initial state
 		this->fsm = new relay::UserStreamStateManager();
@@ -64,6 +67,20 @@ namespace relay {
 		delete fsm;
 
 		std::cout << "UserRelay destructor!" << std::endl;
+	}
+
+	void UserRelay::setupGesturemap() {
+		using namespace Constants::relay::player;
+		std::map<std::string, int>::iterator it = weightedGestures()->begin();
+		for(; it != weightedGestures()->end(); ++it ) {
+
+			std::pair<std::string, int> aWeightPair = (*it);
+			for(int i = 0; i < aWeightPair.second; ++i) {
+				gestures.push_back( aWeightPair.first );
+				std::cout << gestures.back() << std::endl;
+			}
+		}
+
 	}
 
 	void UserRelay::setupDebug() {
@@ -134,12 +151,18 @@ namespace relay {
 		ci::gl::popMatrices();
 	}
 
+	std::string UserRelay::getRandomGesture() {
+		int index = ci::Rand::randInt( gestures.size() );
+		std::string path = ci::app::App::get()->getResourcePath( gestures.at( index ) );
+		return path;
+	}
+
 	// Debug state switching
 	bool UserRelay::setStateLive( ci::app::MouseEvent event ) { this->fsm->changeState( new relay::UserStreamLive() ); return true; };
 	bool UserRelay::setStateRecorder( ci::app::MouseEvent event ) { this->fsm->changeState( new relay::UserStreamRecorder() ); return true; };
 	bool UserRelay::setStatePlayback( ci::app::MouseEvent event ) {
 		UserStreamPlayer* player = new relay::UserStreamPlayer();
-		player->setJson( ci::app::App::get()->getResourcePath("jsontest.json") );			// Note the UserStreamPlayer requires the JSON to be set before 'enter' - set via string path or Json::Value
+		player->setJson( getRandomGesture() );			// Note the UserStreamPlayer requires the JSON to be set before 'enter' - set via string path or Json::Value
 		this->fsm->changeState( player );
 		return true;
 	};

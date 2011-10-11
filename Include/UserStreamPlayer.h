@@ -17,10 +17,10 @@
 #include "cinder/app/MouseEvent.h"
 #include "cinder/app/FileDropEvent.h"
 #include <boost/signals2.hpp>
-
+#include <boost/ptr_container/ptr_vector.hpp>
 // Forward declerations
 namespace SKELETON { struct SKELETON; struct SKELETON_JOINT; }
-namespace mowa { namespace sgui { class LabelControl; class ButtonControl; class BoolVarControl; class IntVarControl; class SimpleGUI; }}
+namespace mowa { namespace sgui { class Control; class LabelControl; class ButtonControl; class BoolVarControl; class IntVarControl; class SimpleGUI; }}
 class WuCinderNITE;
 class UserTracker;
 
@@ -46,6 +46,7 @@ namespace relay {
 
 		///// CALLBACKS
 		bool onToggleRecordingClicked( ci::app::MouseEvent event );
+		bool onRecordingSelected( ci::app::MouseEvent event );
 		int filedropCallbackId;
 
 		///// ACCESSORS
@@ -68,6 +69,8 @@ namespace relay {
 		mowa::sgui::BoolVarControl* _loopButton;	// Toggle button
 		mowa::sgui::IntVarControl* _frameSlider;
 		mowa::sgui::SimpleGUI* _gui;		// SimpleGUI instance
+
+		boost::ptr_vector< mowa::sgui::Control > _miscGuis;
 
 		Json::Value _json;
 		std::string _jsonString;

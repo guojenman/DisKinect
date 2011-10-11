@@ -71,11 +71,27 @@ namespace relay {
 			_gui->bgColor = ColorA(0.15, 0.15, 0.15, 1.0);
 			_label = _gui->addLabel("Playing");
 			_loopButton = _gui->addParam("Loop", &_shouldLoop, _shouldLoop);
-			_gui->addSeparator();
+//			_gui->addSeparator();
 			_frameSlider = _gui->addParam("Frame:", &_currentFrame, 0, _totalframes, 0);
-			_gui->addSeparator();
+//			_gui->addSeparator();
 			_toggle = _gui->addButton("Pause");
 			_toggle->registerClick( this, &UserStreamPlayer::onToggleRecordingClicked );
+
+
+			// Add a button for each
+			_miscGuis.push_back( _gui->addColumn() );
+			_miscGuis.push_back( _gui->addColumn() );
+			_miscGuis.push_back( _gui->addLabel("Gestures") );
+
+			using namespace Constants::relay::player;
+			std::map<std::string, int>::iterator it = weightedGestures()->begin();
+			for(; it != weightedGestures()->end(); ++it ) {
+				std::pair<std::string, int> aWeightPair = (*it);
+
+				mowa::sgui::ButtonControl* button = _gui->addButton( aWeightPair.first );
+				button->registerClick( this, &UserStreamPlayer::onRecordingSelected );
+				_miscGuis.push_back( button );
+			}
 		}
 	}
 
@@ -148,6 +164,17 @@ namespace relay {
 			play();
 		}
 
+		return true;
+	}
+
+	bool UserStreamPlayer::onRecordingSelected( ci::app::MouseEvent event ) {
+		std::string path = ci::app::App::get()->getResourcePath( _gui->getSelectedControl()->name );
+		std::cout << _gui->getSelectedControl()->name << " : " << path << std::endl;
+		setJson( path );
+
+		_frameSlider->max = getTotalFrames();
+		_label->name = "PLAYING";
+		_toggle->name = "PAUSE";
 		return true;
 	}
 

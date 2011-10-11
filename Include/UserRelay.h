@@ -15,8 +15,6 @@
 #ifndef USERRELAY_H_
 #define USERRELAY_H_
 
-
-
 #include "UserStreamStateManager.h"
 #include "cinder/Vector.h"
 #include "json/json.h"
@@ -50,6 +48,10 @@ namespace relay {
 		WuCinderNITE* ni;
 		UserTracker* tracker;
 		relay::UserStreamStateManager* fsm;
+
+		void setupGesturemap();
+		std::vector<std::string> gestures;
+		std::string getRandomGesture();
 
 		// Debug
 		mowa::sgui::SimpleGUI* _debugGUI;

@@ -6,8 +6,10 @@
  */
 #ifndef CONSTANTS_H_
 #define CONSTANTS_H_
-#include <iostream>
+
 #include "cinder/Vector.h"
+#include <iosfwd>
+#include <map>
 
 namespace cinder { class MayaCamUI; };
 namespace Constants {
@@ -18,19 +20,23 @@ namespace Constants {
 		static bool DRAW_SKELETON = true;
 		static bool DRAW_DEPTHMAP = true;
 		static bool USE_GUI = true;
-		static bool CREATE_TIMELAPSE = false;
+		static bool CREATE_TIMELAPSE = true;
 		static bool USE_ARDUINO = false;
-		static bool USE_RECORDED_ONI = true;
+		static bool USE_RECORDED_ONI = false;
 	};
 
 	namespace relay {
 		namespace repeater {
-			static float MIN_CUMALTIVE_DELTA_BEFORE_RECORDING = 100.0f;	// At least this much movement has to accumulate while a user is active before we start recording
+			static float MIN_CUMALTIVE_DELTA_BEFORE_RECORDING = 25.0f;	// At least this much movement has to accumulate while a user is active before we start recording
 
 			// Record somewhere between this many frames - arbitary numbers
 			// TODO: instead, stop recording after if delta decreases?
 			static float MIN_FRAMES_TO_RECORD = 50;
 			static float MAX_FRAMES_TO_RECORD = 200;
+		}
+
+		namespace player {
+			extern std::map<std::string, int>* weightedGestures();
 		}
 	}
 
