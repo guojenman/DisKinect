@@ -110,7 +110,7 @@ void Puppeteer::update(SKELETON::SKELETON& skeleton)
 				if (mUserTracked == 0 && ++mUserNoneFrames > 500) {
 					// reset every 500 frames if there's no active user
 					mUserNoneFrames = 0;
-					arduino->sendMessage("c|");
+					arduino->sendMessage("k|");
 				} else {
 					// send normal message
 					std::ostringstream message;
@@ -124,7 +124,7 @@ void Puppeteer::update(SKELETON::SKELETON& skeleton)
 			} else {
 				mUserTracked = UserTracker::getInstance()->activeUserId;
 				mUserNoneFrames = 0;
-				arduino->sendMessage("c|");
+				arduino->sendMessage("k|");
 			}
 		}
 
