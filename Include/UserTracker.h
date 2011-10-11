@@ -47,12 +47,12 @@ private:
 		ci::Vec3f	torso;
 
 		bool operator<(const UserInfo& other) {
-			if (distanceFromActivationZone < 0.25f) {
-				// ignore everything else if in the activation zone
-				return true;
-			}
-			// find closest or most active
-			return distanceFromActivationZone < other.distanceFromActivationZone ? true : isActive > other.isActive;
+//			if (distanceFromActivationZone < 0.25f) {
+//				return true;
+//			}
+//			return distanceFromActivationZone < other.distanceFromActivationZone ? true : isActive > other.isActive;
+
+			return isActive > other.isActive;;
 		}
 	};
 

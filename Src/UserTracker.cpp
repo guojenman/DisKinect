@@ -126,33 +126,32 @@ void UserTracker::update()
 
 //			std::cout << "TotalDist: " << totalDist << " ValidJoints: " << validJoints << std::endl;
 
-			if (totalDist <= activeMotionTolerance) {
-				if (++it->motionAtZeroDuration == activeTickTotlerance) {
-					it->isActive = false;
-				}
-			} else {
-				it->motionAtZeroDuration = 0;
-				if (!it->isActive) {
-					it->isActive = true;
-				}
-			}
+//			if (totalDist <= activeMotionTolerance) {
+//				if (++it->motionAtZeroDuration == activeTickTotlerance) {
+//					it->isActive = false;
+//				}
+//			} else {
+//				it->motionAtZeroDuration = 0;
+//				if (!it->isActive) {
+//					it->isActive = true;
+//				}
+//			}
 
+			it->isActive = it->distanceFromActivationZone < 0.5f;
 
+//			std::cout << "Total Delta:"<< totalDist << std::endl;
 
-	//			std::cout << "Total Delta:"<< totalDist << std::endl;
-	//			std::cout << "Total Delta:"<< totalDist << std::endl;
-
-				it->shoulderL = shoulderL;
-				it->shoulderR = shoulderR;
-				it->handL = handL;
-				it->handR = handR;
-				it->kneeL = kneeL;
-				it->kneeR = kneeR;
-			} else {
-				it->isActive = false;
-			}
-			it++;
+			it->shoulderL = shoulderL;
+			it->shoulderR = shoulderR;
+			it->handL = handL;
+			it->handR = handR;
+			it->kneeL = kneeL;
+			it->kneeR = kneeR;
+		} else {
+			it->isActive = false;
 		}
+		it++;
+	}
 	ni->mMutex.unlock();
 	mUsers.sort();
 
