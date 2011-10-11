@@ -39,6 +39,9 @@ private:
 	ci::Vec3f lastHandPosR;
 	float lastLegPosL;
 	float lastLegPosR;
+
+	unsigned int mUserTracked;
+	int mUserNoneFrames;
 };
 
 } /* namespace puppetier */
