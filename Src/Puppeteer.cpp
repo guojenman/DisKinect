@@ -6,7 +6,7 @@
 #include "cinder/Quaternion.h"
 #include "Puppeteer.h"
 #include "XnTypes.h"
-
+#include "UserTracker.h"
 #include "Constants.h"
 
 #define CHECK_DELTA(val1, val2) math<float>::abs(val1 - val2) >= .25f ? val1 : val2
@@ -21,7 +21,7 @@ Puppeteer::Puppeteer() {
 	arduinoUnit = 10.0f;
 	if (Constants::Debug::USE_ARDUINO) {
 		arduino = new ArduinoCommandInterface();
-		arduino->setup("tty.usbmodemfd131", false);
+		arduino->setup(Constants::Puppeteer::USB_COM, false);
 	}
 }
 
@@ -104,15 +104,28 @@ void Puppeteer::update(SKELETON::SKELETON& skeleton)
 		handPosR.y = CHECK_DELTA(handPosR.y, lastHandPosR.y);
 		handPosR.z = CHECK_DELTA(handPosR.z, lastHandPosR.z);
 
-		std::ostringstream message;
-		message << round(handPosL.x) << "," << round(handPosL.y) << "," << round(handPosL.z) << ","
-				<< round(handPosR.x) << "," << round(handPosR.y) << "," << round(handPosR.z) << ","
-				<< round(legPosL) << ","
-				<< round(legPosR) << "|";
 
-//		std::cout << message.str() << std::endl;
 		if (Constants::Debug::USE_ARDUINO) {
-			arduino->sendMessage(message.str());
+			if (UserTracker::getInstance()->activeUserId == mUserTracked) {
+				if (mUserTracked == 0 && ++mUserNoneFrames > 500) {
+					// reset every 500 frames if there's no active user
+					mUserNoneFrames = 0;
+					arduino->sendMessage("c|");
+				} else {
+					// send normal message
+					std::ostringstream message;
+					message << round(handPosL.x) << "," << round(handPosL.y) << "," << round(handPosL.z) << ","
+							<< round(handPosR.x) << "," << round(handPosR.y) << "," << round(handPosR.z) << ","
+							<< round(legPosL) << ","
+							<< round(legPosR) << "|";
+					arduino->sendMessage(message.str());
+					// std::cout << message.str() << std::endl;
+				}
+			} else {
+				mUserTracked = UserTracker::getInstance()->activeUserId;
+				mUserNoneFrames = 0;
+				arduino->sendMessage("c|");
+			}
 		}
 
 		lastHandPosL.x = handPosL.x;

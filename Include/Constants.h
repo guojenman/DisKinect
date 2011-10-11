@@ -43,6 +43,10 @@ namespace Constants {
 	namespace UserTracker {
 		static ci::Vec3f ACTIVATION_ZONE = ci::Vec3f(0.0f, 0.0f, 2.5f);
 	}
+
+	namespace Puppeteer {
+		static std::string USB_COM = "tty.usbmodemfd131";
+	}
 }
 
 #endif /* CONSTANTS_H_ */
