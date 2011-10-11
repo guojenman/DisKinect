@@ -57,7 +57,7 @@ void DisKinect::setup()
 		mapMode.nFPS = 30;
 		mapMode.nXRes = 640;
 		mapMode.nYRes = 480;
-		aNi->setup("./Resources/Sample-User.xml", mapMode, true, true);
+		aNi->setup(getResourcePath("Sample-User.xml"), mapMode, true, true);
 	}
 
 	aNi->useCalibrationFile(getResourcePath("calibration.dat"));
