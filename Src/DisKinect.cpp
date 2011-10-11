@@ -68,8 +68,8 @@ void DisKinect::setup()
 	float qDepth = WuCinderNITE::getInstance()->maxDepth * 0.25f;
 	ci::CameraPersp cam;
 	cam.setPerspective(60.0f, cinder::app::App::get()->getWindowAspectRatio(), 1.0f, WuCinderNITE::getInstance()->maxDepth * 2.0f);
-//	cam.lookAt(ci::Vec3f(qDepth, qDepth, -qDepth), Vec3f(0, 0, qDepth));
-	cam.lookAt(ci::Vec3f(0, 0, -qDepth), ci::Vec3f::zero());
+	cam.lookAt(ci::Vec3f(qDepth, qDepth, -qDepth), Vec3f(0, 0, qDepth));
+//	cam.lookAt(ci::Vec3f(0, 0, -qDepth), ci::Vec3f::zero());
 	Constants::mayaCam()->setCurrentCam( cam );
 
 	userTracker = UserTracker::getInstance();
@@ -94,8 +94,9 @@ void DisKinect::draw()
 {
 	gl::clear( ColorA::black(), true);
 
-	userTracker->draw();
+
 	userRelay->draw();
+	userTracker->draw();
 	puppetier->draw();
 
 }

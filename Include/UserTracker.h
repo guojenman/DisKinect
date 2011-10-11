@@ -11,6 +11,7 @@
 #pragma once
 
 #include "cinder/Vector.h"
+#include "cinder/Text.h"
 #include <boost/signals2.hpp>
 #include <list>
 #include <stddef.h>
@@ -62,11 +63,13 @@ private:
 	void onNewUser(XnUserID nId);
 	void onLostUser(XnUserID nId);
 
+	ci::Font	mFont;
+
 	WuCinderNITE*		ni;
 	std::list<UserInfo>	mUsers;
 	boost::signals2::connection	mSignalConnectionNewUser;
 	boost::signals2::connection	mSignalConnectionLostUser;
-
+	boost::mutex	mMutex;
 
 };
 

@@ -31,6 +31,8 @@ UserTracker::UserTracker()
 	activationZone = ci::Vec3f(0, 0, 2.5f);
 	totalDist = 0;
 
+	mFont = ci::Font("Arial", 14);
+
 	mSignalConnectionNewUser = ni->signalNewUser.connect( boost::bind(&UserTracker::onNewUser, this, boost::lambda::_1) );
 	mSignalConnectionLostUser = ni->signalLostUser.connect( boost::bind(&UserTracker::onLostUser, this, boost::lambda::_1) );
 }
@@ -57,6 +59,7 @@ void UserTracker::onNewUser(XnUserID nId)
 
 void UserTracker::onLostUser(XnUserID nId)
 {
+	mMutex.lock();
 	for(std::list<UserInfo>::iterator it = mUsers.begin(); it != mUsers.end();) {
 		if (it->id == nId) {
 			mUsers.erase(it);
@@ -64,6 +67,7 @@ void UserTracker::onLostUser(XnUserID nId)
 		}
 		it++;
 	}
+	mMutex.unlock();
 }
 
 void UserTracker::update()
@@ -71,12 +75,13 @@ void UserTracker::update()
 	totalDist = 0;
 	float confidence = 0.5f;
 	ni->mMutex.lock();
-		// measure distance of important joints have moved from the last position
-		// and decide if the user is active or not - used for sorting, and gives us
-		// the next active user, if user A stays still for too long (possible lost of user)
-		for(std::list<UserInfo>::iterator it = mUsers.begin(); it != mUsers.end();) {
-			SKELETON::SKELETON &skeleton = ni->skeletons[it->id];
-			if (skeleton.isTracking) {
+	mMutex.lock();
+	// measure distance of important joints have moved from the last position
+	// and decide if the user is active or not - used for sorting, and gives us
+	// the next active user, if user A stays still for too long (possible lost of user)
+	for(std::list<UserInfo>::iterator it = mUsers.begin(); it != mUsers.end();) {
+		SKELETON::SKELETON &skeleton = ni->skeletons[it->id];
+		if (skeleton.isTracking) {
 
 			ci::Vec3f &shoulderL = skeleton.joints[XN_SKEL_LEFT_SHOULDER].confidence > confidence
 					? skeleton.joints[XN_SKEL_LEFT_SHOULDER].position : it->shoulderL;
@@ -99,7 +104,7 @@ void UserTracker::update()
 			ci::Vec3f &torso = skeleton.joints[XN_SKEL_TORSO].confidence > confidence
 					? skeleton.joints[XN_SKEL_TORSO].position : it->torso;
 
-			it->distanceFromActivationZone = torso.distance(activationZone);
+			it->distanceFromActivationZone = torso.xz().distance(activationZone.xz());
 
 			totalDist = 0;
 			float distance;
@@ -152,31 +157,53 @@ void UserTracker::update()
 		}
 		it++;
 	}
+	mMutex.unlock();
 	ni->mMutex.unlock();
 	mUsers.sort();
 
 	if (!mUsers.empty() && mUsers.begin()->isActive) {
 		if (mUsers.begin()->id != activeUserId) {
 			activeUserId = mUsers.begin()->id;
-			ci::app::console() << mUsers.begin()->id << std::endl;
+//			ci::app::console() << mUsers.begin()->id << std::endl;
 		}
 	} else if (activeUserId != 0) {
-		ci::app::console() << "no active user" << std::endl;
+//		ci::app::console() << "no active user" << std::endl;
 		activeUserId = 0;
 	}
 }
 
 void UserTracker::draw()
 {
-	ci::gl::enableAlphaBlending();
-	ci::gl::pushMatrices();
-	ci::gl::setMatrices(Constants::mayaCam()->getCamera());
-		ci::gl::color(ci::ColorA(1, 1, 1, 0.2f));
-		ci::gl::pushModelView();
-		ci::gl::translate(ci::Vec3f(0, ni->mFloor.ptPoint.Y / 1000.0f, 0));
-		ci::gl::drawBillboard(activationZone, ci::Vec2f(0.5f, 0.5f), 0, ci::Vec3f::xAxis(), ci::Vec3f::zAxis());
-		ci::gl::popModelView();
-	ci::gl::popMatrices();
-	ci::gl::disableAlphaBlending();
+	if (!mUsers.empty()) {
+		ni->mMutex.lock();
+		ci::Vec3f torso = ni->skeletons[activeUserId].joints[XN_SKEL_TORSO].position;
+		ni->mMutex.unlock();
+
+
+		glLineWidth(3.0f);
+		ci::gl::pushMatrices();
+		ci::gl::setMatrices(Constants::mayaCam()->getCamera());
+			ci::gl::color(ci::ColorA(1, 1, 1, 1));
+			ci::gl::pushModelView();
+			ci::gl::drawCube(ci::Vec3f(activationZone.x, torso.y, activationZone.z), ci::Vec3f(0.1f, 0.1f, 0.1f));
+			ci::gl::enableAlphaBlending();
+			ci::gl::color(ci::ColorA(1, 1, 1, 0.5f));
+			ci::gl::drawLine(ci::Vec3f(activationZone.x, torso.y, activationZone.z), torso);
+			ci::gl::popModelView();
+		ci::gl::popMatrices();
+
+		std::ostringstream txt;
+		txt << "closest user: " << round(mUsers.begin()->distanceFromActivationZone * 100.0f) / 100.0f << "m";
+		ci::gl::pushMatrices();
+		ci::gl::setMatricesWindow(ci::app::App::get()->getWindowSize());
+			ci::gl::color(ci::ColorA(1, 1, 1, 1));
+			ci::gl::pushModelView();
+			ci::gl::drawString(txt.str(), ci::Vec2f(10.0f, 10.0f), ci::ColorA(1, 1, 1, 1), mFont);
+			ci::gl::popModelView();
+			ci::gl::disableAlphaBlending();
+		ci::gl::popMatrices();
+
+		glLineWidth(1.0f);
+	}
 }
 
