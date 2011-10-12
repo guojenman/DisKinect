@@ -69,7 +69,6 @@ private:
 	std::list<UserInfo>	mUsers;
 	boost::signals2::connection	mSignalConnectionNewUser;
 	boost::signals2::connection	mSignalConnectionLostUser;
-	boost::mutex	mMutex;
 
 };
 

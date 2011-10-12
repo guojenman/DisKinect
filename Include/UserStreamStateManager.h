@@ -28,6 +28,7 @@ class UserStreamStateManager {
 
 		void update();
 		void draw();
+		IUserStream* getCurrentState() { return currentState; };
 		SKELETON::SKELETON getSkeleton();
 
 	private:

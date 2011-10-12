@@ -59,7 +59,6 @@ void UserTracker::onNewUser(XnUserID nId)
 
 void UserTracker::onLostUser(XnUserID nId)
 {
-	mMutex.lock();
 	for(std::list<UserInfo>::iterator it = mUsers.begin(); it != mUsers.end();) {
 		if (it->id == nId) {
 			mUsers.erase(it);
@@ -67,7 +66,6 @@ void UserTracker::onLostUser(XnUserID nId)
 		}
 		it++;
 	}
-	mMutex.unlock();
 }
 
 void UserTracker::update()
@@ -75,7 +73,6 @@ void UserTracker::update()
 	totalDist = 0;
 	float confidence = 0.5f;
 	ni->mMutex.lock();
-	mMutex.lock();
 	// measure distance of important joints have moved from the last position
 	// and decide if the user is active or not - used for sorting, and gives us
 	// the next active user, if user A stays still for too long (possible lost of user)
@@ -157,7 +154,6 @@ void UserTracker::update()
 		}
 		it++;
 	}
-	mMutex.unlock();
 	ni->mMutex.unlock();
 	mUsers.sort();
 
@@ -175,11 +171,7 @@ void UserTracker::update()
 void UserTracker::draw()
 {
 	if (!mUsers.empty()) {
-		ni->mMutex.lock();
 		ci::Vec3f torso = ni->skeletons[activeUserId].joints[XN_SKEL_TORSO].position;
-		ni->mMutex.unlock();
-
-
 		glLineWidth(3.0f);
 		ci::gl::pushMatrices();
 		ci::gl::setMatrices(Constants::mayaCam()->getCamera());

@@ -100,11 +100,18 @@ namespace relay {
 			_debugGUI->addButton("Recording")->registerClick( this, &UserRelay::setStateRecorder );
 			_debugGUI->addButton("Playback")->registerClick( this, &UserRelay::setStatePlayback );
 			_debugGUI->addButton("Repeater")->registerClick( this, &UserRelay::setStateRepeater );
+			_debugGUI->addParam("ActivationZone", &(tracker->activationZone.z), 1.0f, 4.0f, tracker->activationZone.z);
 		}
 	}
 
 	void UserRelay::update() {
 		fsm->update();
+
+//		relay::UserStreamLive* liveInstance = dynamic_cast<relay::UserStreamLive*>( fsm->getSkeleton() );
+//		if (liveInstance)  {
+//			std::cout << "It's a live instance!" << std::endl;
+//		}
+//		fsm->currentState
 	}
 
 	void UserRelay::draw() {

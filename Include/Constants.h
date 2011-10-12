@@ -22,7 +22,7 @@ namespace Constants {
 		static bool USE_GUI = true;
 		static bool CREATE_TIMELAPSE = true;
 		static bool USE_ARDUINO = false;
-		static bool USE_RECORDED_ONI = true;
+		static bool USE_RECORDED_ONI = false;
 	};
 
 	namespace relay {
@@ -47,7 +47,7 @@ namespace Constants {
 	}
 
 	namespace UserTracker {
-		static ci::Vec3f ACTIVATION_ZONE = ci::Vec3f(0.0f, 0.0f, 2.5f);
+		static ci::Vec3f ACTIVATION_ZONE = ci::Vec3f(0.0f, 0.0f, 3.0f);
 	}
 
 	namespace Puppeteer {

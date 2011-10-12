@@ -385,7 +385,9 @@ Vec2f FloatVarControl::draw(Vec2f pos) {
 		(pos + SimpleGUI::labelSize + SimpleGUI::sliderSize + SimpleGUI::padding*2).y)
 	);	
 	
-	gl::drawString(name, pos, SimpleGUI::textColor, SimpleGUI::textFont);
+	std::stringstream ss;
+	ss << " " << name << *var;
+	gl::drawString(ss.str(), pos, SimpleGUI::textColor, SimpleGUI::textFont);
 	
 	gl::color(SimpleGUI::darkColor);
 	gl::drawSolidRect(activeArea);
