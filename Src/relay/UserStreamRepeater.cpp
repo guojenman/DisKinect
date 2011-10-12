@@ -9,7 +9,7 @@
 
 #include "WuCinderNITE.h"
 #include "UserTracker.h"
-#include "SkeletonStruct.h"
+
 
 #include "UserStreamRecorder.h"
 #include "UserStreamPlayer.h"
@@ -22,7 +22,7 @@
 
 namespace relay {
 	UserStreamRepeater::UserStreamRepeater() {
-		// TODO Auto-generated constructor stub
+//		 TODO Auto-generated constructor stub
 		player = NULL;
 		recorder = NULL;
 		current = NULL;
@@ -71,6 +71,7 @@ namespace relay {
 		if( getState() == WAITING_TO_RECORD && canStartRecording() ) {
 			startRecording();
 		}
+
 		// Check if we've recorded enough
 		if( getState() == RECORDING && recorder->getFrameNumber() == _numberOfFramesToRecord) {
 			stopRecording();
@@ -120,7 +121,6 @@ namespace relay {
 	}
 
 	void UserStreamRepeater::stopRecording() {
-
 		std::cout << "UserStreamRepeater: Stopping recording!" << std::endl;
 
 		// Stop recording, get json, and destroy recorder
@@ -144,7 +144,6 @@ namespace relay {
 
 	void UserStreamRepeater::onNewUser(XnUserID nId) {
 		if( getState() == RECORDING ) {
-//			stopRe
 		}
 
 		std::cout << "UserStreamRepeater - newUser!" << std::endl;

@@ -11,6 +11,7 @@
 #define USERSTREAMREPEATER_H_
 
 #include "IUserStream.h"
+#include "SkeletonStruct.h"
 #include "json/json.h"
 #include "boost/bind.hpp"
 #include "boost/signals2.hpp"
@@ -23,7 +24,7 @@ namespace SKELETON {
 }
 class WuCinderNITE;
 class UserTracker;
-
+//
 namespace relay {
 	class UserStreamRecorder;
 	class UserStreamPlayer;
@@ -44,6 +45,7 @@ namespace relay {
 			void update();
 			void draw();
 			void exit();
+
 			SKELETON::SKELETON getSkeleton();
 
 		private:
