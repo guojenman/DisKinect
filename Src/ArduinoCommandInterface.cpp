@@ -1,21 +1,22 @@
 
 #include "ArduinoCommandInterface.h"
+#include "Constants.h"
 
-void ArduinoCommandInterface::setup(string device, bool debug = false)
+void ArduinoCommandInterface::setup(std::string device, bool debug = false)
 {
 	isDebug = debug;
 	if(isDebug) printDevices();	
 	bindDevice(device);
 }
 
-void ArduinoCommandInterface::bindDevice(string device)
+void ArduinoCommandInterface::bindDevice(std::string device)
 {
     try {
-		Serial::Device dev = Serial::findDeviceByNameContains(device);
-		serial = Serial( dev, 9600);
+		ci::Serial::Device dev = ci::Serial::findDeviceByNameContains(device);
+		serial = ci::Serial( dev, 9600);
 	}
 	catch( ... ) {
-		console() << "There was an error initializing the serial device!" << std::endl;
+		ci::app::console() << "There was an error initializing the serial device!" << std::endl;
 		exit( -1 );
 	}
 }
@@ -23,13 +24,13 @@ void ArduinoCommandInterface::bindDevice(string device)
 void ArduinoCommandInterface::printDevices()
 {
     // print the devices
-	const vector<Serial::Device> &devices( Serial::getDevices() );
-	for( vector<Serial::Device>::const_iterator deviceIt = devices.begin(); deviceIt != devices.end(); ++deviceIt ) {
-		console() << "Device: " << deviceIt->getName() << endl;
+	const std::vector<ci::Serial::Device> &devices( ci::Serial::getDevices() );
+	for( std::vector<ci::Serial::Device>::const_iterator deviceIt = devices.begin(); deviceIt != devices.end(); ++deviceIt ) {
+		ci::app::console() << "Device: " << deviceIt->getName() << std::endl;
 	}
 }
 
-void ArduinoCommandInterface::sendMessage(string message)
+void ArduinoCommandInterface::sendMessage(std::string message)
 {
 	serial.writeString(message);
 }

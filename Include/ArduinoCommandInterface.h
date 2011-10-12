@@ -5,17 +5,13 @@
 
 #include <sstream>
 
-using namespace ci;
-using namespace ci::app;
-using namespace std;
-
 class ArduinoCommandInterface {
 public:
 	void update();
-	void setup(string device, bool debug);
+	void setup(std::string device, bool debug);
     void printDevices();
-    void bindDevice(string device);
-	void sendMessage(string message);
+    void bindDevice(std::string device);
+	void sendMessage(std::string message);
 	bool isDebug;
-    Serial serial;
+    ci::Serial serial;
 };
