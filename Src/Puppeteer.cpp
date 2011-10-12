@@ -17,7 +17,7 @@ namespace puppeteer {
 
 Puppeteer::Puppeteer() {
 	lastUpdateTime = 0.0f;
-	updateInterval = 0.5f;
+	updateInterval = 1.0f;
 	arduinoUnit = 10.0f;
 	if (Constants::Debug::USE_ARDUINO) {
 		arduino = new ArduinoCommandInterface();
@@ -119,7 +119,7 @@ void Puppeteer::update(SKELETON::SKELETON& skeleton)
 							<< round(legPosL) << ","
 							<< round(legPosR) << "|";
 					arduino->sendMessage(message.str());
-					// std::cout << message.str() << std::endl;
+//					std::cout << message.str() << std::endl;
 				}
 			} else {
 				mUserTracked = UserTracker::getInstance()->activeUserId;

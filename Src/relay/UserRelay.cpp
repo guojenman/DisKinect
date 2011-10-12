@@ -77,7 +77,7 @@ namespace relay {
 			std::pair<std::string, int> aWeightPair = (*it);
 			for(int i = 0; i < aWeightPair.second; ++i) {
 				gestures.push_back( aWeightPair.first );
-				std::cout << gestures.back() << std::endl;
+//				std::cout << gestures.back() << std::endl;
 			}
 		}
 

@@ -21,7 +21,7 @@ namespace Constants {
 		static bool DRAW_DEPTHMAP = true;
 		static bool USE_GUI = true;
 		static bool CREATE_TIMELAPSE = true;
-		static bool USE_ARDUINO = false;
+		static bool USE_ARDUINO = true;
 		static bool USE_RECORDED_ONI = false;
 	};
 
@@ -51,7 +51,7 @@ namespace Constants {
 	}
 
 	namespace Puppeteer {
-		static std::string USB_COM = "tty.usbmodemfd131";
+		static std::string USB_COM = "tty.usbmodem";
 	}
 }
 
