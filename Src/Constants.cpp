@@ -1,7 +1,7 @@
 /*
  * Constants.cpp
  *
- *  Created on: Oct 1, 2011
+ *  Created on: Oct 1, 1011
  *      Author: mariogonzalez
  */
 #include "Constants.h"
@@ -24,11 +24,14 @@ namespace Constants {
 				static std::map<std::string, int> weights;
 
 				if( !wasSetup ) {
-					weights.insert( std::pair<std::string, int>("come here.json", 10) );
-					weights.insert( std::pair<std::string, int>("attention.json", 20) );
-					weights.insert( std::pair<std::string, int>("left arm up z.json", 10) );
-					weights.insert( std::pair<std::string, int>("right arm up.json", 10) );
-//					weights.insert( std::pair<std::string, int>("jsontest.json", 10) );
+					weights.insert( std::pair<std::string, int>("attention.json", 15) );
+					weights.insert( std::pair<std::string, int>("both_arm_raise.json", 10) );
+					weights.insert( std::pair<std::string, int>("left_arm_up_y.json", 10) );
+					weights.insert( std::pair<std::string, int>("left_arm_up_z.json", 10) );
+					weights.insert( std::pair<std::string, int>("right_arm_up_y.json", 10) );
+					weights.insert( std::pair<std::string, int>("towards.json", 10) );
+					weights.insert( std::pair<std::string, int>("towardsmore.json", 15) );
+					weights.insert( std::pair<std::string, int>("wave.json", 25) );
 				}
 
 				return &weights;

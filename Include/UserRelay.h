@@ -19,6 +19,8 @@
 #include "cinder/Vector.h"
 #include "json/json.h"
 #include "cinder/app/MouseEvent.h"
+#include "cinder/app/FileDropEvent.h"
+
 
 // Forward declerations
 namespace SKELETON {
@@ -61,6 +63,7 @@ namespace relay {
 		bool setStateRecorder( ci::app::MouseEvent event );
 		bool setStatePlayback( ci::app::MouseEvent event );
 		bool setStateRepeater( ci::app::MouseEvent event );
+		bool fileDrop( ci::app::FileDropEvent event );
 	};
 
 } /* relay */

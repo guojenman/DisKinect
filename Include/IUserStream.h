@@ -25,6 +25,7 @@ namespace relay {
 		virtual void update() = 0;
 		virtual void exit() = 0;
 		virtual void draw() = 0;
+		virtual bool wantsToExit() = 0;
 		virtual SKELETON::SKELETON getSkeleton() = 0;
 
 	protected:

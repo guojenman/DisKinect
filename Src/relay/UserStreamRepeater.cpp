@@ -10,6 +10,7 @@
 #include "WuCinderNITE.h"
 #include "UserTracker.h"
 
+#include "SkeletonStruct.h"
 
 #include "UserStreamRecorder.h"
 #include "UserStreamPlayer.h"
@@ -141,6 +142,11 @@ namespace relay {
 		_cumalitiveDelta += tracker->getTotalDist();
 		return getSkeleton().isTracking && _cumalitiveDelta > Constants::relay::repeater::MIN_CUMALTIVE_DELTA_BEFORE_RECORDING;
 	}
+
+	bool UserStreamRepeater::wantsToExit()  {
+		if( player ) return player->wantsToExit();
+		else return false;;
+	};
 
 	void UserStreamRepeater::onNewUser(XnUserID nId) {
 		if( getState() == RECORDING ) {

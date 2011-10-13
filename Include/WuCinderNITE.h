@@ -105,6 +105,7 @@ public:
 	ci::Surface8u		mImageSurface;
 
 	bool isThreaded() { return mThread != NULL; }
+	bool hasColorImage() { return mUseColorImage; };
 
 protected:
 	WuCinderNITE();

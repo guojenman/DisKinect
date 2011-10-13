@@ -57,6 +57,7 @@ namespace relay {
 //		UserStreamRepeater* repeater = new relay::UserStreamRepeater();
 //		this->fsm->setInitialState( repeater);
 
+		ci::app::App::get()->registerFileDrop( this, &UserRelay::fileDrop );
 		setupDebug();
 	}
 
@@ -107,11 +108,20 @@ namespace relay {
 	void UserRelay::update() {
 		fsm->update();
 
-//		relay::UserStreamLive* liveInstance = dynamic_cast<relay::UserStreamLive*>( fsm->getSkeleton() );
-//		if (liveInstance)  {
-//			std::cout << "It's a live instance!" << std::endl;
-//		}
-//		fsm->currentState
+		if( Constants::Debug::USE_IDLE_TIMER ) {
+			relay::UserStreamLive* liveInstance = dynamic_cast<relay::UserStreamLive*>( fsm->getCurrentState() );
+
+			if( liveInstance ) {
+				if ( liveInstance->wantsToExit() ) {
+					ci::app::MouseEvent event;
+					setStatePlayback( event );
+				}
+
+			} else if ( tracker->activeUserId != 0 || fsm->getCurrentState()->wantsToExit() ) {
+				ci::app::MouseEvent event;
+				setStateLive( event );
+			}
+		}
 	}
 
 	void UserRelay::draw() {
@@ -165,8 +175,12 @@ namespace relay {
 	}
 
 	// Debug state switching
-	bool UserRelay::setStateLive( ci::app::MouseEvent event ) { this->fsm->changeState( new relay::UserStreamLive() ); return true; };
-	bool UserRelay::setStateRecorder( ci::app::MouseEvent event ) { this->fsm->changeState( new relay::UserStreamRecorder() ); return true; };
+	bool UserRelay::setStateLive( ci::app::MouseEvent event ) {
+		this->fsm->changeState( new relay::UserStreamLive() ); return true;
+	};
+	bool UserRelay::setStateRecorder( ci::app::MouseEvent event ) {
+		this->fsm->changeState( new relay::UserStreamRecorder() ); return true;
+	};
 	bool UserRelay::setStatePlayback( ci::app::MouseEvent event ) {
 		UserStreamPlayer* player = new relay::UserStreamPlayer();
 		player->setJson( getRandomGesture() );			// Note the UserStreamPlayer requires the JSON to be set before 'enter' - set via string path or Json::Value
@@ -174,4 +188,15 @@ namespace relay {
 		return true;
 	};
 	bool UserRelay::setStateRepeater( ci::app::MouseEvent event ) { this->fsm->changeState( new relay::UserStreamRepeater() ); return true; };
+
+	bool UserRelay::fileDrop( ci::app::FileDropEvent event ) {
+			if(event.getNumFiles() != 1) return false;
+			UserStreamPlayer* player = new relay::UserStreamPlayer();
+			std::string fileRef = event.getFile(0);
+			std::cout << fileRef << std::endl;
+			player->setJson( fileRef );
+			this->fsm->changeState( player );
+
+			return true;
+		}
 }

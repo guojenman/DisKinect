@@ -46,6 +46,7 @@ WuCinderNITE::WuCinderNITE() {
 	mNeedPoseForCalibration = false;
 	mIsCalibrated = false;
 	mRunUpdates = false;
+	mUseColorImage = false;
 
 	mContext = new xn::Context();
 	mDepthGen = new xn::DepthGenerator();

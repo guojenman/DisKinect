@@ -12,6 +12,9 @@
 #define USERSTREAMLIVE_H_
 
 #include "IUserStream.h"
+#include "boost/signals2.hpp"
+#include "Constants.h"
+#include <XnTypes.h>
 
 // Forward declerations
 namespace SKELETON {
@@ -33,6 +36,17 @@ class UserStreamLive : public IUserStream  {
 		void draw();
 		void exit();
 		SKELETON::SKELETON getSkeleton();
+
+		bool wantsToExit();
+	private:
+		boost::signals2::connection	_signalConnectionNewUser;
+		boost::signals2::connection	_signalConnectionLostUser;
+
+		XnUserID _activeUserID;
+		int	_framesActive;
+		int _framesInactive;
+		void onNewUser(XnUserID id);
+		void onLostUser(XnUserID Id);
 	};
 }
 

@@ -11,7 +11,7 @@
 #define USERSTREAMREPEATER_H_
 
 #include "IUserStream.h"
-#include "SkeletonStruct.h"
+
 #include "json/json.h"
 #include "boost/bind.hpp"
 #include "boost/signals2.hpp"
@@ -45,6 +45,7 @@ namespace relay {
 			void update();
 			void draw();
 			void exit();
+			bool wantsToExit();
 
 			SKELETON::SKELETON getSkeleton();
 

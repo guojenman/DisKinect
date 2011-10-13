@@ -218,7 +218,7 @@ void Puppeteer::draw()
 
 		gl::popMatrices();
 
-		gl::color(Color(1, 1, 1));
+		gl::color( Color(1, 1, 1));
 	}
 }
 

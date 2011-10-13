@@ -50,7 +50,7 @@ void DisKinect::setup()
 {
 	WuCinderNITE* aNi = WuCinderNITE::getInstance();
 	if (Constants::Debug::USE_RECORDED_ONI) {
-		aNi->setup(getResourcePath("1.oni"));
+		aNi->setup(getResourcePath("SkeletonRec.oni"));
 //		aNi->setup(getResourcePath("SkeletonRec.oni"));
 	} else {
 		XnMapOutputMode mapMode;
@@ -94,7 +94,6 @@ void DisKinect::draw()
 {
 	gl::clear( ColorA::black(), true);
 
-
 	userRelay->draw();
 	userTracker->draw();
 	puppetier->draw();
@@ -120,7 +119,7 @@ void DisKinect::keyUp(KeyEvent event)
 void DisKinect::mouseDown( MouseEvent event )
 {
 	MayaCamUI* mayaCam = Constants::mayaCam();
-	mayaCam->mouseDown(event.getPos());
+	mayaCam->mouseDown(	event.getPos());
 }
 void DisKinect::mouseDrag( MouseEvent event )
 {

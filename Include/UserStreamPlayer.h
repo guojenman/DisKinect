@@ -43,6 +43,8 @@ namespace relay {
 		void play();
 		void pause();
 		void restart();
+		bool isDone() { return _currentFrame >= _totalframes; };
+		bool wantsToExit() { return isDone(); };
 
 		///// CALLBACKS
 		bool onToggleRecordingClicked( ci::app::MouseEvent event );

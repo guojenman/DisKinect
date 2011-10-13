@@ -42,6 +42,7 @@ class UserStreamRecorder : public IUserStream  {
 		void update();
 		void draw();
 		void exit();
+		bool wantsToExit() { return false; };
 
 		Json::Value getRecordAsJSONValue();
 		SKELETON::SKELETON getSkeleton();

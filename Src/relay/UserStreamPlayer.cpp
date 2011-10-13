@@ -60,7 +60,7 @@ namespace relay {
 
 		_currentFrame = 0;
 		_state = PLAYING;
-		_shouldLoop = true;
+		_shouldLoop = false;
 		filedropCallbackId = ci::app::App::get()->registerFileDrop( this, &UserStreamPlayer::fileDrop );
 
 		if( Constants::Debug::USE_GUI ) {
@@ -76,6 +76,7 @@ namespace relay {
 //			_gui->addSeparator();
 			_toggle = _gui->addButton("Pause");
 			_toggle->registerClick( this, &UserStreamPlayer::onToggleRecordingClicked );
+
 
 
 			// Add a button for each
@@ -121,7 +122,8 @@ namespace relay {
 		ni = NULL;
 		tracker = NULL;
 
-		ci::app::App::get()->unregisterFileDrop( filedropCallbackId );
+		if( filedropCallbackId )
+			ci::app::App::get()->unregisterFileDrop( filedropCallbackId );
 
 		delete _gui; _gui = NULL;
 		delete _label; _label = NULL;
@@ -191,6 +193,7 @@ namespace relay {
 			return skeleton;
 		}
 
+//		std::cout << "FrameNumber: " << frameToPlay << " Total:" << _recording.size()  << std::endl;
 	}
 
 
@@ -233,7 +236,7 @@ namespace relay {
 
         for( Json::ValueIterator itr = root.begin() ; itr != root.end() ; itr++ ) {
         	_recording.push_back( UserStreamFrame::fromJSON( (*itr) ) );
-			_totalframes = _recording.back()->framenumber + 1;
+			_totalframes = _recording.size();
         }
 
         restart();
