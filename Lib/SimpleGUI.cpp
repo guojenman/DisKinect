@@ -273,7 +273,7 @@ bool SimpleGUI::onMouseDown(MouseEvent event) {
 		it++;
 	}	
 
-	std::cout << "Control count: " << controls.size() << std::endl;
+//	std::cout << "Control count: " << controls.size() << std::endl;
 	return false;
 }
 

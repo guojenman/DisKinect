@@ -22,7 +22,7 @@ namespace Constants {
 		static bool USE_GUI = true;
 		static bool CREATE_TIMELAPSE = true;
 		static bool USE_ARDUINO = true;
-		static bool USE_RECORDED_ONI = false;
+		static bool USE_RECORDED_ONI = true;
 		static bool USE_IDLE_TIMER = true;
 	};
 

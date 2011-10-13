@@ -220,6 +220,8 @@ void Puppeteer::draw()
 
 		gl::color( Color(1, 1, 1));
 	}
+
+	arduino->draw();
 }
 
 }
