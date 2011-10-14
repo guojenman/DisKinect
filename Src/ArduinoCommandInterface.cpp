@@ -35,10 +35,7 @@ void ArduinoCommandInterface::setupGUI() {
 	_gui->bgColor = ci::ColorA(0.15, 0.15, 0.15, 1.0);
 
 	int yPadding = 145;
-	_gui->addColumn(0, yPadding);
-//	_gui->addColumn();
-//	_gui->addColumn();
-//	_gui->addColumn();
+	_gui->addColumn( (SimpleGUI::labelSize.x + SimpleGUI::spacing) * 0, yPadding);
 	_gui->addParam("IgnoreKinect", &ignoreExternalSendRequest, ignoreExternalSendRequest);
 
 	addButton( "LeftArmX_up", "q" );
@@ -51,7 +48,7 @@ void ArduinoCommandInterface::setupGUI() {
 	addButton( "LeftArmY_down", "x" );
 
 
-	_gui->addColumn((SimpleGUI::labelSize.x + SimpleGUI::spacing) * 1, yPadding);
+	_gui->addColumn( (SimpleGUI::labelSize.x + SimpleGUI::spacing) * 1, yPadding);
 	addButton( "RightArmX_up", "o" );
 	addButton( "RightArmX_down", "p" );
 
@@ -61,10 +58,11 @@ void ArduinoCommandInterface::setupGUI() {
 	addButton( "RightArmY_up", "n" );
 	addButton( "RightArmY_down", "m" );
 
-	_gui->addColumn((SimpleGUI::labelSize.x + SimpleGUI::spacing) * 2, yPadding);
+	_gui->addColumn( (SimpleGUI::labelSize.x + SimpleGUI::spacing) * 2, yPadding);
 	addButton( "LeftLeg_up", "d" );
 	addButton( "LeftLeg_down", "f" );
-	_gui->addColumn((SimpleGUI::labelSize.x + SimpleGUI::spacing) * 3, yPadding);
+
+	_gui->addColumn( (SimpleGUI::labelSize.x + SimpleGUI::spacing) * 3, yPadding);
 	addButton( "RightLeg_up", "h" );
 	addButton( "RightLeg_down", "j" );
 }
